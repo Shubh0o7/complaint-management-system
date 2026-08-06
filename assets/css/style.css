@@ -1,0 +1,122 @@
+/* ============================================
+   Complaint Management System - Phase 1
+   Custom Blue & White Theme
+   Built with Bootstrap 5
+   ============================================ */
+
+/* ---------- Root Variables ---------- */
+:root {
+    --primary-blue: #0d6efd;
+    --primary-dark: #0a58ca;
+    --light-blue: #e7f1ff;
+    --white: #ffffff;
+    --gray-light: #f8f9fa;
+    --gray-medium: #6c757d;
+    --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --shadow-md: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+}
+
+/* ---------- Global Styles ---------- */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--gray-light);
+    color: #333;
+}
+
+/* ---------- Sidebar ---------- */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 250px;
+    z-index: 1000;
+    transition: all 0.3s ease;
+    overflow-y: auto;
+}
+
+.sidebar .nav-link {
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+}
+
+.sidebar .nav-link:hover {
+    background-color: var(--light-blue);
+    color: var(--primary-blue);
+}
+
+.sidebar .nav-link.active {
+    background-color: var(--primary-blue) !important;
+    color: var(--white) !important;
+}
+
+/* ---------- Main Content Area ---------- */
+.d-flex > .flex-grow-1 {
+    margin-left: 250px;
+    min-height: 100vh;
+}
+
+/* ---------- Cards ---------- */
+.card {
+    border-radius: 0.75rem;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* ---------- Buttons ---------- */
+.btn-primary {
+    background-color: var(--primary-blue);
+    border-color: var(--primary-blue);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+}
+
+/* ---------- Form Controls ---------- */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-blue);
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+
+/* ---------- Table ---------- */
+.table-hover tbody tr:hover {
+    background-color: var(--light-blue);
+}
+
+/* ---------- Alerts ---------- */
+.alert {
+    border-radius: 0.5rem;
+    border: none;
+}
+
+/* ---------- Auth Pages ---------- */
+.min-vh-100 {
+    min-height: 100vh;
+}
+
+/* ---------- Profile Avatar ---------- */
+.rounded-circle {
+    font-weight: bold;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 768px) {
+    .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        min-height: auto;
+    }
+
+    .d-flex > .flex-grow-1 {
+        margin-left: 0;
+    }
+}
