@@ -2,9 +2,55 @@
 require_once 'config.php';
 require_once 'includes/auth_check.php';
 
-// Fetch complaints for the logged-in user
-$stmt = $conn->prepare("SELECT id, subject, category, status, created_at FROM complaints WHERE user_id = ? ORDER BY created_at DESC");
-$stmt->bind_param('i', $_SESSION['user_id']);
+// Get categories for filter dropdown
+$categories = [];
+$cat_result = $conn->query("SELECT name FROM categories ORDER BY name");
+if ($cat_result) {
+    while ($row = $cat_result->fetch_assoc()) {
+        $categories[] = $row['name'];
+    }
+}
+if (empty($categories)) {
+    $categories = ['Academic', 'Infrastructure', 'Faculty', 'Hostel', 'Transport', 'Fees', 'Other'];
+}
+
+// Filter parameters
+$filter_status = trim($_GET['status'] ?? '');
+$filter_category = trim($_GET['category'] ?? '');
+$filter_priority = trim($_GET['priority'] ?? '');
+$search_query = trim($_GET['search'] ?? '');
+
+// Build dynamic query
+$where_clauses = ["user_id = ?"];
+$params = [$_SESSION['user_id']];
+$types = 'i';
+
+if ($filter_status && in_array($filter_status, ['Pending', 'In Progress', 'Resolved'])) {
+    $where_clauses[] = "status = ?";
+    $params[] = $filter_status;
+    $types .= 's';
+}
+if ($filter_category) {
+    $where_clauses[] = "category = ?";
+    $params[] = $filter_category;
+    $types .= 's';
+}
+if ($filter_priority && in_array($filter_priority, ['Low', 'Medium', 'High', 'Critical'])) {
+    $where_clauses[] = "priority = ?";
+    $params[] = $filter_priority;
+    $types .= 's';
+}
+if ($search_query) {
+    $where_clauses[] = "(subject LIKE ? OR description LIKE ?)";
+    $search_param = '%' . $search_query . '%';
+    $params[] = $search_param;
+    $params[] = $search_param;
+    $types .= 'ss';
+}
+
+$sql = "SELECT id, subject, category, priority, status, created_at FROM complaints WHERE " . implode(' AND ', $where_clauses) . " ORDER BY created_at DESC";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param($types, ...$params);
 $stmt->execute();
 $complaints = $stmt->get_result();
 ?>
@@ -31,6 +77,54 @@ $complaints = $stmt->get_result();
                     </a>
                 </div>
 
+                <!-- Search & Filter Bar -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+                        <form method="GET" class="row g-2 align-items-end">
+                            <div class="col-md-3">
+                                <label class="form-label small fw-semibold">Search</label>
+                                <input type="text" class="form-control form-control-sm" name="search" placeholder="Search subject..." value="<?= htmlspecialchars($search_query) ?>">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small fw-semibold">Status</label>
+                                <select class="form-select form-select-sm" name="status">
+                                    <option value="">All Status</option>
+                                    <option value="Pending" <?= $filter_status === 'Pending' ? 'selected' : '' ?>>Pending</option>
+                                    <option value="In Progress" <?= $filter_status === 'In Progress' ? 'selected' : '' ?>>In Progress</option>
+                                    <option value="Resolved" <?= $filter_status === 'Resolved' ? 'selected' : '' ?>>Resolved</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small fw-semibold">Category</label>
+                                <select class="form-select form-select-sm" name="category">
+                                    <option value="">All Categories</option>
+                                    <?php foreach ($categories as $cat): ?>
+                                    <option value="<?= htmlspecialchars($cat) ?>" <?= $filter_category === $cat ? 'selected' : '' ?>><?= htmlspecialchars($cat) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label small fw-semibold">Priority</label>
+                                <select class="form-select form-select-sm" name="priority">
+                                    <option value="">All Priorities</option>
+                                    <option value="Low" <?= $filter_priority === 'Low' ? 'selected' : '' ?>>Low</option>
+                                    <option value="Medium" <?= $filter_priority === 'Medium' ? 'selected' : '' ?>>Medium</option>
+                                    <option value="High" <?= $filter_priority === 'High' ? 'selected' : '' ?>>High</option>
+                                    <option value="Critical" <?= $filter_priority === 'Critical' ? 'selected' : '' ?>>Critical</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 d-flex gap-2">
+                                <button type="submit" class="btn btn-primary btn-sm">
+                                    <i class="bi bi-search me-1"></i>Filter
+                                </button>
+                                <a href="complaints.php" class="btn btn-outline-secondary btn-sm">
+                                    <i class="bi bi-x-circle me-1"></i>Clear
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
                 <div class="card border-0 shadow-sm">
                     <div class="card-body p-0">
                         <?php if ($complaints->num_rows > 0): ?>
@@ -41,6 +135,7 @@ $complaints = $stmt->get_result();
                                             <th>#</th>
                                             <th>Subject</th>
                                             <th>Category</th>
+                                            <th>Priority</th>
                                             <th>Status</th>
                                             <th>Date</th>
                                         </tr>
@@ -51,6 +146,18 @@ $complaints = $stmt->get_result();
                                             <td><?= $i++ ?></td>
                                             <td><?= htmlspecialchars($row['subject']) ?></td>
                                             <td><span class="badge bg-light text-dark"><?= htmlspecialchars($row['category']) ?></span></td>
+                                            <td>
+                                                <?php
+                                                $priority_class = match($row['priority'] ?? 'Medium') {
+                                                    'Low' => 'bg-secondary',
+                                                    'Medium' => 'bg-info text-white',
+                                                    'High' => 'bg-warning text-dark',
+                                                    'Critical' => 'bg-danger',
+                                                    default => 'bg-secondary'
+                                                };
+                                                ?>
+                                                <span class="badge <?= $priority_class ?>"><?= htmlspecialchars($row['priority'] ?? 'Medium') ?></span>
+                                            </td>
                                             <td>
                                                 <?php
                                                 $badge_class = match($row['status']) {
@@ -71,7 +178,7 @@ $complaints = $stmt->get_result();
                         <?php else: ?>
                             <div class="text-center py-5">
                                 <i class="bi bi-inbox display-4 text-muted"></i>
-                                <p class="text-muted mt-2">No complaints submitted yet.</p>
+                                <p class="text-muted mt-2">No complaints found matching your criteria.</p>
                                 <a href="add_complaint.php" class="btn btn-primary btn-sm">
                                     <i class="bi bi-plus-circle me-1"></i> Submit Your First Complaint
                                 </a>

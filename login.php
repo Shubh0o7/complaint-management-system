@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (empty($email) || empty($password)) {
         $error = 'Please fill in all fields.';
     } else {
-        $stmt = $conn->prepare("SELECT id, full_name, password FROM users WHERE email = ?");
+        $stmt = $conn->prepare("SELECT id, full_name, email, password, role FROM users WHERE email = ?");
         $stmt->bind_param('s', $email);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -20,8 +20,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (password_verify($password, $user['password'])) {
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_name'] = $user['full_name'];
-                $_SESSION['user_email'] = $email;
-                header('Location: dashboard.php');
+                $_SESSION['user_email'] = $user['email'];
+                $_SESSION['user_role'] = $user['role'] ?? 'user';
+
+                // Redirect based on role
+                if ($_SESSION['user_role'] === 'admin') {
+                    header('Location: admin_dashboard.php');
+                } else {
+                    header('Location: dashboard.php');
+                }
                 exit();
             } else {
                 $error = 'Invalid email or password.';
@@ -48,14 +55,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="row min-vh-100 align-items-center justify-content-center">
             <div class="col-md-5 col-lg-4">
                 <div class="text-center mb-4">
-                    <h2 class="text-primary fw-bold">Login</h2>
-                    <p class="text-muted">Access your complaint portal</p>
+                    <h2 class="text-primary fw-bold"><i class="bi bi-shield-check me-2"></i>CMS</h2>
+                    <p class="text-muted">Complaint Management System</p>
                 </div>
                 <div class="card shadow-sm border-0">
                     <div class="card-body p-4">
+                        <h5 class="text-center mb-3">Login to your account</h5>
                         <?php if ($error): ?>
                             <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <?= htmlspecialchars($error) ?>
+                                <i class="bi bi-exclamation-circle me-1"></i><?= htmlspecialchars($error) ?>
                                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                             </div>
                         <?php endif; ?>
@@ -65,23 +73,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                                     <input type="email" class="form-control" id="email" name="email" 
-                                           value="<?= htmlspecialchars($email ?? '') ?>" required>
+                                           value="<?= htmlspecialchars($email ?? '') ?>" placeholder="Enter your email" required>
                                 </div>
                             </div>
                             <div class="mb-3">
                                 <label for="password" class="form-label">Password</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                                    <input type="password" class="form-control" id="password" name="password" required>
+                                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
                                 </div>
                             </div>
                             <div class="d-grid">
-                                <button type="submit" class="btn btn-primary">Login</button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-box-arrow-in-right me-1"></i>Login
+                                </button>
                             </div>
                         </form>
                     </div>
                 </div>
-                <p class="text-center mt-3">Don't have an account? <a href="register.php" class="text-primary">Register here</a></p>
+                <p class="text-center mt-3">Don't have an account? <a href="register.php" class="text-primary fw-semibold">Register here</a></p>
                 <p class="text-center"><a href="index.php" class="text-muted"><i class="bi bi-arrow-left"></i> Back to Home</a></p>
             </div>
         </div>

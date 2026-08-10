@@ -1,77 +1,132 @@
-# Complaint Management System — Phase 1
+# Complaint Management System
 
-A clean, Bootstrap 5-based complaint management system with user authentication, a dashboard with sidebar + profile, and a complaint submission/listing module. Built with PHP and MySQL.
+A full-featured web-based complaint management system built with PHP, MySQL, and Bootstrap 5. Features a clean blue & white theme, role-based access control, and a comprehensive admin panel.
 
-## Features (Phase 1)
+## Features
 
-- **Authentication**: Register, Login, Logout with `password_hash()` / `password_verify()` and prepared statements
-- **Dashboard**: Welcome banner, profile card, complaint count stats
-- **Complaint Module**: Submit new complaints and view a table of your own complaints
-- **UI**: Bootstrap 5 with a custom blue & white theme, responsive sidebar layout
-- **Security**: Session guards, prepared statements (SQL injection prevention), XSS protection via `htmlspecialchars()`
+### Phase 1 — Core System
+- **User Authentication** — Register, Login, Logout with `password_hash()`/`password_verify()` and prepared statements
+- **Dashboard** — Welcome banner, profile card, complaint statistics by status
+- **Submit Complaints** — Form with subject, category, priority, and description
+- **View Complaints** — User-scoped complaint listing with search & filter
+- **Session Management** — Auth guards on all protected pages
 
-## File Structure
-
-```
-complaint-management-system/
-├── index.php              # Landing page (redirects if logged in)
-├── login.php              # Login form + auth logic
-├── register.php           # Registration form + validation
-├── logout.php             # Session destroy + redirect
-├── dashboard.php          # Main dashboard with stats & profile
-├── add_complaint.php      # Complaint submission form
-├── complaints.php         # List of user's complaints
-├── config.php             # MySQLi connection (edit credentials here)
-├── database.sql           # SQL schema (users + complaints tables)
-├── includes/
-│   ├── sidebar.php        # Shared sidebar navigation
-│   ├── topbar.php         # Shared top navigation bar
-│   └── auth_check.php     # Authentication guard partial
-├── assets/
-│   ├── css/style.css      # Custom blue/white theme styles
-│   └── js/script.js       # Form validation + alert auto-dismiss
-└── README.md              # This file
-```
-
-## Setup (XAMPP / WAMP)
-
-1. **Import the database**:  
-   Open phpMyAdmin → Import → select `database.sql` → Go.  
-   This creates the `complaint_system` database with `users` and `complaints` tables.
-
-2. **Place the project**:  
-   Copy the `complaint-management-system/` folder into your server's `htdocs/` (XAMPP) or `www/` (WAMP) directory.
-
-3. **Configure database credentials**:  
-   Open `config.php` and adjust `DB_HOST`, `DB_USER`, `DB_PASS`, `DB_NAME` if your setup differs from the defaults (`localhost`, `root`, `''`, `complaint_system`).
-
-4. **Run**:  
-   Start Apache and MySQL, then visit:  
-   ```
-   http://localhost/complaint-management-system/index.php
-   ```
-
-## Out of Scope (Phase 1)
-
-The following are **deliberately not included** in this phase:
-
-- Admin panel / admin roles
-- Complaint editing or deletion
-- File attachments on complaints
-- Email notifications
-- Password reset flow
-- Pagination on complaint listing
-- API endpoints
-
-These may be added in future phases.
+### Phase 2 — Admin Panel & Enhanced Features
+- **Admin Dashboard** — Overview stats (total users, complaints, pending, critical), recent complaints table
+- **Admin Complaint Management** — View all complaints, update status (Pending → In Progress → Resolved), filter by status/category/priority, search
+- **Admin User Management** — View all registered users, see complaint counts per user, promote/demote admin role
+- **Complaint Categories** — Database-driven categories (Academic, Infrastructure, Faculty, Hostel, Transport, Fees, Other)
+- **Priority Levels** — Low, Medium, High, Critical with color-coded badges
+- **Status Tracking** — Pending, In Progress, Resolved with admin-controlled updates
+- **Search & Filter** — Filter complaints by status, category, priority; search by subject/description
+- **Role-Based Access** — Admin vs User roles with separate dashboards and navigation
+- **Dynamic Sidebar** — Shows admin links only for admin users
 
 ## Tech Stack
 
-- **Backend**: PHP 7.4+ (procedural with MySQLi)
-- **Database**: MySQL 5.7+ / MariaDB
-- **Frontend**: Bootstrap 5.3, Bootstrap Icons
-- **JavaScript**: Vanilla JS (no frameworks)
+- **Backend:** PHP 7.4+ (MySQLi with prepared statements)
+- **Database:** MySQL / MariaDB
+- **Frontend:** Bootstrap 5.3, Bootstrap Icons
+- **Theme:** Custom blue & white with admin green accent
+
+## Project Structure
+
+```
+complaint-management-system/
+├── index.php                  # Landing page with redirect logic
+├── login.php                  # Login with role-based redirect
+├── register.php               # User registration
+├── logout.php                 # Session destroy & redirect
+├── dashboard.php              # User dashboard
+├── add_complaint.php          # Submit complaint (categories + priority)
+├── complaints.php             # User complaints with search/filter
+├── admin_dashboard.php        # Admin overview & stats
+├── admin_complaints.php       # Admin: manage all complaints
+├── admin_users.php            # Admin: manage users & roles
+├── config.php                 # Database connection config
+├── database.sql               # Full database schema (Phase 2)
+├── includes/
+│   ├── sidebar.php            # Dynamic sidebar (user/admin)
+│   ├── topbar.php             # Top navigation bar
+│   ├── auth_check.php         # User authentication guard
+│   └── admin_check.php        # Admin role guard
+├── assets/
+│   ├── css/style.css          # Custom theme styles
+│   └── js/script.js           # Form validation & UI helpers
+└── README.md
+```
+
+## Setup Instructions
+
+### Requirements
+- XAMPP / WAMP / MAMP (or any Apache + PHP + MySQL stack)
+- PHP 7.4 or higher
+- MySQL 5.7+ or MariaDB 10.3+
+
+### Installation
+
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/Shubh0o7/complaint-management-system.git
+   ```
+
+2. **Move to your web server directory:**
+   ```bash
+   # For XAMPP
+   cp -r complaint-management-system /path/to/xampp/htdocs/
+   ```
+
+3. **Import the database:**
+   - Open phpMyAdmin (http://localhost/phpmyadmin)
+   - Create a new database named `complaint_system` (or let the SQL file create it)
+   - Import `database.sql`
+
+4. **Configure database credentials:**
+   - Edit `config.php` if your MySQL credentials differ from the defaults:
+     ```php
+     define('DB_HOST', 'localhost');
+     define('DB_USER', 'root');
+     define('DB_PASS', '');
+     define('DB_NAME', 'complaint_system');
+     ```
+
+5. **Access the application:**
+   - Visit: `http://localhost/complaint-management-system/`
+   - Register a new account or use the default admin:
+     - Email: `admin@cms.com`
+     - Password: `admin123`
+
+### Creating an Admin User
+
+The `database.sql` file includes a default admin account. To manually promote a user:
+
+```sql
+UPDATE users SET role = 'admin' WHERE email = 'your-email@example.com';
+```
+
+## Database Schema
+
+### Tables
+- **users** — id, full_name, email, password (hashed), role (user/admin), created_at
+- **complaints** — id, user_id (FK), subject, category, priority, description, status, created_at
+- **categories** — id, name, description, created_at
+
+## Screenshots
+
+*Coming soon*
+
+## Security Features
+
+- Password hashing with `password_hash()` (bcrypt)
+- Prepared statements for all database queries (SQL injection prevention)
+- Session-based authentication with role checks
+- Input sanitization with `htmlspecialchars()`
+- CSRF-safe form handling
 
 ## License
 
-MIT
+This project is for educational purposes.
+
+## Author
+
+Shubham Shukla

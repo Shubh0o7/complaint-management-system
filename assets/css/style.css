@@ -1,6 +1,6 @@
 /* ============================================
-   Complaint Management System - Phase 1
-   Custom Blue & White Theme
+   Complaint Management System - Phase 2
+   Custom Blue & White Theme + Admin Panel
    Built with Bootstrap 5
    ============================================ */
 
@@ -14,6 +14,8 @@
     --gray-medium: #6c757d;
     --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
     --shadow-md: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    --admin-accent: #198754;
+    --admin-light: #d1e7dd;
 }
 
 /* ---------- Global Styles ---------- */
@@ -51,6 +53,26 @@ body {
     color: var(--white) !important;
 }
 
+/* ---------- Admin Sidebar Section ---------- */
+.sidebar .nav-link.admin-link:hover {
+    background-color: var(--admin-light);
+    color: var(--admin-accent);
+}
+
+.sidebar .nav-link.admin-link.active {
+    background-color: var(--admin-accent) !important;
+    color: var(--white) !important;
+}
+
+.sidebar .admin-section-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05rem;
+    color: var(--gray-medium);
+    padding: 0.5rem 1rem 0.2rem;
+    margin-top: 0.5rem;
+}
+
 /* ---------- Main Content Area ---------- */
 .d-flex > .flex-grow-1 {
     margin-left: 250px;
@@ -66,6 +88,27 @@ body {
 .card:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
+}
+
+/* ---------- Stat Cards (Admin) ---------- */
+.stat-card {
+    border-left: 4px solid var(--primary-blue);
+}
+
+.stat-card.stat-pending {
+    border-left-color: #ffc107;
+}
+
+.stat-card.stat-progress {
+    border-left-color: #0dcaf0;
+}
+
+.stat-card.stat-resolved {
+    border-left-color: #198754;
+}
+
+.stat-card.stat-critical {
+    border-left-color: #dc3545;
 }
 
 /* ---------- Buttons ---------- */
@@ -91,6 +134,13 @@ body {
     background-color: var(--light-blue);
 }
 
+.table th {
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03rem;
+}
+
 /* ---------- Alerts ---------- */
 .alert {
     border-radius: 0.5rem;
@@ -107,6 +157,42 @@ body {
     font-weight: bold;
 }
 
+/* ---------- Admin Badge ---------- */
+.admin-badge {
+    background: linear-gradient(135deg, var(--admin-accent), #157347);
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 0.25rem;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* ---------- Priority Indicators ---------- */
+.priority-low { color: #6c757d; }
+.priority-medium { color: #0dcaf0; }
+.priority-high { color: #ffc107; }
+.priority-critical { color: #dc3545; font-weight: bold; }
+
+/* ---------- Filter Bar ---------- */
+.filter-bar .form-control,
+.filter-bar .form-select {
+    font-size: 0.85rem;
+}
+
+/* ---------- Status Update Form (Admin) ---------- */
+.status-form select {
+    font-size: 0.8rem;
+    padding: 0.25rem 0.5rem;
+}
+
+/* ---------- Admin Welcome Banner ---------- */
+.admin-banner {
+    background: linear-gradient(135deg, #198754, #157347);
+    color: white;
+    border-radius: 0.75rem;
+}
+
 /* ---------- Responsive ---------- */
 @media (max-width: 768px) {
     .sidebar {
@@ -118,5 +204,9 @@ body {
 
     .d-flex > .flex-grow-1 {
         margin-left: 0;
+    }
+
+    .filter-bar .row > div {
+        margin-bottom: 0.5rem;
     }
 }

@@ -7,6 +7,27 @@
         <small class="text-muted">Complaint Management</small>
     </div>
     <ul class="nav flex-column p-3">
+        <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+        <!-- Admin Navigation -->
+        <li class="nav-item mb-1">
+            <a class="nav-link rounded <?= basename($_SERVER['PHP_SELF']) === 'admin_dashboard.php' ? 'active bg-dark text-white' : 'text-dark' ?>" href="admin_dashboard.php">
+                <i class="bi bi-shield-lock me-2"></i> Admin Dashboard
+            </a>
+        </li>
+        <li class="nav-item mb-1">
+            <a class="nav-link rounded <?= basename($_SERVER['PHP_SELF']) === 'admin_complaints.php' ? 'active bg-dark text-white' : 'text-dark' ?>" href="admin_complaints.php">
+                <i class="bi bi-kanban me-2"></i> Manage Complaints
+            </a>
+        </li>
+        <li class="nav-item mb-1">
+            <a class="nav-link rounded <?= basename($_SERVER['PHP_SELF']) === 'admin_users.php' ? 'active bg-dark text-white' : 'text-dark' ?>" href="admin_users.php">
+                <i class="bi bi-people me-2"></i> Manage Users
+            </a>
+        </li>
+        <li class="nav-item mb-2"><hr class="my-1"></li>
+        <?php endif; ?>
+
+        <!-- User Navigation -->
         <li class="nav-item mb-1">
             <a class="nav-link rounded <?= basename($_SERVER['PHP_SELF']) === 'dashboard.php' ? 'active bg-primary text-white' : 'text-dark' ?>" href="dashboard.php">
                 <i class="bi bi-speedometer2 me-2"></i> Dashboard
@@ -24,6 +45,13 @@
         </li>
     </ul>
     <div class="mt-auto p-3 border-top">
+        <div class="mb-2">
+            <small class="text-muted">Logged in as:</small><br>
+            <strong class="text-dark"><?= htmlspecialchars($_SESSION['user_name'] ?? '') ?></strong>
+            <?php if (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin'): ?>
+            <span class="badge bg-danger ms-1">Admin</span>
+            <?php endif; ?>
+        </div>
         <a href="logout.php" class="btn btn-outline-danger btn-sm w-100">
             <i class="bi bi-box-arrow-right me-1"></i> Logout
         </a>
