@@ -1,6 +1,8 @@
 <?php
 require_once 'config.php';
 require_once 'includes/admin_check.php';
+require_once 'includes/notification_helper.php';
+require_once 'includes/email_helper.php';
 
 // Handle status update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
@@ -8,12 +10,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
     $new_status = $_POST['new_status'];
     $admin_remarks = trim($_POST['admin_remarks'] ?? '');
     
+    // Get old status for comparison
+    $old_stmt = $conn->prepare("SELECT status, user_id, subject FROM complaints WHERE id = ?");
+    $old_stmt->bind_param('i', $complaint_id);
+    $old_stmt->execute();
+    $old_data = $old_stmt->get_result()->fetch_assoc();
+    $old_stmt->close();
+    $old_status = $old_data['status'] ?? '';
+    $complaint_user_id = $old_data['user_id'] ?? 0;
+    $complaint_subject = $old_data['subject'] ?? '';
+    
     $resolved_at = ($new_status === 'Resolved') ? date('Y-m-d H:i:s') : null;
     
     $stmt = $conn->prepare("UPDATE complaints SET status = ?, admin_remarks = ?, resolved_at = ? WHERE id = ?");
     $stmt->bind_param('sssi', $new_status, $admin_remarks, $resolved_at, $complaint_id);
     $stmt->execute();
     $stmt->close();
+    
+    // Add timeline entry if status changed
+    if ($old_status !== $new_status) {
+        $timeline_desc = "Status changed from '$old_status' to '$new_status'";
+        if (!empty($admin_remarks)) {
+            $timeline_desc .= ". Remarks: $admin_remarks";
+        }
+        $t_stmt = $conn->prepare("INSERT INTO complaint_timeline (complaint_id, action, description, performed_by) VALUES (?, 'status_change', ?, ?)");
+        $t_stmt->bind_param('isi', $complaint_id, $timeline_desc, $_SESSION['user_id']);
+        $t_stmt->execute();
+        $t_stmt->close();
+        
+        // Notify the complaint owner
+        if ($complaint_user_id) {
+            $notif_msg = "Your complaint \"$complaint_subject\" status changed to $new_status";
+            create_notification($conn, $complaint_user_id, 'status_change', $notif_msg, 'view_complaint.php?id=' . $complaint_id);
+            
+            // Send email notification
+            send_status_change_email($conn, $complaint_id, $old_status, $new_status);
+        }
+    }
     
     $_SESSION['flash_msg'] = "Complaint #$complaint_id status updated to '$new_status'.";
     header('Location: admin_complaints.php?' . http_build_query($_GET));
@@ -177,7 +210,11 @@ while ($row = $result->fetch_assoc()) {
                                             <strong><?= htmlspecialchars($c['full_name']) ?></strong><br>
                                             <small class="text-muted"><?= htmlspecialchars($c['email']) ?></small>
                                         </td>
-                                        <td><?= htmlspecialchars($c['subject']) ?></td>
+                                        <td>
+                                            <a href="view_complaint.php?id=<?= $c['id'] ?>" class="text-decoration-none fw-semibold">
+                                                <?= htmlspecialchars($c['subject']) ?>
+                                            </a>
+                                        </td>
                                         <td><span class="badge bg-light text-dark"><?= htmlspecialchars($c['category']) ?></span></td>
                                         <td>
                                             <?php
@@ -205,7 +242,10 @@ while ($row = $result->fetch_assoc()) {
                                         </td>
                                         <td><?= date('d M Y', strtotime($c['created_at'])) ?></td>
                                         <td>
-                                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modal-<?= $c['id'] ?>">
+                                            <a href="view_complaint.php?id=<?= $c['id'] ?>" class="btn btn-sm btn-outline-info me-1" title="View Details">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#modal-<?= $c['id'] ?>" title="Update Status">
                                                 <i class="bi bi-pencil-square"></i>
                                             </button>
                                         </td>
@@ -274,6 +314,7 @@ while ($row = $result->fetch_assoc()) {
                         <input type="hidden" name="complaint_id" value="<?= $c['id'] ?>">
                     </div>
                     <div class="modal-footer">
+                        <a href="view_complaint.php?id=<?= $c['id'] ?>" class="btn btn-outline-info me-auto"><i class="bi bi-eye me-1"></i>View Full Details</a>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         <button type="submit" name="update_status" class="btn btn-primary"><i class="bi bi-check-circle me-1"></i>Update Status</button>
                     </div>

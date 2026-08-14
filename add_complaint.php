@@ -1,6 +1,7 @@
 <?php
 require_once 'config.php';
 require_once 'includes/auth_check.php';
+require_once 'includes/notification_helper.php';
 
 // Get categories from database
 $categories = [];
@@ -31,10 +32,79 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (strlen($subject) > 200) $errors[] = 'Subject must be under 200 characters.';
     if (!in_array($priority, ['Low', 'Medium', 'High', 'Critical'])) $errors[] = 'Invalid priority level.';
 
+    // File attachment validation
+    $uploaded_files = [];
+    if (!empty($_FILES['attachments']['name'][0])) {
+        $allowed_types = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'text/plain'];
+        $max_size = 5 * 1024 * 1024; // 5MB per file
+        $max_files = 3;
+
+        $file_count = count($_FILES['attachments']['name']);
+        if ($file_count > $max_files) {
+            $errors[] = "Maximum $max_files files allowed.";
+        } else {
+            for ($i = 0; $i < $file_count; $i++) {
+                if ($_FILES['attachments']['error'][$i] === UPLOAD_ERR_OK) {
+                    $file_type = $_FILES['attachments']['type'][$i];
+                    $file_size = $_FILES['attachments']['size'][$i];
+
+                    if (!in_array($file_type, $allowed_types)) {
+                        $errors[] = 'File "' . htmlspecialchars($_FILES['attachments']['name'][$i]) . '" has an unsupported type.';
+                    }
+                    if ($file_size > $max_size) {
+                        $errors[] = 'File "' . htmlspecialchars($_FILES['attachments']['name'][$i]) . '" exceeds 5MB limit.';
+                    }
+                } elseif ($_FILES['attachments']['error'][$i] !== UPLOAD_ERR_NO_FILE) {
+                    $errors[] = 'Error uploading file: ' . htmlspecialchars($_FILES['attachments']['name'][$i]);
+                }
+            }
+        }
+    }
+
     if (empty($errors)) {
         $stmt = $conn->prepare("INSERT INTO complaints (user_id, subject, category, priority, description) VALUES (?, ?, ?, ?, ?)");
         $stmt->bind_param('issss', $_SESSION['user_id'], $subject, $category, $priority, $description);
         if ($stmt->execute()) {
+            $complaint_id = $conn->insert_id;
+
+            // Handle file uploads
+            if (!empty($_FILES['attachments']['name'][0])) {
+                $upload_dir = 'uploads/';
+                if (!is_dir($upload_dir)) {
+                    mkdir($upload_dir, 0755, true);
+                }
+
+                for ($i = 0; $i < count($_FILES['attachments']['name']); $i++) {
+                    if ($_FILES['attachments']['error'][$i] === UPLOAD_ERR_OK) {
+                        $original_name = $_FILES['attachments']['name'][$i];
+                        $extension = pathinfo($original_name, PATHINFO_EXTENSION);
+                        $stored_name = uniqid('attach_') . '_' . time() . '.' . $extension;
+                        $file_path = $upload_dir . $stored_name;
+
+                        if (move_uploaded_file($_FILES['attachments']['tmp_name'][$i], $file_path)) {
+                            $file_size = $_FILES['attachments']['size'][$i];
+                            $file_type = $_FILES['attachments']['type'][$i];
+                            $ins = $conn->prepare("INSERT INTO complaint_attachments (complaint_id, file_name, original_name, file_type, file_size) VALUES (?, ?, ?, ?, ?)");
+                            $ins->bind_param('isssi', $complaint_id, $stored_name, $original_name, $file_type, $file_size);
+                            $ins->execute();
+                            $ins->close();
+                        }
+                    }
+                }
+            }
+
+            // Add timeline entry
+            $timeline_stmt = $conn->prepare("INSERT INTO complaint_timeline (complaint_id, action, description, performed_by) VALUES (?, 'created', 'Complaint submitted', ?)");
+            $timeline_stmt->bind_param('ii', $complaint_id, $_SESSION['user_id']);
+            $timeline_stmt->execute();
+            $timeline_stmt->close();
+
+            // Notify admins
+            $admin_result = $conn->query("SELECT id FROM users WHERE role = 'admin'");
+            while ($admin = $admin_result->fetch_assoc()) {
+                create_notification($conn, $admin['id'], 'new_complaint', 'New complaint: ' . $subject, 'view_complaint.php?id=' . $complaint_id);
+            }
+
             $success = 'Complaint submitted successfully!';
             $subject = $category = $priority = $description = '';
         } else {
@@ -87,7 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <div class="card border-0 shadow-sm">
                     <div class="card-body p-4">
-                        <form method="POST" id="complaintForm" novalidate>
+                        <form method="POST" id="complaintForm" enctype="multipart/form-data" novalidate>
                             <div class="row">
                                 <div class="col-md-12 mb-3">
                                     <label for="subject" class="form-label fw-semibold">Subject <span class="text-danger">*</span></label>
@@ -125,6 +195,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <label for="description" class="form-label fw-semibold">Description <span class="text-danger">*</span></label>
                                 <textarea class="form-control" id="description" name="description" rows="5" placeholder="Describe your complaint in detail..." required><?= htmlspecialchars($description ?? '') ?></textarea>
                             </div>
+
+                            <!-- File Attachments -->
+                            <div class="mb-4">
+                                <label for="attachments" class="form-label fw-semibold"><i class="bi bi-paperclip me-1"></i>Attachments</label>
+                                <input type="file" class="form-control" id="attachments" name="attachments[]" multiple accept=".jpg,.jpeg,.png,.gif,.webp,.pdf,.doc,.docx,.txt">
+                                <div class="form-text">
+                                    <i class="bi bi-info-circle me-1"></i>Max 3 files, 5MB each. Supported: Images (JPG, PNG, GIF, WebP), PDF, Word, Text
+                                </div>
+                                <div id="filePreview" class="mt-2 d-flex flex-wrap gap-2"></div>
+                            </div>
+
                             <div class="d-flex gap-2">
                                 <button type="submit" class="btn btn-primary">
                                     <i class="bi bi-send me-1"></i>Submit Complaint
@@ -141,5 +222,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="assets/js/script.js"></script>
+    <script>
+    // File preview
+    document.getElementById('attachments').addEventListener('change', function() {
+        const preview = document.getElementById('filePreview');
+        preview.innerHTML = '';
+        const files = this.files;
+        if (files.length > 3) {
+            preview.innerHTML = '<span class="text-danger small">Maximum 3 files allowed!</span>';
+            this.value = '';
+            return;
+        }
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const size = (file.size / 1024 / 1024).toFixed(2);
+            const badge = document.createElement('span');
+            badge.className = 'badge bg-light text-dark border';
+            badge.innerHTML = '<i class="bi bi-file-earmark me-1"></i>' + file.name + ' (' + size + ' MB)';
+            preview.appendChild(badge);
+        }
+    });
+    </script>
 </body>
 </html>

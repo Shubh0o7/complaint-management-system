@@ -1,3 +1,17 @@
+<?php
+// Get unread notification count for badge
+$unread_count = 0;
+if (isset($_SESSION['user_id'])) {
+    $notif_stmt = $conn->prepare("SELECT COUNT(*) as cnt FROM notifications WHERE user_id = ? AND is_read = 0");
+    if ($notif_stmt) {
+        $notif_stmt->bind_param('i', $_SESSION['user_id']);
+        $notif_stmt->execute();
+        $notif_result = $notif_stmt->get_result()->fetch_assoc();
+        $unread_count = $notif_result['cnt'] ?? 0;
+        $notif_stmt->close();
+    }
+}
+?>
 <!-- Sidebar Navigation -->
 <nav class="sidebar bg-white shadow-sm d-flex flex-column" style="width:250px;min-height:100vh;">
     <div class="p-3 border-bottom">
@@ -24,6 +38,11 @@
                 <i class="bi bi-people me-2"></i> Manage Users
             </a>
         </li>
+        <li class="nav-item mb-1">
+            <a class="nav-link rounded <?= basename($_SERVER['PHP_SELF']) === 'reports.php' ? 'active bg-dark text-white' : 'text-dark' ?>" href="reports.php">
+                <i class="bi bi-graph-up me-2"></i> Reports & Analytics
+            </a>
+        </li>
         <li class="nav-item mb-2"><hr class="my-1"></li>
         <?php endif; ?>
 
@@ -41,6 +60,14 @@
         <li class="nav-item mb-1">
             <a class="nav-link rounded <?= basename($_SERVER['PHP_SELF']) === 'complaints.php' ? 'active bg-primary text-white' : 'text-dark' ?>" href="complaints.php">
                 <i class="bi bi-list-ul me-2"></i> My Complaints
+            </a>
+        </li>
+        <li class="nav-item mb-1">
+            <a class="nav-link rounded <?= basename($_SERVER['PHP_SELF']) === 'notifications.php' ? 'active bg-primary text-white' : 'text-dark' ?>" href="notifications.php">
+                <i class="bi bi-bell me-2"></i> Notifications
+                <?php if ($unread_count > 0): ?>
+                <span class="badge bg-danger rounded-pill ms-1"><?= $unread_count > 99 ? '99+' : $unread_count ?></span>
+                <?php endif; ?>
             </a>
         </li>
     </ul>

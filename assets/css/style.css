@@ -1,6 +1,6 @@
 /* ============================================
-   Complaint Management System - Phase 2
-   Custom Blue & White Theme + Admin Panel
+   Complaint Management System - Phase 1, 2 & 3
+   Custom Blue & White Theme
    Built with Bootstrap 5
    ============================================ */
 
@@ -14,8 +14,6 @@
     --gray-medium: #6c757d;
     --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
     --shadow-md: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
-    --admin-accent: #198754;
-    --admin-light: #d1e7dd;
 }
 
 /* ---------- Global Styles ---------- */
@@ -53,26 +51,6 @@ body {
     color: var(--white) !important;
 }
 
-/* ---------- Admin Sidebar Section ---------- */
-.sidebar .nav-link.admin-link:hover {
-    background-color: var(--admin-light);
-    color: var(--admin-accent);
-}
-
-.sidebar .nav-link.admin-link.active {
-    background-color: var(--admin-accent) !important;
-    color: var(--white) !important;
-}
-
-.sidebar .admin-section-label {
-    font-size: 0.7rem;
-    text-transform: uppercase;
-    letter-spacing: 0.05rem;
-    color: var(--gray-medium);
-    padding: 0.5rem 1rem 0.2rem;
-    margin-top: 0.5rem;
-}
-
 /* ---------- Main Content Area ---------- */
 .d-flex > .flex-grow-1 {
     margin-left: 250px;
@@ -88,27 +66,6 @@ body {
 .card:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
-}
-
-/* ---------- Stat Cards (Admin) ---------- */
-.stat-card {
-    border-left: 4px solid var(--primary-blue);
-}
-
-.stat-card.stat-pending {
-    border-left-color: #ffc107;
-}
-
-.stat-card.stat-progress {
-    border-left-color: #0dcaf0;
-}
-
-.stat-card.stat-resolved {
-    border-left-color: #198754;
-}
-
-.stat-card.stat-critical {
-    border-left-color: #dc3545;
 }
 
 /* ---------- Buttons ---------- */
@@ -134,13 +91,6 @@ body {
     background-color: var(--light-blue);
 }
 
-.table th {
-    font-size: 0.85rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.03rem;
-}
-
 /* ---------- Alerts ---------- */
 .alert {
     border-radius: 0.5rem;
@@ -157,40 +107,324 @@ body {
     font-weight: bold;
 }
 
-/* ---------- Admin Badge ---------- */
-.admin-badge {
-    background: linear-gradient(135deg, var(--admin-accent), #157347);
-    color: white;
-    padding: 0.2rem 0.6rem;
-    border-radius: 0.25rem;
-    font-size: 0.7rem;
-    font-weight: 600;
-    text-transform: uppercase;
+/* ---------- Admin Panel (Phase 2) ---------- */
+.admin-stat-card {
+    border-left: 4px solid var(--primary-blue);
 }
 
-/* ---------- Priority Indicators ---------- */
+.admin-stat-card.warning {
+    border-left-color: #ffc107;
+}
+
+.admin-stat-card.danger {
+    border-left-color: #dc3545;
+}
+
+.admin-stat-card.success {
+    border-left-color: #198754;
+}
+
+/* Priority Indicators */
 .priority-low { color: #6c757d; }
 .priority-medium { color: #0dcaf0; }
 .priority-high { color: #ffc107; }
 .priority-critical { color: #dc3545; font-weight: bold; }
 
-/* ---------- Filter Bar ---------- */
-.filter-bar .form-control,
-.filter-bar .form-select {
+/* ---------- Phase 3: Timeline ---------- */
+.timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 0.75rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #dee2e6;
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 1.5rem;
+    padding-left: 1rem;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -1.35rem;
+    top: 0.35rem;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--primary-blue);
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px var(--primary-blue);
+}
+
+.timeline-item.status-change::before {
+    background: #ffc107;
+    box-shadow: 0 0 0 2px #ffc107;
+}
+
+.timeline-item.comment::before {
+    background: #198754;
+    box-shadow: 0 0 0 2px #198754;
+}
+
+.timeline-item.attachment::before {
+    background: #6f42c1;
+    box-shadow: 0 0 0 2px #6f42c1;
+}
+
+.timeline-item.created::before {
+    background: #0d6efd;
+    box-shadow: 0 0 0 2px #0d6efd;
+}
+
+.timeline-time {
+    font-size: 0.75rem;
+    color: var(--gray-medium);
+}
+
+.timeline-content {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 0.5rem;
+    padding: 0.75rem 1rem;
+    margin-top: 0.25rem;
+}
+
+/* ---------- Phase 3: Comments ---------- */
+.comment-card {
+    border-left: 3px solid var(--primary-blue);
+    background: #fff;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.comment-card.admin-comment {
+    border-left-color: #dc3545;
+    background: #fff5f5;
+}
+
+.comment-card .comment-author {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.comment-card .comment-time {
+    font-size: 0.75rem;
+    color: var(--gray-medium);
+}
+
+.comment-card .comment-body {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+/* ---------- Phase 3: Notifications ---------- */
+.notification-item {
+    padding: 1rem;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.2s ease;
+    cursor: pointer;
+}
+
+.notification-item:hover {
+    background-color: var(--light-blue);
+}
+
+.notification-item.unread {
+    background-color: #f0f7ff;
+    border-left: 3px solid var(--primary-blue);
+}
+
+.notification-item .notif-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+}
+
+.notification-item .notif-icon.status-change {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.notification-item .notif-icon.new-comment {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.notification-item .notif-icon.new-complaint {
+    background: #cfe2ff;
+    color: #084298;
+}
+
+.notification-badge {
+    position: relative;
+}
+
+.notification-badge .badge {
+    font-size: 0.65rem;
+    padding: 0.2em 0.45em;
+}
+
+/* ---------- Phase 3: Attachments ---------- */
+.attachment-card {
+    border: 1px solid #e9ecef;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    color: inherit;
+}
+
+.attachment-card:hover {
+    background-color: var(--light-blue);
+    border-color: var(--primary-blue);
+    text-decoration: none;
+    color: inherit;
+}
+
+.attachment-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+.attachment-icon.pdf {
+    background: #fde8e8;
+    color: #dc3545;
+}
+
+.attachment-icon.image {
+    background: #d1e7dd;
+    color: #198754;
+}
+
+.attachment-icon.doc {
+    background: #cfe2ff;
+    color: #0d6efd;
+}
+
+.attachment-icon.other {
+    background: #f8f9fa;
+    color: #6c757d;
+}
+
+.attachment-info .file-name {
+    font-weight: 500;
     font-size: 0.85rem;
 }
 
-/* ---------- Status Update Form (Admin) ---------- */
-.status-form select {
-    font-size: 0.8rem;
-    padding: 0.25rem 0.5rem;
+.attachment-info .file-size {
+    font-size: 0.75rem;
+    color: var(--gray-medium);
 }
 
-/* ---------- Admin Welcome Banner ---------- */
-.admin-banner {
-    background: linear-gradient(135deg, #198754, #157347);
-    color: white;
+/* ---------- Phase 3: Reports & Analytics ---------- */
+.report-card {
+    border: none;
     border-radius: 0.75rem;
+    box-shadow: var(--shadow-sm);
+    transition: all 0.3s ease;
+}
+
+.report-card:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-3px);
+}
+
+.stat-number {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--gray-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+}
+
+.chart-container.small {
+    height: 200px;
+}
+
+/* ---------- Phase 3: View Complaint Detail ---------- */
+.complaint-detail-header {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    color: #fff;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.complaint-detail-header .complaint-id {
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+.complaint-detail-header .complaint-subject {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0.5rem 0;
+}
+
+.detail-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.detail-meta-item:last-child {
+    border-bottom: none;
+}
+
+.detail-meta-item .meta-label {
+    font-weight: 600;
+    font-size: 0.85rem;
+    min-width: 100px;
+    color: var(--gray-medium);
+}
+
+/* ---------- Phase 3: File Upload Preview ---------- */
+.file-preview-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.35rem 0.65rem;
+    border-radius: 2rem;
+    font-size: 0.8rem;
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
 }
 
 /* ---------- Responsive ---------- */
@@ -206,7 +440,29 @@ body {
         margin-left: 0;
     }
 
-    .filter-bar .row > div {
-        margin-bottom: 0.5rem;
+    .timeline {
+        padding-left: 1.5rem;
+    }
+
+    .chart-container {
+        height: 250px;
+    }
+
+    .complaint-detail-header {
+        padding: 1rem;
+    }
+
+    .complaint-detail-header .complaint-subject {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .chart-container {
+        height: 200px;
+    }
+
+    .stat-number {
+        font-size: 1.5rem;
     }
 }

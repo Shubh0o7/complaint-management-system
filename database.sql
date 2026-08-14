@@ -1,4 +1,4 @@
--- Complaint Management System - Phase 1 & Phase 2
+-- Complaint Management System - Phase 1, 2 & 3
 -- Database Schema
 -- Import this file into MySQL via phpMyAdmin or CLI
 
@@ -7,6 +7,10 @@ CREATE DATABASE IF NOT EXISTS `complaint_system`
   COLLATE utf8mb4_unicode_ci;
 
 USE `complaint_system`;
+
+-- ============================================
+-- PHASE 1 & 2 TABLES
+-- ============================================
 
 -- Users table (updated: added role column for admin support)
 CREATE TABLE IF NOT EXISTS `users` (
@@ -53,14 +57,78 @@ CREATE TABLE IF NOT EXISTS `complaints` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Default admin account (password: admin123 - change after first login)
--- Password hash for 'admin123'
 INSERT IGNORE INTO `users` (`full_name`, `email`, `password`, `role`) VALUES
 ('Administrator', 'admin@cms.com', '$2y$10$8K1p/a0dR1xqM8k3UKJHueWbEFwKEFNkBfQr3VCdLwMqRqSFqKmFi', 'admin');
 
--- Migration queries for existing Phase 1 databases:
--- Run these if you already have the Phase 1 tables:
+-- ============================================
+-- PHASE 3 TABLES
+-- ============================================
+
+-- Complaint Timeline / Activity Log (tracks all status changes and actions)
+CREATE TABLE IF NOT EXISTS `complaint_timeline` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `complaint_id` INT NOT NULL,
+  `user_id` INT NOT NULL,
+  `action` VARCHAR(100) NOT NULL,
+  `old_value` VARCHAR(100) DEFAULT NULL,
+  `new_value` VARCHAR(100) DEFAULT NULL,
+  `description` TEXT DEFAULT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`complaint_id`) REFERENCES `complaints`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Complaint Attachments (file uploads linked to complaints)
+CREATE TABLE IF NOT EXISTS `complaint_attachments` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `complaint_id` INT NOT NULL,
+  `user_id` INT NOT NULL,
+  `file_name` VARCHAR(255) NOT NULL,
+  `original_name` VARCHAR(255) NOT NULL,
+  `file_type` VARCHAR(100) NOT NULL,
+  `file_size` INT NOT NULL,
+  `uploaded_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`complaint_id`) REFERENCES `complaints`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Complaint Comments (conversation between user and admin)
+CREATE TABLE IF NOT EXISTS `complaint_comments` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `complaint_id` INT NOT NULL,
+  `user_id` INT NOT NULL,
+  `comment` TEXT NOT NULL,
+  `is_admin` TINYINT(1) DEFAULT 0,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`complaint_id`) REFERENCES `complaints`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- Notifications (in-app notification system)
+CREATE TABLE IF NOT EXISTS `notifications` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `user_id` INT NOT NULL,
+  `complaint_id` INT DEFAULT NULL,
+  `title` VARCHAR(200) NOT NULL,
+  `message` TEXT NOT NULL,
+  `type` ENUM('status_change', 'comment', 'assignment', 'system') DEFAULT 'system',
+  `is_read` TINYINT(1) DEFAULT 0,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`complaint_id`) REFERENCES `complaints`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- ============================================
+-- MIGRATION QUERIES (for existing databases)
+-- ============================================
+
+-- Phase 2 migrations (run if upgrading from Phase 1):
 -- ALTER TABLE `users` ADD COLUMN `role` ENUM('user', 'admin') DEFAULT 'user' AFTER `password`;
 -- ALTER TABLE `complaints` ADD COLUMN `priority` ENUM('Low', 'Medium', 'High', 'Critical') DEFAULT 'Medium' AFTER `category`;
 -- ALTER TABLE `complaints` ADD COLUMN `admin_remarks` TEXT DEFAULT NULL AFTER `status`;
 -- ALTER TABLE `complaints` ADD COLUMN `resolved_at` TIMESTAMP NULL DEFAULT NULL AFTER `admin_remarks`;
 -- ALTER TABLE `complaints` MODIFY COLUMN `status` ENUM('Pending', 'In Progress', 'Resolved', 'Rejected') DEFAULT 'Pending';
+
+-- Phase 3 migrations (run if upgrading from Phase 2):
+-- Just run the CREATE TABLE IF NOT EXISTS statements above for the 4 new tables.
+-- They will only create if they don't already exist.
