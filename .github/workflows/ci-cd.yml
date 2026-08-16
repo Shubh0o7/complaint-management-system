@@ -88,13 +88,18 @@ jobs:
           DB_NAME: complaint_system
         run: |
           set -euo pipefail
-          curl --fail --silent http://127.0.0.1:8090/login.php | grep -q 'Login'
-          curl --fail --silent --cookie-jar /tmp/cms-cookie --cookie /tmp/cms-cookie \
+          curl --fail --silent --show-error http://127.0.0.1:8090/login.php > /tmp/cms-login.html
+          grep -Fq 'Login' /tmp/cms-login.html
+
+          curl --fail --silent --show-error --cookie-jar /tmp/cms-cookie --cookie /tmp/cms-cookie \
             -H 'Content-Type: application/json' \
             --data '{"email":"admin@cms.com","password":"admin123"}' \
-            http://127.0.0.1:8090/api/login.php | grep -q '"success":true'
-          curl --fail --silent --cookie /tmp/cms-cookie \
-            http://127.0.0.1:8090/admin_dashboard.php | grep -q 'Admin Dashboard'
+            http://127.0.0.1:8090/api/login.php > /tmp/cms-login-response.json
+          grep -Fq '"success":true' /tmp/cms-login-response.json
+
+          curl --fail --silent --show-error --cookie /tmp/cms-cookie \
+            http://127.0.0.1:8090/admin_dashboard.php > /tmp/cms-admin-dashboard.html
+          grep -Fq 'Admin Dashboard' /tmp/cms-admin-dashboard.html
 
   deploy:
     name: Build and publish container
