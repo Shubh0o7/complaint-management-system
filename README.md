@@ -183,3 +183,16 @@ For an existing installation, back up the database first and apply the upgrade s
 ### Security and deployment notes
 
 The implementation uses PHP sessions, password hashing, prepared MySQLi statements, role guards, scoped complaint queries, server-side role validation, and notification/timeline writes for workflow actions. Configure production database credentials outside version control, disable directory listing for `uploads/`, enforce HTTPS, and add CSRF tokens before exposing write operations on an internet-facing deployment.
+
+
+## Zero-Configuration Quick Start
+
+The repository includes a complete PHP-Apache and MariaDB stack. With Docker Desktop or Docker Engine installed, run the following single command from the repository directory:
+
+```bash
+docker compose up --build
+```
+
+Then open [http://localhost:8080](http://localhost:8080). The database, tables, departments, categories, application user, and default administrator account are initialized automatically. No manual SQL import, credential editing, or PHP configuration is required. Sign in with `admin@cms.com` and `admin123`, then change the password for any real deployment.
+
+To stop the application, press `Ctrl+C`; to remove the stored database and start completely fresh, run `docker compose down -v` followed by `docker compose up --build`.

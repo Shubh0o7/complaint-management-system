@@ -2,6 +2,10 @@
 CREATE DATABASE IF NOT EXISTS `complaint_system` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `complaint_system`;
 
+CREATE USER IF NOT EXISTS 'complaint_user'@'%' IDENTIFIED BY 'complaint_pass';
+GRANT ALL PRIVILEGES ON `complaint_system`.* TO 'complaint_user'@'%';
+FLUSH PRIVILEGES;
+
 CREATE TABLE IF NOT EXISTS `departments` (
   `id` INT AUTO_INCREMENT PRIMARY KEY,
   `name` VARCHAR(120) NOT NULL UNIQUE,
@@ -118,7 +122,7 @@ CREATE TABLE IF NOT EXISTS `notifications` (
 
 -- Default admin account. Password: admin123; change it after first login.
 INSERT IGNORE INTO `users` (`full_name`, `email`, `password`, `role`) VALUES
-('Administrator', 'admin@cms.com', '$2y$10$8K1p/a0dR1xqM8k3UKJHueWbEFwKEFNkBfQr3VCdLwMqRqSFqKmFi', 'admin');
+('Administrator', 'admin@cms.com', '$2y$10$jWETlUvz2B3DXUNXIEOxDuLQd8/nHsJx.AluIPnftNhR8X0dPX6E6', 'admin');
 
 -- Upgrade notes for existing installations:
 -- ALTER TABLE users MODIFY role ENUM('user','admin','department','officer') NOT NULL DEFAULT 'user';

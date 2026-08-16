@@ -1,0 +1,37 @@
+services:
+  db:
+    image: mariadb:11.4
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: complaint_system
+      MARIADB_USER: complaint_user
+      MARIADB_PASSWORD: complaint_pass
+      MARIADB_ROOT_PASSWORD: root_pass
+    volumes:
+      - complaint_db:/var/lib/mysql
+      - ./database.sql:/docker-entrypoint-initdb.d/01-database.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h localhost -u root -proot_pass"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: complaint_user
+      DB_PASS: complaint_pass
+      DB_NAME: complaint_system
+    ports:
+      - "8080:80"
+    volumes:
+      - ./uploads:/var/www/html/uploads
+
+volumes:
+  complaint_db:
