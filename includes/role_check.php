@@ -11,6 +11,10 @@ function require_role(array $roles): void {
     }
 }
 
+function role_home(string $role): string {
+    return ['admin' => 'admin_dashboard.php', 'department' => 'department_dashboard.php', 'officer' => 'officer_dashboard.php', 'user' => 'dashboard.php'][$role] ?? 'dashboard.php';
+}
+
 function role_label(string $role): string {
     return ['user' => 'Complainant', 'admin' => 'Administrator', 'department' => 'Department Manager', 'officer' => 'Complaint Officer'][$role] ?? ucfirst($role);
 }

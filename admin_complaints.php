@@ -7,11 +7,17 @@ require_once 'includes/email_helper.php';
 // Handle status update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
     $complaint_id = (int)$_POST['complaint_id'];
-    $new_status = $_POST['new_status'];
+    $new_status = $_POST['new_status'] ?? '';
+    if (!in_array($new_status, ['Pending', 'In Progress', 'Resolved', 'Rejected'], true)) {
+        $_SESSION['flash_msg'] = 'Invalid complaint status.';
+        $_SESSION['flash_type'] = 'danger';
+        header('Location: admin_complaints.php');
+        exit();
+    }
     $admin_remarks = trim($_POST['admin_remarks'] ?? '');
     
     // Get old status for comparison
-    $old_stmt = $conn->prepare("SELECT status, user_id, subject FROM complaints WHERE id = ?");
+    $old_stmt = $conn->prepare("SELECT c.status, c.user_id, c.subject, u.full_name, u.email FROM complaints c JOIN users u ON u.id = c.user_id WHERE c.id = ?");
     $old_stmt->bind_param('i', $complaint_id);
     $old_stmt->execute();
     $old_data = $old_stmt->get_result()->fetch_assoc();
@@ -19,6 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
     $old_status = $old_data['status'] ?? '';
     $complaint_user_id = $old_data['user_id'] ?? 0;
     $complaint_subject = $old_data['subject'] ?? '';
+    $complaint_user_name = $old_data['full_name'] ?? '';
+    $complaint_user_email = $old_data['email'] ?? '';
     
     $resolved_at = ($new_status === 'Resolved') ? date('Y-m-d H:i:s') : null;
     
@@ -33,18 +41,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
         if (!empty($admin_remarks)) {
             $timeline_desc .= ". Remarks: $admin_remarks";
         }
-        $t_stmt = $conn->prepare("INSERT INTO complaint_timeline (complaint_id, action, description, performed_by) VALUES (?, 'status_change', ?, ?)");
-        $t_stmt->bind_param('isi', $complaint_id, $timeline_desc, $_SESSION['user_id']);
+        $t_stmt = $conn->prepare("INSERT INTO complaint_timeline (complaint_id, user_id, action, old_value, new_value, description) VALUES (?, ?, 'status_change', ?, ?, ?)");
+        $t_stmt->bind_param('iisss', $complaint_id, $_SESSION['user_id'], $old_status, $new_status, $timeline_desc);
         $t_stmt->execute();
         $t_stmt->close();
         
         // Notify the complaint owner
         if ($complaint_user_id) {
             $notif_msg = "Your complaint \"$complaint_subject\" status changed to $new_status";
-            create_notification($conn, $complaint_user_id, 'status_change', $notif_msg, 'view_complaint.php?id=' . $complaint_id);
+            create_notification($conn, (int)$complaint_user_id, $complaint_id, 'Complaint Status Updated', $notif_msg, 'status_change');
             
-            // Send email notification
-            send_status_change_email($conn, $complaint_id, $old_status, $new_status);
+            // Send a mock/logged email notification when email is configured.
+            if ($complaint_user_email !== '') {
+                send_status_change_email($complaint_user_email, $complaint_user_name, $complaint_id, $complaint_subject, $old_status, $new_status);
+            }
         }
     }
     

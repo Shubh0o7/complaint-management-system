@@ -25,15 +25,27 @@ if (!isset($_FILES['file']) || $_FILES['file']['error'] !== UPLOAD_ERR_OK) {
     exit();
 }
 
-// Validate complaint ownership
-$verify_stmt = $conn->prepare("SELECT user_id FROM complaints WHERE id = ?");
+// Validate complaint ownership or assignment.
+$role = $_SESSION['user_role'] ?? 'user';
+if ($role === 'admin') {
+    $verify_stmt = $conn->prepare('SELECT user_id FROM complaints WHERE id = ?');
+    $verify_stmt->bind_param('i', $complaint_id);
+} elseif ($role === 'department') {
+    $verify_stmt = $conn->prepare('SELECT user_id FROM complaints WHERE id = ? AND department_id = ?');
+    $verify_stmt->bind_param('ii', $complaint_id, $_SESSION['department_id']);
+} elseif ($role === 'officer') {
+    $verify_stmt = $conn->prepare('SELECT user_id FROM complaints WHERE id = ? AND officer_id = ?');
+    $verify_stmt->bind_param('ii', $complaint_id, $user_id);
+} else {
+    $verify_stmt = $conn->prepare('SELECT user_id FROM complaints WHERE id = ? AND user_id = ?');
+    $verify_stmt->bind_param('ii', $complaint_id, $user_id);
+}
 if (!$verify_stmt) {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'Server error.']);
     exit();
 }
 
-$verify_stmt->bind_param('i', $complaint_id);
 $verify_stmt->execute();
 $verify_result = $verify_stmt->get_result();
 $verify_stmt->close();

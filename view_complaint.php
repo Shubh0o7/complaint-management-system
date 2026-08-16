@@ -1,27 +1,30 @@
 <?php
 require_once 'config.php';
-require_once 'includes/auth_check.php';
+require_once 'includes/role_check.php';
 require_once 'includes/notification_helper.php';
+require_once 'includes/workflow_helper.php';
 
 $complaint_id = (int)($_GET['id'] ?? 0);
 
 if ($complaint_id <= 0) {
-    header('Location: complaints.php');
+    header('Location: ' . role_home($_SESSION['user_role'] ?? 'user'));
     exit();
 }
 
 // Fetch complaint details
-$is_admin = (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin');
-
-if ($is_admin) {
-    $stmt = $conn->prepare("SELECT c.*, u.full_name as user_name, u.email as user_email FROM complaints c JOIN users u ON c.user_id = u.id WHERE c.id = ?");
-} else {
-    $stmt = $conn->prepare("SELECT c.*, u.full_name as user_name, u.email as user_email FROM complaints c JOIN users u ON c.user_id = u.id WHERE c.id = ? AND c.user_id = ?");
-}
-
-if ($is_admin) {
+$role = $_SESSION['user_role'] ?? 'user';
+$is_admin = $role === 'admin';
+if ($role === 'admin') {
+    $stmt = $conn->prepare("SELECT c.*, u.full_name as user_name, u.email as user_email, d.name as department_name, o.full_name as officer_name FROM complaints c JOIN users u ON c.user_id = u.id LEFT JOIN departments d ON d.id = c.department_id LEFT JOIN users o ON o.id = c.officer_id WHERE c.id = ?");
     $stmt->bind_param('i', $complaint_id);
+} elseif ($role === 'department') {
+    $stmt = $conn->prepare("SELECT c.*, u.full_name as user_name, u.email as user_email, d.name as department_name, o.full_name as officer_name FROM complaints c JOIN users u ON c.user_id = u.id LEFT JOIN departments d ON d.id = c.department_id LEFT JOIN users o ON o.id = c.officer_id WHERE c.id = ? AND c.department_id = ?");
+    $stmt->bind_param('ii', $complaint_id, $_SESSION['department_id']);
+} elseif ($role === 'officer') {
+    $stmt = $conn->prepare("SELECT c.*, u.full_name as user_name, u.email as user_email, d.name as department_name, o.full_name as officer_name FROM complaints c JOIN users u ON c.user_id = u.id LEFT JOIN departments d ON d.id = c.department_id LEFT JOIN users o ON o.id = c.officer_id WHERE c.id = ? AND c.officer_id = ?");
+    $stmt->bind_param('ii', $complaint_id, $_SESSION['user_id']);
 } else {
+    $stmt = $conn->prepare("SELECT c.*, u.full_name as user_name, u.email as user_email, d.name as department_name, o.full_name as officer_name FROM complaints c JOIN users u ON c.user_id = u.id LEFT JOIN departments d ON d.id = c.department_id LEFT JOIN users o ON o.id = c.officer_id WHERE c.id = ? AND c.user_id = ?");
     $stmt->bind_param('ii', $complaint_id, $_SESSION['user_id']);
 }
 $stmt->execute();
@@ -29,7 +32,7 @@ $complaint = $stmt->get_result()->fetch_assoc();
 $stmt->close();
 
 if (!$complaint) {
-    header('Location: complaints.php');
+    header('Location: ' . role_home($_SESSION['user_role'] ?? 'user'));
     exit();
 }
 

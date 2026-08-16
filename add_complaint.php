@@ -2,6 +2,7 @@
 require_once 'config.php';
 require_once 'includes/auth_check.php';
 require_once 'includes/notification_helper.php';
+require_once 'includes/workflow_helper.php';
 
 // Get categories from database
 $categories = [];
@@ -84,8 +85,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         if (move_uploaded_file($_FILES['attachments']['tmp_name'][$i], $file_path)) {
                             $file_size = $_FILES['attachments']['size'][$i];
                             $file_type = $_FILES['attachments']['type'][$i];
-                            $ins = $conn->prepare("INSERT INTO complaint_attachments (complaint_id, file_name, original_name, file_type, file_size) VALUES (?, ?, ?, ?, ?)");
-                            $ins->bind_param('isssi', $complaint_id, $stored_name, $original_name, $file_type, $file_size);
+                            $ins = $conn->prepare("INSERT INTO complaint_attachments (complaint_id, user_id, file_name, original_name, file_type, file_size) VALUES (?, ?, ?, ?, ?, ?)");
+                            $ins->bind_param('iisssi', $complaint_id, $_SESSION['user_id'], $stored_name, $original_name, $file_type, $file_size);
                             $ins->execute();
                             $ins->close();
                         }
@@ -93,16 +94,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
-            // Add timeline entry
-            $timeline_stmt = $conn->prepare("INSERT INTO complaint_timeline (complaint_id, action, description, performed_by) VALUES (?, 'created', 'Complaint submitted', ?)");
-            $timeline_stmt->bind_param('ii', $complaint_id, $_SESSION['user_id']);
-            $timeline_stmt->execute();
-            $timeline_stmt->close();
+            add_timeline_entry($conn, $complaint_id, (int)$_SESSION['user_id'], 'created', null, null, 'Complaint submitted');
 
             // Notify admins
             $admin_result = $conn->query("SELECT id FROM users WHERE role = 'admin'");
             while ($admin = $admin_result->fetch_assoc()) {
-                create_notification($conn, $admin['id'], 'new_complaint', 'New complaint: ' . $subject, 'view_complaint.php?id=' . $complaint_id);
+                create_notification($conn, (int)$admin['id'], $complaint_id, 'New Complaint', 'A new complaint has been submitted: ' . $subject, 'system');
             }
 
             $success = 'Complaint submitted successfully!';

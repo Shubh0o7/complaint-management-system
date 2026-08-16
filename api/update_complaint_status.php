@@ -60,7 +60,7 @@ $old_status = $complaint_row['status'];
 $complaint_stmt->close();
 
 // Update complaint
-$stmt = $conn->prepare("UPDATE complaints SET status = ?, admin_remarks = ?, resolved_at = IF(? = 'Resolved', NOW(), resolved_at) WHERE id = ?");
+$stmt = $conn->prepare("UPDATE complaints SET status = ?, admin_remarks = ?, resolved_at = IF(? = 'Resolved', NOW(), NULL) WHERE id = ?");
 
 if ($stmt) {
     $stmt->bind_param('sssi', $new_status, $admin_remarks, $new_status, $complaint_id);
@@ -69,10 +69,10 @@ if ($stmt) {
         // Log timeline entry
         $action = 'status_change';
         $timeline_desc = 'Status changed from ' . $old_status . ' to ' . $new_status;
-        $timeline_stmt = $conn->prepare("INSERT INTO complaint_timeline (complaint_id, user_id, action, description) VALUES (?, ?, ?, ?)");
+        $timeline_stmt = $conn->prepare("INSERT INTO complaint_timeline (complaint_id, user_id, action, old_value, new_value, description) VALUES (?, ?, ?, ?, ?, ?)");
         
         if ($timeline_stmt) {
-            $timeline_stmt->bind_param('iiss', $complaint_id, $admin_id, $action, $timeline_desc);
+            $timeline_stmt->bind_param('iissss', $complaint_id, $admin_id, $action, $old_status, $new_status, $timeline_desc);
             $timeline_stmt->execute();
             $timeline_stmt->close();
         }

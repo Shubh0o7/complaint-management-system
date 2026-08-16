@@ -126,3 +126,30 @@ function mark_all_as_read($conn, $user_id) {
     return false;
 }
 ?>
+<?php
+function mark_notification_read(mysqli $conn, int $notification_id, int $user_id): bool {
+    $stmt = $conn->prepare('UPDATE notifications SET is_read = 1 WHERE id = ? AND user_id = ?');
+    if (!$stmt) return false;
+    $stmt->bind_param('ii', $notification_id, $user_id);
+    $ok = $stmt->execute();
+    $stmt->close();
+    return $ok;
+}
+
+function mark_all_notifications_read(mysqli $conn, int $user_id): bool {
+    return mark_all_as_read($conn, $user_id);
+}
+
+function get_notifications(mysqli $conn, int $user_id, int $limit = 20, int $offset = 0): array {
+    $stmt = $conn->prepare('SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT ? OFFSET ?');
+    if (!$stmt) return [];
+    $stmt->bind_param('iii', $user_id, $limit, $offset);
+    $stmt->execute();
+    $rows = $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+    $stmt->close();
+    return $rows;
+}
+
+function get_unread_notification_count(mysqli $conn, int $user_id): int {
+    return get_unread_count($conn, $user_id);
+}

@@ -1,10 +1,11 @@
 <?php
 require_once 'config.php';
-require_once 'includes/auth_check.php';
+require_once 'includes/role_check.php';
 require_once 'includes/notification_helper.php';
+require_once 'includes/workflow_helper.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header('Location: complaints.php');
+    header('Location: ' . role_home($_SESSION['user_role'] ?? 'user'));
     exit();
 }
 
@@ -13,18 +14,24 @@ $comment = trim($_POST['comment'] ?? '');
 
 if ($complaint_id <= 0 || empty($comment)) {
     $_SESSION['error'] = 'Invalid comment submission.';
-    header('Location: complaints.php');
+    header('Location: ' . role_home($_SESSION['user_role'] ?? 'user'));
     exit();
 }
 
-// Verify user has access to this complaint
-$is_admin = (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'admin');
-
-if ($is_admin) {
-    $stmt = $conn->prepare("SELECT id, user_id, subject FROM complaints WHERE id = ?");
+// Verify the current role can access this complaint.
+$role = $_SESSION['user_role'] ?? 'user';
+$is_staff = in_array($role, ['admin', 'department', 'officer'], true);
+if ($role === 'admin') {
+    $stmt = $conn->prepare('SELECT id, user_id, subject FROM complaints WHERE id = ?');
     $stmt->bind_param('i', $complaint_id);
+} elseif ($role === 'department') {
+    $stmt = $conn->prepare('SELECT id, user_id, subject FROM complaints WHERE id = ? AND department_id = ?');
+    $stmt->bind_param('ii', $complaint_id, $_SESSION['department_id']);
+} elseif ($role === 'officer') {
+    $stmt = $conn->prepare('SELECT id, user_id, subject FROM complaints WHERE id = ? AND officer_id = ?');
+    $stmt->bind_param('ii', $complaint_id, $_SESSION['user_id']);
 } else {
-    $stmt = $conn->prepare("SELECT id, user_id, subject FROM complaints WHERE id = ? AND user_id = ?");
+    $stmt = $conn->prepare('SELECT id, user_id, subject FROM complaints WHERE id = ? AND user_id = ?');
     $stmt->bind_param('ii', $complaint_id, $_SESSION['user_id']);
 }
 $stmt->execute();
@@ -33,12 +40,12 @@ $stmt->close();
 
 if (!$complaint) {
     $_SESSION['error'] = 'Complaint not found or access denied.';
-    header('Location: complaints.php');
+    header('Location: ' . role_home($_SESSION['user_role'] ?? 'user'));
     exit();
 }
 
 // Insert comment
-$is_admin_flag = $is_admin ? 1 : 0;
+$is_admin_flag = $is_staff ? 1 : 0;
 $stmt = $conn->prepare("INSERT INTO complaint_comments (complaint_id, user_id, comment, is_admin) VALUES (?, ?, ?, ?)");
 $stmt->bind_param('iisi', $complaint_id, $_SESSION['user_id'], $comment, $is_admin_flag);
 
@@ -61,13 +68,13 @@ if ($stmt->execute()) {
                 $stmt2->close();
 
                 // Add timeline entry for file upload
-                add_timeline_entry($conn, $complaint_id, $_SESSION['user_id'], 'file_uploaded', null, $file['name'], 'File attached with comment');
+                add_timeline_entry($conn, $complaint_id, (int)$_SESSION['user_id'], 'file_uploaded', null, $file['name'], 'File attached with comment');
             }
         }
     }
 
     // Send notifications
-    notify_new_comment($conn, $complaint_id, $_SESSION['user_id'], $_SESSION['user_name'], $comment, $is_admin);
+    notify_new_comment($conn, $complaint_id, (int)$_SESSION['user_id'], $_SESSION['user_name'], $comment, $is_staff);
 
     $_SESSION['success'] = 'Comment posted successfully!';
 } else {

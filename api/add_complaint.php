@@ -83,7 +83,7 @@ if ($stmt->execute()) {
                 $complaint_id,
                 'New Complaint',
                 'A new complaint has been submitted: ' . $subject,
-                'new_complaint'
+                'system'
             );
         }
         $admin_stmt->close();

@@ -33,14 +33,26 @@ if (strlen($comment) > 5000) {
 }
 
 // Get complaint
-$complaint_stmt = $conn->prepare("SELECT user_id FROM complaints WHERE id = ?");
+$role = $_SESSION['user_role'] ?? 'user';
+if ($role === 'admin') {
+    $complaint_stmt = $conn->prepare('SELECT user_id FROM complaints WHERE id = ?');
+    $complaint_stmt->bind_param('i', $complaint_id);
+} elseif ($role === 'department') {
+    $complaint_stmt = $conn->prepare('SELECT user_id FROM complaints WHERE id = ? AND department_id = ?');
+    $complaint_stmt->bind_param('ii', $complaint_id, $_SESSION['department_id']);
+} elseif ($role === 'officer') {
+    $complaint_stmt = $conn->prepare('SELECT user_id FROM complaints WHERE id = ? AND officer_id = ?');
+    $complaint_stmt->bind_param('ii', $complaint_id, $user_id);
+} else {
+    $complaint_stmt = $conn->prepare('SELECT user_id FROM complaints WHERE id = ? AND user_id = ?');
+    $complaint_stmt->bind_param('ii', $complaint_id, $user_id);
+}
 if (!$complaint_stmt) {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'Server error.']);
     exit();
 }
 
-$complaint_stmt->bind_param('i', $complaint_id);
 $complaint_stmt->execute();
 $complaint_result = $complaint_stmt->get_result();
 
@@ -56,7 +68,7 @@ $complaint_user = $complaint_row['user_id'];
 $complaint_stmt->close();
 
 // Insert comment
-$is_admin = $_SESSION['user_role'] === 'admin' ? 1 : 0;
+$is_admin = in_array($role, ['admin', 'department', 'officer'], true) ? 1 : 0;
 $stmt = $conn->prepare("INSERT INTO complaint_comments (complaint_id, user_id, comment, is_admin, created_at) VALUES (?, ?, ?, ?, NOW())");
 
 if ($stmt) {
@@ -81,7 +93,7 @@ if ($stmt) {
                 $complaint_id,
                 'New Comment',
                 'A new comment has been added to your complaint.',
-                'new_comment'
+                'comment'
             );
         }
         
