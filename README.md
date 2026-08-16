@@ -207,3 +207,10 @@ git status
 ## License
 
 This project is provided for educational and demonstration purposes. Add an explicit license before distributing it as a reusable software product.
+
+
+## Public project demo
+
+The repository includes a GitHub Pages-compatible interactive preview at [https://shubh0o7.github.io/complaint-management-system/](https://shubh0o7.github.io/complaint-management-system/). Visitors can switch between the four roles, view dashboards, submit sample complaints, update statuses, inspect timelines, and see notifications. Demo changes are stored in the visitor's browser through `localStorage` and do not modify the production database.
+
+GitHub Pages cannot execute PHP or MySQL. The interactive preview is therefore the presentation layer for the college project, while the complete server-backed application remains available through Docker Compose for environments that support PHP and MariaDB.
