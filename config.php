@@ -6,7 +6,7 @@
  * Edit the credentials below to match your local MySQL setup.
  */
 
-define('DB_HOST', 'localhost');
+define('DB_HOST', '127.0.0.1');
 define('DB_USER', 'root');
 define('DB_PASS', '');
 define('DB_NAME', 'complaint_system');
