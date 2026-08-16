@@ -92,12 +92,14 @@ if ($filter_category) {
     $types .= 's';
 }
 if ($search_query) {
-    $where_clauses[] = "(c.subject LIKE ? OR c.description LIKE ? OR u.full_name LIKE ?)";
+    $where_clauses[] = "(c.reference_no LIKE ? OR c.id = ? OR c.subject LIKE ? OR c.description LIKE ? OR u.full_name LIKE ?)";
     $search_param = "%$search_query%";
     $params[] = $search_param;
+    $params[] = (int)$search_query;
     $params[] = $search_param;
     $params[] = $search_param;
-    $types .= 'sss';
+    $params[] = $search_param;
+    $types .= 'sisss';
 }
 
 $where_sql = '';

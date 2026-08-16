@@ -1,6 +1,6 @@
 # College Project Documentation
 
-This directory contains the design evidence and operational documentation for the Online Complaint and Grievance Management System.
+This directory contains the design evidence and operational documentation for the Online Complaint and Grievance Management System. The public GitHub Pages preview is branded **CampusResolve — Student Grievance Portal**, while the formal academic and server-backed application title remains unchanged.
 
 | Document | Purpose |
 |---|---|
