@@ -17,6 +17,8 @@ const seed = {
 };
 
 let state = loadState();
+const previewRole = new URLSearchParams(window.location.search).get('role');
+if (previewRole && roles[previewRole]) state.role = previewRole;
 let currentView = 'overview';
 const $ = (selector) => document.querySelector(selector);
 const esc = (value) => String(value ?? '').replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' }[char]));
