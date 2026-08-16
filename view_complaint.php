@@ -35,6 +35,7 @@ if (!$complaint) {
     header('Location: ' . role_home($_SESSION['user_role'] ?? 'user'));
     exit();
 }
+$display_user_name = $is_admin ? ($complaint['user_name'] ?? '') : (((int)($complaint['is_anonymous'] ?? 0) === 1) ? 'Anonymous complainant' : ($complaint['user_name'] ?? ''));
 
 // Fetch timeline
 $timeline = get_complaint_timeline($conn, $complaint_id);
@@ -124,12 +125,16 @@ function format_file_size($bytes) {
                                     <?= get_priority_badge($complaint['priority']) ?>
                                     <span class="badge bg-light text-dark"><i class="bi bi-folder me-1"></i><?= htmlspecialchars($complaint['category']) ?></span>
                                     <small class="text-muted"><i class="bi bi-calendar me-1"></i><?= date('M d, Y \a\t h:i A', strtotime($complaint['created_at'])) ?></small>
+                                    <span class="badge bg-light text-dark">SLA due: <?= htmlspecialchars($complaint['sla_due_at'] ?? 'Not calculated') ?></span>
+                                    <?php if (is_complaint_overdue($complaint['sla_due_at'] ?? null, $complaint['status'])): ?><span class="badge bg-danger">Overdue</span><?php endif; ?>
                                 </div>
                             </div>
                             <div class="text-end">
-                                <small class="text-muted d-block">Complaint #<?= $complaint_id ?></small>
+                                <small class="text-muted d-block">Reference: <strong><?= htmlspecialchars($complaint['reference_no'] ?? ('#' . $complaint_id)) ?></strong></small>
+                                <a class="btn btn-sm btn-outline-primary mt-2" href="receipt.php?id=<?= $complaint_id ?>"><i class="bi bi-file-earmark-pdf me-1"></i>PDF receipt</a>
+                                <?php if ($complaint['status'] === 'Resolved' && !$is_admin): ?><a class="btn btn-sm btn-outline-success mt-2" href="feedback.php?id=<?= $complaint_id ?>"><i class="bi bi-star me-1"></i><?= $complaint['feedback_rating'] ? 'Update feedback' : 'Rate resolution' ?></a><?php endif; ?>
                                 <?php if ($is_admin): ?>
-                                <small class="text-muted">By: <?= htmlspecialchars($complaint['user_name']) ?></small>
+                                <small class="text-muted">By: <?= htmlspecialchars($display_user_name) ?></small>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -167,7 +172,7 @@ function format_file_size($bytes) {
                                                 <small class="text-muted ms-2">(<?= format_file_size($file['file_size']) ?>)</small>
                                                 <br><small class="text-muted">Uploaded by <?= htmlspecialchars($file['full_name']) ?> on <?= date('M d, Y', strtotime($file['uploaded_at'])) ?></small>
                                             </div>
-                                            <a href="uploads/<?= htmlspecialchars($file['file_name']) ?>" class="btn btn-sm btn-outline-primary" download="<?= htmlspecialchars($file['original_name']) ?>">
+                                            <a href="download_attachment.php?id=<?= (int)$file['id'] ?>" class="btn btn-sm btn-outline-primary" download="<?= htmlspecialchars($file['original_name']) ?>">
                                                 <i class="bi bi-download"></i>
                                             </a>
                                         </div>
@@ -207,6 +212,7 @@ function format_file_size($bytes) {
                                 <!-- Add Comment Form -->
                                 <hr class="my-3">
                                 <form action="add_comment.php" method="POST" class="mt-3">
+                                    <?= csrf_field() ?>
                                     <input type="hidden" name="complaint_id" value="<?= $complaint_id ?>">
                                     <div class="mb-3">
                                         <textarea class="form-control" name="comment" rows="3" placeholder="Write your comment..." required></textarea>
@@ -248,7 +254,7 @@ function format_file_size($bytes) {
                                             <div class="ms-3">
                                                 <strong class="d-block">Complaint Created</strong>
                                                 <small class="text-muted"><?= date('M d, Y \a\t h:i A', strtotime($complaint['created_at'])) ?></small>
-                                                <p class="mb-0 mt-1 text-muted small">By <?= htmlspecialchars($complaint['user_name']) ?></p>
+                                                <p class="mb-0 mt-1 text-muted small">By <?= htmlspecialchars($display_user_name) ?></p>
                                             </div>
                                         </div>
                                     </div>
@@ -330,7 +336,7 @@ function format_file_size($bytes) {
                                     <?php endif; ?>
                                     <tr>
                                         <td class="text-muted fw-semibold">Submitted By</td>
-                                        <td><?= htmlspecialchars($complaint['user_name']) ?></td>
+                                        <td><?= htmlspecialchars($display_user_name) ?></td>
                                     </tr>
                                 </table>
                             </div>

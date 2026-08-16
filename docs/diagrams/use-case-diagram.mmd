@@ -1,0 +1,27 @@
+flowchart LR
+    C[Complainant] --> UC1((Register / Login))
+    C --> UC2((Submit complaint))
+    C --> UC3((Track by reference))
+    C --> UC4((Comment and attach files))
+    C --> UC5((Download receipt))
+    C --> UC6((Rate resolved complaint))
+    C --> UC7((Manage profile / password))
+    A[Administrator] --> UC1
+    A --> UC8((Route and assign complaints))
+    A --> UC9((Update status / remarks))
+    A --> UC10((Escalate overdue cases))
+    A --> UC11((Export CSV / PDF))
+    A --> UC12((Review audit dashboard))
+    A --> UC13((Manage users and departments))
+    D[Department Manager] --> UC1
+    D --> UC14((Review department queue))
+    D --> UC8
+    D --> UC9
+    D --> UC10
+    O[Complaint Officer] --> UC1
+    O --> UC15((View assigned workload))
+    O --> UC9
+    O --> UC10
+    E[Email Service] --> UC16((Send / log notifications))
+    UC2 -. includes .-> UC16
+    UC9 -. includes .-> UC16

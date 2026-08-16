@@ -1,0 +1,25 @@
+sequenceDiagram
+    actor C as Complainant
+    participant UI as PHP Form
+    participant S as Security Helpers
+    participant DB as MariaDB
+    participant N as Notification Service
+    participant M as Email Adapter
+    participant A as Audit Log
+    C->>UI: Submit complaint + attachment
+    UI->>S: Validate CSRF and fields
+    S-->>UI: Validation result
+    UI->>S: Validate MIME and store file
+    S-->>UI: Secure stored filename
+    UI->>DB: Insert complaint with SLA due date
+    DB-->>UI: New complaint ID
+    UI->>S: Generate GRV reference number
+    S->>DB: Update reference number
+    UI->>DB: Insert timeline event
+    UI->>N: Notify administrators
+    N->>DB: Store in-app notifications
+    UI->>M: Queue/log email notifications
+    M->>DB: Store email delivery status
+    UI->>A: Record create event
+    A->>DB: Store audit log
+    UI-->>C: Show reference number and receipt link

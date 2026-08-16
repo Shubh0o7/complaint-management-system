@@ -24,6 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 }
 
 require_once __DIR__ . '/../config.php';
+require_once __DIR__ . '/../includes/security.php';
 
 // Get input data (supports both JSON body and form data)
 $contentType = isset($_SERVER['CONTENT_TYPE']) ? trim($_SERVER['CONTENT_TYPE']) : '';
@@ -76,6 +77,9 @@ if ($result->num_rows === 1) {
         $_SESSION['user_email'] = $user['email'];
         $_SESSION['user_role'] = $user['role'] ?? 'user';
         $_SESSION['department_id'] = $user['department_id'] ?? null;
+        $updateLogin = $conn->prepare('UPDATE users SET last_login_at = NOW() WHERE id = ?');
+        if ($updateLogin) { $updateLogin->bind_param('i', $user['id']); $updateLogin->execute(); $updateLogin->close(); }
+        audit_log($conn, 'login', 'user', (int)$user['id'], 'Successful login');
 
         $redirects = [
             'admin' => 'admin_dashboard.php',

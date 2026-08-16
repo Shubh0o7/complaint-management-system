@@ -20,13 +20,23 @@ pass "PHP syntax (${#php_files[@]} files)"
 node --check docs/app.js >/dev/null
 pass "GitHub Pages demo JavaScript syntax"
 
-for file in index.html docs/index.html docs/styles.css docs/app.js docs/.nojekyll database.sql Dockerfile docker-compose.yml .github/workflows/ci-cd.yml; do
+for file in index.html docs/index.html docs/styles.css docs/app.js docs/.nojekyll database.sql Dockerfile docker-compose.yml .github/workflows/ci-cd.yml includes/security.php includes/pdf_helper.php profile.php change_password.php forgot_password.php reset_password.php feedback.php receipt.php admin_export.php admin_audit.php escalate_complaint.php; do
   test -e "$file" || fail "Missing required file: $file"
 done
-pass "Required application, demo, and deployment files"
+for file in docs/SRS.md docs/TEST-CASES.md docs/TEST-RESULTS.md docs/DATABASE-DESIGN.md docs/INSTALLATION.md docs/DEPLOYMENT.md docs/FUTURE-SCOPE.md docs/PROJECT-REPORT.md; do
+  test -e "$file" || fail "Missing required documentation: $file"
+done
+for file in docs/diagrams/er-diagram.mmd docs/diagrams/dfd-level-0.mmd docs/diagrams/dfd-level-1.mmd docs/diagrams/dfd-level-2.mmd docs/diagrams/use-case-diagram.mmd docs/diagrams/system-architecture.mmd docs/diagrams/complaint-sequence.mmd; do
+  test -s "$file" || fail "Missing diagram source: $file"
+done
+pass "Required application, demo, deployment, and documentation files"
 
 grep -q "CREATE TABLE.*complaints" database.sql || fail "Complaint schema is missing"
 grep -q "CREATE TABLE.*notifications" database.sql || fail "Notification schema is missing"
+grep -q "CREATE TABLE.*audit_logs" database.sql || fail "Audit schema is missing"
+grep -q "reference_no" database.sql || fail "Complaint reference schema is missing"
+grep -q "feedback_rating" database.sql || fail "Feedback schema is missing"
+grep -q "sla_due_at" database.sql || fail "SLA schema is missing"
 grep -q "packages: write" .github/workflows/ci-cd.yml || fail "Container publishing permission is missing"
 pass "Database and CI/CD markers"
 

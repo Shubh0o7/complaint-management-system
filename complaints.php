@@ -41,14 +41,16 @@ if ($filter_priority && in_array($filter_priority, ['Low', 'Medium', 'High', 'Cr
     $types .= 's';
 }
 if ($search_query) {
-    $where_clauses[] = "(subject LIKE ? OR description LIKE ?)";
+        $where_clauses[] = "(subject LIKE ? OR description LIKE ? OR reference_no LIKE ? OR CAST(id AS CHAR) LIKE ?)";
     $search_param = '%' . $search_query . '%';
-    $params[] = $search_param;
-    $params[] = $search_param;
-    $types .= 'ss';
+        $params[] = $search_param;
+        $params[] = $search_param;
+        $params[] = $search_param;
+        $params[] = $search_param;
+        $types .= 'ssss';
 }
 
-$sql = "SELECT id, subject, category, priority, status, created_at FROM complaints WHERE " . implode(' AND ', $where_clauses) . " ORDER BY created_at DESC";
+$sql = "SELECT id, reference_no, subject, category, priority, status, sla_due_at, feedback_rating, created_at FROM complaints WHERE " . implode(' AND ', $where_clauses) . " ORDER BY created_at DESC";
 $stmt = $conn->prepare($sql);
 $stmt->bind_param($types, ...$params);
 $stmt->execute();
@@ -83,7 +85,7 @@ $complaints = $stmt->get_result();
                         <form method="GET" class="row g-2 align-items-end">
                             <div class="col-md-3">
                                 <label class="form-label small fw-semibold">Search</label>
-                                <input type="text" class="form-control form-control-sm" name="search" placeholder="Search subject..." value="<?= htmlspecialchars($search_query) ?>">
+                                <input type="text" class="form-control form-control-sm" name="search" placeholder="Search subject or GRV reference..." value="<?= htmlspecialchars($search_query) ?>">
                             </div>
                             <div class="col-md-2">
                                 <label class="form-label small fw-semibold">Status</label>
@@ -132,7 +134,7 @@ $complaints = $stmt->get_result();
                                 <table class="table table-hover mb-0">
                                     <thead class="table-light">
                                         <tr>
-                                            <th>#</th>
+                                            <th>Reference</th>
                                             <th>Subject</th>
                                             <th>Category</th>
                                             <th>Priority</th>
@@ -143,8 +145,8 @@ $complaints = $stmt->get_result();
                                     <tbody>
                                         <?php $i = 1; while ($row = $complaints->fetch_assoc()): ?>
                                         <tr>
-                                            <td><?= $i++ ?></td>
-                                            <td><?= htmlspecialchars($row['subject']) ?></td>
+                                            <td><a href="view_complaint.php?id=<?= (int)$row['id'] ?>" class="fw-semibold"><?= htmlspecialchars($row['reference_no']) ?></a><br><?php if (is_complaint_overdue($row['sla_due_at'], $row['status'])): ?><span class="badge bg-danger">Overdue</span><?php endif; ?></td>
+                                            <td><a href="view_complaint.php?id=<?= (int)$row['id'] ?>" class="text-decoration-none"><?= htmlspecialchars($row['subject']) ?></a><?php if ($row['status'] === 'Resolved'): ?><br><a class="small" href="feedback.php?id=<?= (int)$row['id'] ?>"><?= $row['feedback_rating'] ? 'Update feedback' : 'Rate resolution' ?></a><?php endif; ?></td>
                                             <td><span class="badge bg-light text-dark"><?= htmlspecialchars($row['category']) ?></span></td>
                                             <td>
                                                 <?php
@@ -169,7 +171,7 @@ $complaints = $stmt->get_result();
                                                 ?>
                                                 <span class="badge <?= $badge_class ?>"><?= htmlspecialchars($row['status']) ?></span>
                                             </td>
-                                            <td><?= date('M d, Y', strtotime($row['created_at'])) ?></td>
+                                            <td><?= date('M d, Y', strtotime($row['created_at'])) ?><br><a class="small" href="receipt.php?id=<?= (int)$row['id'] ?>">PDF receipt</a></td>
                                         </tr>
                                         <?php endwhile; ?>
                                     </tbody>

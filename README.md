@@ -21,10 +21,10 @@ This project digitizes the full complaint lifecycle. A complainant submits a cas
 | --- | --- |
 | **Four role workspaces** | Complainant, administrator, department manager, and complaint officer |
 | **Complaint lifecycle** | Submission, routing, assignment, investigation, resolution, and rejection |
-| **Traceability** | Status history, activity timeline, comments, remarks, and notifications |
-| **Evidence handling** | Attachment metadata and local upload storage in the full application |
+| **Traceability** | Status history, activity timeline, comments, remarks, notifications, and audit logs |
+| **Evidence handling** | MIME-validated private uploads, authorized downloads, PDF receipts, and reference numbers |
 | **Public presentation** | GitHub Pages interactive demo with local browser persistence |
-| **Production-style runtime** | PHP 8.3-compatible application, MariaDB, Docker Compose, and CI/CD |
+| **Production-style runtime** | PHP 8.3-compatible application, MariaDB, Docker Compose, CI/CD, SLA monitoring, and exports |
 
 ## Live demo
 
@@ -36,17 +36,19 @@ GitHub Pages is static hosting and cannot execute PHP or MySQL. For that reason,
 
 ## Interface screenshots
 
-### Complainant workspace
+The public preview includes a consistent interface for each operational role. These captures use seeded demonstration data and are stored in the repository for academic evaluation.
 
-![Complainant workspace showing complaint metrics, queue, priorities, statuses, and recent activity](docs/screenshots/overview.png)
+| Complainant | Administrator |
+| --- | --- |
+| ![Complainant workspace](docs/screenshots/modules/user.png) | ![Administrator workspace](docs/screenshots/modules/admin.png) |
 
-The complainant view presents the most important information at a glance: total cases, pending work, active investigations, resolved cases, a searchable complaint queue, and recent notifications.
+| Department Manager | Complaint Officer |
+| --- | --- |
+| ![Department manager workspace](docs/screenshots/modules/department.png) | ![Complaint officer workspace](docs/screenshots/modules/officer.png) |
 
-### Administrator workspace
+## Design evidence
 
-![Administrator workspace showing the role-based service overview and full complaint queue](docs/screenshots/administrator.png)
-
-The administrator view demonstrates the same consistent design system with a different operational context. The role selector can be used in the live demo to switch between administrator, department manager, officer, and complainant workspaces.
+The project includes a complete academic documentation pack: [SRS](docs/SRS.md), [project report](docs/PROJECT-REPORT.md), [test cases](docs/TEST-CASES.md), [test results](docs/TEST-RESULTS.md), [database design](docs/DATABASE-DESIGN.md), [installation guide](docs/INSTALLATION.md), [deployment guide](docs/DEPLOYMENT.md), and [future scope](docs/FUTURE-SCOPE.md). The [diagram gallery](docs/diagrams/) contains the ER diagram, DFD Levels 0–2, use-case diagram, system architecture, and complaint-submission sequence diagram.
 
 ## Role-based workflow
 
@@ -99,8 +101,8 @@ Administrators have system-wide oversight, complaint routing, role-account manag
 | Backend | PHP 8.3-compatible server-side application |
 | Database | MySQL or MariaDB with MySQLi prepared statements |
 | Charts | Chart.js |
-| Authentication | PHP sessions with `password_hash()` and `password_verify()` |
-| File storage | Local attachment storage under `uploads/` |
+| **Authentication** | PHP sessions, password hashing, CSRF protection, reset tokens, and audit events |
+| **File storage** | MIME-validated private attachment storage with authorized download endpoint |
 | Demo hosting | GitHub Pages static interactive preview |
 | Local runtime | Docker Compose with PHP-Apache and MariaDB |
 | CI/CD | GitHub Actions with PHP linting, MariaDB smoke tests, and GHCR publishing |
@@ -119,9 +121,9 @@ A successful run currently verifies:
 
 | Test area | Result |
 | --- | --- |
-| PHP syntax | **33 PHP files passed** |
+| PHP syntax | **45 PHP files passed** |
 | GitHub Pages JavaScript syntax | **Passed with Node.js `--check`** |
-| Required application and deployment files | **Passed** |
+| Application, documentation, diagrams, and deployment files | **Passed** |
 | Database and CI/CD configuration markers | **Passed** |
 | Static HTML, CSS, and JavaScript serving | **Passed** |
 
@@ -166,6 +168,10 @@ docker compose up --build
 | Password | `admin123` |
 
 These credentials are for development and evaluation only. Change the password before using the server-backed application with real data.
+
+## College submission pack
+
+The repository is organized so a professor can inspect both the running system and the engineering evidence without searching through unrelated files. Start with the live demo, then review the README screenshots, the [project report](docs/PROJECT-REPORT.md), and the [test results](docs/TEST-RESULTS.md). The full diagram sources and rendered PNGs are under `docs/diagrams/`, while role screenshots are under `docs/screenshots/modules/`.
 
 ## Project structure
 
@@ -214,7 +220,7 @@ The schema is organized around the complaint lifecycle. `users` stores all four 
 
 ## Security and deployment notes
 
-The application uses prepared MySQLi statements, password hashing, PHP session authentication, role guards, scoped complaint queries, unique upload names, attachment metadata, and timeline records. For production use, place secrets outside version control, enforce HTTPS, change the seeded administrator password, add CSRF protection, strengthen server-side MIME validation, disable directory listing, and use a private database account with only the required permissions.
+The application uses prepared MySQLi statements, password hashing, PHP session authentication, role guards, CSRF protection, expiring password-reset tokens, scoped complaint queries, MIME-detected uploads with random filenames, private download authorization, audit logs, SLA monitoring, and timeline records. For production use, place secrets outside version control, enforce HTTPS, change the seeded administrator password, configure real SMTP, disable directory listing, and use a private database account with only the required permissions.
 
 GitHub Pages is appropriate for the static project preview only. The PHP application must be deployed to a PHP-capable host with MariaDB, Docker, or the published container image. The GitHub Actions workflow supports an optional `DEPLOY_HOOK_URL` repository secret for hosting providers that expose a deployment hook.
 

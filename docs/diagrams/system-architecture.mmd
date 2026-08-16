@@ -1,0 +1,33 @@
+flowchart TB
+    subgraph Client[Client layer]
+      Browser[Responsive browser UI]
+      Pages[GitHub Pages interactive demo]
+    end
+    subgraph App[Application layer]
+      Apache[Apache + PHP 8.3]
+      Auth[Session auth + CSRF]
+      Workflow[Complaint workflow services]
+      Reports[CSV/PDF reporting]
+    end
+    subgraph Data[Data layer]
+      MySQL[(MariaDB / MySQL)]
+      Uploads[Private upload storage]
+      Logs[Audit and email logs]
+    end
+    subgraph Ops[Operations]
+      Actions[GitHub Actions CI/CD]
+      Registry[GitHub Container Registry]
+      SMTP[SMTP / mail provider]
+    end
+    Browser --> Apache
+    Browser --> Pages
+    Apache --> Auth
+    Apache --> Workflow
+    Apache --> Reports
+    Auth --> MySQL
+    Workflow --> MySQL
+    Workflow --> Uploads
+    Workflow --> Logs
+    Workflow --> SMTP
+    Actions --> Registry
+    Actions --> Apache

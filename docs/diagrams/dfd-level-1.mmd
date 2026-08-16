@@ -1,0 +1,27 @@
+flowchart TB
+    C[Complainant] --> P1[1. Authentication & Profile]
+    A[Administrator] --> P1
+    D[Department Manager] --> P1
+    O[Complaint Officer] --> P1
+    P1 <--> U[(Users)]
+    C --> P2[2. Complaint Intake]
+    P2 --> CDB[(Complaints)]
+    P2 --> ATT[(Attachments)]
+    P2 --> P3[3. Routing & Assignment]
+    A --> P3
+    P3 --> CDB
+    D --> P3
+    P3 --> N[(Notifications)]
+    P3 --> E[Email Adapter]
+    D --> P4[4. Investigation & Resolution]
+    O --> P4
+    C --> P4
+    P4 --> CDB
+    P4 --> T[(Timeline & Comments)]
+    P4 --> F[(Feedback)]
+    P4 --> N
+    A --> P5[5. SLA, Audit & Reporting]
+    P5 --> CDB
+    P5 --> SLA[(SLA Policies)]
+    P5 --> AL[(Audit Logs)]
+    P5 --> R[CSV/PDF Reports]

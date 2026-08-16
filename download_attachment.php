@@ -1,0 +1,6 @@
+<?php
+require_once 'config.php'; require_once 'includes/auth_check.php';
+$attachmentId=(int)($_GET['id']??0); $userId=(int)$_SESSION['user_id']; $role=$_SESSION['user_role']??'user';
+$sql="SELECT a.file_name,a.original_name,a.file_type,a.file_size,c.user_id,c.department_id,c.officer_id FROM complaint_attachments a JOIN complaints c ON c.id=a.complaint_id WHERE a.id=? AND (c.user_id=? OR ?='admin' OR c.officer_id=? OR (c.department_id IS NOT NULL AND c.department_id=?)) LIMIT 1";
+$stmt=$conn->prepare($sql);$stmt->bind_param('iisii',$attachmentId,$userId,$role,$userId,$_SESSION['department_id']);$stmt->execute();$row=$stmt->get_result()->fetch_assoc();$stmt->close();if(!$row){http_response_code(404);exit('Attachment not found.');}
+$paths=[__DIR__.'/uploads/private/'.$row['file_name'],__DIR__.'/uploads/'.$row['file_name']];$path=null;foreach($paths as $candidate){if(is_file($candidate)){$path=$candidate;break;}}if(!$path){http_response_code(404);exit('File no longer exists.');}header('Content-Type: '.($row['file_type']?:'application/octet-stream'));header('Content-Length: '.filesize($path));header('Content-Disposition: attachment; filename="'.basename($row['original_name']).'"');readfile($path);exit;

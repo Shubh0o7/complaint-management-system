@@ -10,6 +10,7 @@ header('Content-Type: application/json');
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../includes/auth_check.php';
 require_once __DIR__ . '/../includes/notification_helper.php';
+require_once __DIR__ . '/../includes/security.php';
 
 // Only allow POST requests
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -18,11 +19,13 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
+require_csrf_json();
 $user_id = $_SESSION['user_id'];
 $subject = trim($_POST['subject'] ?? '');
 $category = trim($_POST['category'] ?? '');
 $priority = trim($_POST['priority'] ?? 'Medium');
 $description = trim($_POST['description'] ?? '');
+$is_anonymous = !empty($_POST['is_anonymous']) ? 1 : 0;
 
 // Validate input
 if (empty($subject) || empty($category) || empty($description)) {
@@ -49,17 +52,20 @@ if (!in_array($priority, $valid_priorities)) {
 }
 
 // Insert complaint
-$stmt = $conn->prepare("INSERT INTO complaints (user_id, subject, category, priority, description, status) VALUES (?, ?, ?, ?, ?, 'Pending')");
+$sla_due_at = calculate_sla_due_at($conn, $priority);
+$stmt = $conn->prepare("INSERT INTO complaints (user_id, subject, category, priority, description, status, is_anonymous, sla_due_at, reference_no) VALUES (?, ?, ?, ?, ?, 'Pending', ?, ?, '')");
 if (!$stmt) {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'Server error. Please try again later.']);
     exit();
 }
 
-$stmt->bind_param('issss', $user_id, $subject, $category, $priority, $description);
+$stmt->bind_param('issssis', $user_id, $subject, $category, $priority, $description, $is_anonymous, $sla_due_at);
 
 if ($stmt->execute()) {
     $complaint_id = $stmt->insert_id;
+    $reference_no = generate_reference_no($conn, $complaint_id);
+    audit_log($conn, 'create', 'complaint', $complaint_id, 'Complaint ' . $reference_no . ' created through API');
     
     // Log timeline entry
     $action = 'created';
@@ -92,6 +98,7 @@ if ($stmt->execute()) {
     echo json_encode([
         'success' => true,
         'message' => 'Complaint submitted successfully!',
+        'reference_no' => $reference_no,
         'complaint_id' => $complaint_id,
         'redirect' => 'complaints.php'
     ]);

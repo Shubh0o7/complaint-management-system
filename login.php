@@ -3,7 +3,12 @@ require_once 'config.php';
 // Session is started in config.php
 // If user is already logged in, redirect to dashboard
 if (isset($_SESSION['user_id'])) {
-    $redirect = ($_SESSION['user_role'] === 'admin') ? 'admin_dashboard.php' : 'dashboard.php';
+    $redirect = match ($_SESSION['user_role'] ?? 'user') {
+        'admin' => 'admin_dashboard.php',
+        'department' => 'department_dashboard.php',
+        'officer' => 'officer_dashboard.php',
+        default => 'dashboard.php',
+    };
     header('Location: ' . $redirect);
     exit();
 }
@@ -58,7 +63,8 @@ if (isset($_SESSION['user_id'])) {
                         </form>
                     </div>
                 </div>
-                <p class="text-center mt-3">Don't have an account? <a href="register.php" class="text-primary fw-semibold">Register here</a></p>
+                <p class="text-center mt-3"><a href="forgot_password.php" class="text-primary fw-semibold">Forgot password?</a></p>
+                <p class="text-center">Don't have an account? <a href="register.php" class="text-primary fw-semibold">Register here</a></p>
                 <p class="text-center"><a href="index.php" class="text-muted"><i class="bi bi-arrow-left"></i> Back to Home</a></p>
             </div>
         </div>

@@ -1,0 +1,11 @@
+flowchart LR
+    C[Complainant] -->|Submit, track, comment, feedback| S((Online Grievance Management System))
+    A[Administrator] -->|Route, assign, approve, report| S
+    D[Department Manager] -->|Review, assign, remark| S
+    O[Complaint Officer] -->|Investigate, update, resolve| S
+    S -->|Notifications, status, receipts| C
+    S -->|Dashboards, audit, exports| A
+    S -->|Scoped queue, SLA alerts| D
+    S -->|Assigned work queue| O
+    S <-->|SMTP / Email provider| E[Email Service]
+    S <-->|MySQL records| DB[(Complaint Database)]

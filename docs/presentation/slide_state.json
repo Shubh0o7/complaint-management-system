@@ -1,0 +1,124 @@
+{
+  "project_info": {
+    "title": "Online Complaint & Grievance Management System",
+    "created": 1786899793.913,
+    "last_updated": 1786900704.755,
+    "total_slides": 11
+  },
+  "slides": [
+    {
+      "id": "cover",
+      "state": "edited",
+      "pageNum": 1
+    },
+    {
+      "id": "problem",
+      "state": "edited",
+      "pageNum": 2
+    },
+    {
+      "id": "solution",
+      "state": "edited",
+      "pageNum": 3
+    },
+    {
+      "id": "roles",
+      "state": "edited",
+      "pageNum": 4
+    },
+    {
+      "id": "data-model",
+      "state": "edited",
+      "pageNum": 5
+    },
+    {
+      "id": "security",
+      "state": "edited",
+      "pageNum": 6
+    },
+    {
+      "id": "sla",
+      "state": "edited",
+      "pageNum": 7
+    },
+    {
+      "id": "reports",
+      "state": "edited",
+      "pageNum": 8
+    },
+    {
+      "id": "testing",
+      "state": "edited",
+      "pageNum": 9
+    },
+    {
+      "id": "deployment",
+      "state": "edited",
+      "pageNum": 10
+    },
+    {
+      "id": "conclusion",
+      "state": "edited",
+      "pageNum": 11
+    }
+  ],
+  "outline": [
+    {
+      "id": "cover",
+      "title": "Online Complaint & Grievance Management System",
+      "summary": "Title slide for the college project presentation with subtitle and presenter context."
+    },
+    {
+      "id": "problem",
+      "title": "The problem: complaints are difficult to track",
+      "summary": "Show the institutional pain points created by paper registers and fragmented email workflows."
+    },
+    {
+      "id": "solution",
+      "title": "The proposed solution: one accountable workflow",
+      "summary": "Explain the end-to-end complaint lifecycle from submission through routing, investigation, resolution, and feedback."
+    },
+    {
+      "id": "roles",
+      "title": "Four role workspaces, one shared process",
+      "summary": "Present the responsibilities and permissions of complainants, administrators, department managers, and complaint officers.",
+      "image_plan": "/home/ubuntu/complaint-management-system/docs/screenshots/overview.png; /home/ubuntu/complaint-management-system/docs/screenshots/modules/admin.png; /home/ubuntu/complaint-management-system/docs/screenshots/modules/department.png; /home/ubuntu/complaint-management-system/docs/screenshots/modules/officer.png - Four role workspaces matching Complainant, Administrator, Department Manager, and Complaint Officer UI screens"
+    },
+    {
+      "id": "data-model",
+      "title": "The data model makes the workflow traceable",
+      "summary": "Explain the core relational entities, governance tables, and GRV reference-number pattern."
+    },
+    {
+      "id": "security",
+      "title": "Security is part of the design",
+      "summary": "Summarize CSRF, password, role authorization, upload, anonymous complaint, and audit controls."
+    },
+    {
+      "id": "sla",
+      "title": "SLA and escalation turn data into action",
+      "summary": "Show priority-based deadlines, overdue indicators, escalation records, and workload analytics."
+    },
+    {
+      "id": "reports",
+      "title": "Reports and communication support institutional review",
+      "summary": "Show CSV/PDF exports, receipts, notifications, email evidence, and feedback ratings."
+    },
+    {
+      "id": "testing",
+      "title": "Testing and automation make the project reproducible",
+      "summary": "Present the smoke test, CI/CD checks, role matrix, authorization checks, and workflow verification."
+    },
+    {
+      "id": "deployment",
+      "title": "Deployment and demonstration",
+      "summary": "Explain Docker deployment, GitHub Actions, GitHub Pages preview, and the academic documentation pack.",
+      "image_plan": "/home/ubuntu/complaint-management-system/docs/screenshots/modules/user.png - Deployment preview showing GitHub Pages preview UI"
+    },
+    {
+      "id": "conclusion",
+      "title": "Conclusion: more than CRUD",
+      "summary": "Close with the project value, accountability loop, academic readiness, and future integration potential."
+    }
+  ]
+}

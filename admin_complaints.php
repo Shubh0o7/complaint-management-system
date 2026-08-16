@@ -6,6 +6,7 @@ require_once 'includes/email_helper.php';
 
 // Handle status update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
+    require_csrf();
     $complaint_id = (int)$_POST['complaint_id'];
     $new_status = $_POST['new_status'] ?? '';
     if (!in_array($new_status, ['Pending', 'In Progress', 'Resolved', 'Rejected'], true)) {
@@ -29,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
     $complaint_user_email = $old_data['email'] ?? '';
     
     $resolved_at = ($new_status === 'Resolved') ? date('Y-m-d H:i:s') : null;
-    
+    if ($new_status !== 'Resolved') $resolved_at = null;
     $stmt = $conn->prepare("UPDATE complaints SET status = ?, admin_remarks = ?, resolved_at = ? WHERE id = ?");
     $stmt->bind_param('sssi', $new_status, $admin_remarks, $resolved_at, $complaint_id);
     $stmt->execute();
@@ -53,11 +54,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
             
             // Send a mock/logged email notification when email is configured.
             if ($complaint_user_email !== '') {
-                send_status_change_email($complaint_user_email, $complaint_user_name, $complaint_id, $complaint_subject, $old_status, $new_status);
+                send_email_notification($conn, (int)$complaint_user_id, $complaint_id, $complaint_user_email, 'Complaint Status Update: ' . $complaint_subject, "Hello {$complaint_user_name},\n\nComplaint #{$complaint_id} changed from {$old_status} to {$new_status}.\nPlease sign in to view the latest details.");
             }
         }
     }
     
+    audit_log($conn, 'status_change', 'complaint', $complaint_id, "Administrator changed status from {$old_status} to {$new_status}");
     $_SESSION['flash_msg'] = "Complaint #$complaint_id status updated to '$new_status'.";
     header('Location: admin_complaints.php?' . http_build_query($_GET));
     exit();

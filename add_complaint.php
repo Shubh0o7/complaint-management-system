@@ -21,10 +21,12 @@ $errors = [];
 $success = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_csrf();
     $subject = trim($_POST['subject'] ?? '');
     $category = trim($_POST['category'] ?? '');
     $priority = trim($_POST['priority'] ?? 'Medium');
     $description = trim($_POST['description'] ?? '');
+    $is_anonymous = !empty($_POST['is_anonymous']) ? 1 : 0;
 
     // Validation
     if (empty($subject)) $errors[] = 'Subject is required.';
@@ -63,10 +65,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if (empty($errors)) {
-        $stmt = $conn->prepare("INSERT INTO complaints (user_id, subject, category, priority, description) VALUES (?, ?, ?, ?, ?)");
-        $stmt->bind_param('issss', $_SESSION['user_id'], $subject, $category, $priority, $description);
+        $sla_due_at = calculate_sla_due_at($conn, $priority);
+        $stmt = $conn->prepare("INSERT INTO complaints (user_id, subject, category, priority, description, is_anonymous, sla_due_at, reference_no) VALUES (?, ?, ?, ?, ?, ?, ?, '')");
+        $stmt->bind_param('issssis', $_SESSION['user_id'], $subject, $category, $priority, $description, $is_anonymous, $sla_due_at);
         if ($stmt->execute()) {
             $complaint_id = $conn->insert_id;
+            $reference_no = generate_reference_no($conn, $complaint_id);
+            audit_log($conn, 'create', 'complaint', $complaint_id, 'Complaint ' . $reference_no . ' submitted with ' . $priority . ' priority' . ($is_anonymous ? ' anonymously' : ''));
 
             // Handle file uploads
             if (!empty($_FILES['attachments']['name'][0])) {
@@ -102,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 create_notification($conn, (int)$admin['id'], $complaint_id, 'New Complaint', 'A new complaint has been submitted: ' . $subject, 'system');
             }
 
-            $success = 'Complaint submitted successfully!';
+            $success = 'Complaint submitted successfully. Reference number: ' . e($reference_no);
             $subject = $category = $priority = $description = '';
         } else {
             $errors[] = 'Failed to submit complaint. Please try again.';
@@ -155,6 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="card border-0 shadow-sm">
                     <div class="card-body p-4">
                         <form method="POST" id="complaintForm" enctype="multipart/form-data" novalidate>
+                            <?= csrf_field() ?>
                             <div class="row">
                                 <div class="col-md-12 mb-3">
                                     <label for="subject" class="form-label fw-semibold">Subject <span class="text-danger">*</span></label>
@@ -191,6 +197,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <div class="mb-3">
                                 <label for="description" class="form-label fw-semibold">Description <span class="text-danger">*</span></label>
                                 <textarea class="form-control" id="description" name="description" rows="5" placeholder="Describe your complaint in detail..." required><?= htmlspecialchars($description ?? '') ?></textarea>
+                            </div>
+
+                            <div class="form-check form-switch mb-3">
+                                <input class="form-check-input" type="checkbox" id="is_anonymous" name="is_anonymous" value="1">
+                                <label class="form-check-label" for="is_anonymous"><strong>Submit anonymously</strong><br><small class="text-muted">Your identity will be hidden from general staff views, while administrators retain an accountability record.</small></label>
                             </div>
 
                             <!-- File Attachments -->
