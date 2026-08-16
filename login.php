@@ -1,43 +1,11 @@
 <?php
 require_once 'config.php';
-
-$error = '';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['email'] ?? '');
-    $password = $_POST['password'] ?? '';
-
-    if (empty($email) || empty($password)) {
-        $error = 'Please fill in all fields.';
-    } else {
-        $stmt = $conn->prepare("SELECT id, full_name, email, password, role FROM users WHERE email = ?");
-        $stmt->bind_param('s', $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result->num_rows === 1) {
-            $user = $result->fetch_assoc();
-            if (password_verify($password, $user['password'])) {
-                $_SESSION['user_id'] = $user['id'];
-                $_SESSION['user_name'] = $user['full_name'];
-                $_SESSION['user_email'] = $user['email'];
-                $_SESSION['user_role'] = $user['role'] ?? 'user';
-
-                // Redirect based on role
-                if ($_SESSION['user_role'] === 'admin') {
-                    header('Location: admin_dashboard.php');
-                } else {
-                    header('Location: dashboard.php');
-                }
-                exit();
-            } else {
-                $error = 'Invalid email or password.';
-            }
-        } else {
-            $error = 'Invalid email or password.';
-        }
-        $stmt->close();
-    }
+// Session is started in config.php
+// If user is already logged in, redirect to dashboard
+if (isset($_SESSION['user_id'])) {
+    $redirect = ($_SESSION['user_role'] === 'admin') ? 'admin_dashboard.php' : 'dashboard.php';
+    header('Location: ' . $redirect);
+    exit();
 }
 ?>
 <!DOCTYPE html>
@@ -61,30 +29,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="card shadow-sm border-0">
                     <div class="card-body p-4">
                         <h5 class="text-center mb-3">Login to your account</h5>
-                        <?php if ($error): ?>
-                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                <i class="bi bi-exclamation-circle me-1"></i><?= htmlspecialchars($error) ?>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                            </div>
-                        <?php endif; ?>
-                        <form method="POST" action="" id="loginForm" novalidate>
+                        <!-- Dynamic message container -->
+                        <div id="loginMessage" class="d-none"></div>
+                        <form id="loginForm" novalidate>
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email Address</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-envelope"></i></span>
                                     <input type="email" class="form-control" id="email" name="email" 
-                                           value="<?= htmlspecialchars($email ?? '') ?>" placeholder="Enter your email" required>
+                                           placeholder="Enter your email" required>
                                 </div>
+                                <div class="invalid-feedback">Please enter a valid email address.</div>
                             </div>
                             <div class="mb-3">
                                 <label for="password" class="form-label">Password</label>
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                                    <input type="password" class="form-control" id="password" name="password" placeholder="Enter your password" required>
+                                    <input type="password" class="form-control" id="password" name="password" 
+                                           placeholder="Enter your password" required>
                                 </div>
+                                <div class="invalid-feedback">Please enter your password.</div>
                             </div>
                             <div class="d-grid">
-                                <button type="submit" class="btn btn-primary">
+                                <button type="submit" class="btn btn-primary" id="loginBtn">
                                     <i class="bi bi-box-arrow-in-right me-1"></i>Login
                                 </button>
                             </div>
@@ -97,6 +64,102 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/js/script.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const messageDiv = document.getElementById('loginMessage');
+
+        /**
+         * Display a message (success or error) dynamically
+         */
+        function showMessage(type, text) {
+            messageDiv.className = `alert alert-${type} alert-dismissible fade show`;
+            messageDiv.innerHTML = `
+                <i class="bi bi-${type === 'danger' ? 'exclamation-circle' : 'check-circle'} me-1"></i>${text}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            messageDiv.classList.remove('d-none');
+
+            // Auto-dismiss after 5 seconds
+            setTimeout(() => {
+                if (messageDiv && !messageDiv.classList.contains('d-none')) {
+                    messageDiv.classList.add('d-none');
+                }
+            }, 5000);
+        }
+
+        /**
+         * Client-side validation
+         */
+        function validateForm(email, password) {
+            if (!email || !password) {
+                showMessage('danger', 'Please fill in all fields.');
+                return false;
+            }
+            // Basic email format check
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                showMessage('danger', 'Please enter a valid email address.');
+                return false;
+            }
+            return true;
+        }
+
+        /**
+         * Handle form submission via fetch()
+         */
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            // Get form values
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            // Client-side validation
+            if (!validateForm(email, password)) {
+                loginForm.classList.add('was-validated');
+                return;
+            }
+
+            // Disable button and show loading state
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" role="status"></span>Logging in...';
+            messageDiv.classList.add('d-none');
+
+            try {
+                const response = await fetch('api/login.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showMessage('success', data.message);
+                    // Redirect after a short delay
+                    setTimeout(() => {
+                        window.location.href = data.redirect || 'dashboard.php';
+                    }, 1000);
+                } else {
+                    showMessage('danger', data.message || 'Login failed. Please try again.');
+                    // Re-enable button
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = '<i class="bi bi-box-arrow-in-right me-1"></i>Login';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showMessage('danger', 'Network error. Please check your connection and try again.');
+                // Re-enable button
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = '<i class="bi bi-box-arrow-in-right me-1"></i>Login';
+            }
+        });
+    });
+    </script>
 </body>
 </html>
