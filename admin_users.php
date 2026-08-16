@@ -5,7 +5,13 @@ require_once 'includes/admin_check.php';
 // Handle role update
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_role'])) {
     $user_id = (int)$_POST['user_id'];
-    $new_role = $_POST['new_role'];
+    $new_role = $_POST['new_role'] ?? '';
+    if (!in_array($new_role, ['user', 'admin', 'department', 'officer'], true)) {
+        $_SESSION['flash_msg'] = 'Invalid role selected.';
+        $_SESSION['flash_type'] = 'danger';
+        header('Location: admin_users.php');
+        exit();
+    }
     
     // Prevent admin from demoting themselves
     if ($user_id === (int)$_SESSION['user_id']) {
@@ -142,7 +148,7 @@ $stmt->close();
                                         </td>
                                         <td><?= htmlspecialchars($u['email']) ?></td>
                                         <td>
-                                            <span class="badge <?= $u['role'] === 'admin' ? 'bg-danger' : 'bg-primary' ?>">
+                                            <span class="badge <?= $u['role'] === 'admin' ? 'bg-danger' : ($u['role'] === 'officer' ? 'bg-info' : ($u['role'] === 'department' ? 'bg-dark' : 'bg-primary')) ?>">
                                                 <?= ucfirst($u['role']) ?>
                                             </span>
                                         </td>
@@ -153,10 +159,10 @@ $stmt->close();
                                             <div class="btn-group btn-group-sm">
                                                 <form method="POST" class="d-inline">
                                                     <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
-                                                    <input type="hidden" name="new_role" value="<?= $u['role'] === 'admin' ? 'user' : 'admin' ?>">
-                                                    <button type="submit" name="update_role" class="btn btn-outline-warning" title="Toggle Role">
-                                                        <i class="bi bi-arrow-repeat"></i>
-                                                    </button>
+                                                    <select name="new_role" class="form-select form-select-sm" aria-label="Change role">
+                                                        <?php foreach (['user','admin','department','officer'] as $role): ?><option value="<?= $role ?>" <?= $u['role'] === $role ? 'selected' : '' ?>><?= ucfirst($role) ?></option><?php endforeach; ?>
+                                                    </select>
+                                                    <button type="submit" name="update_role" class="btn btn-outline-warning" title="Save Role"><i class="bi bi-save"></i></button>
                                                 </form>
                                                 <form method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this user? All their complaints will also be deleted.')">
                                                     <input type="hidden" name="user_id" value="<?= $u['id'] ?>">

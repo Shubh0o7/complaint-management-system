@@ -51,7 +51,7 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 }
 
 // Query database for user
-$stmt = $conn->prepare("SELECT id, full_name, email, password, role FROM users WHERE email = ?");
+$stmt = $conn->prepare("SELECT id, full_name, email, password, role, department_id, is_active FROM users WHERE email = ?");
 if (!$stmt) {
     http_response_code(500);
     echo json_encode(['success' => false, 'message' => 'Server error. Please try again later.']);
@@ -64,15 +64,26 @@ $result = $stmt->get_result();
 
 if ($result->num_rows === 1) {
     $user = $result->fetch_assoc();
+    if ((int)($user['is_active'] ?? 1) !== 1) {
+        http_response_code(403);
+        echo json_encode(['success' => false, 'message' => 'This account has been disabled. Please contact an administrator.']);
+        exit();
+    }
     if (password_verify($password, $user['password'])) {
-        // Set session variables
+        session_regenerate_id(true);
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_name'] = $user['full_name'];
         $_SESSION['user_email'] = $user['email'];
         $_SESSION['user_role'] = $user['role'] ?? 'user';
+        $_SESSION['department_id'] = $user['department_id'] ?? null;
 
-        // Determine redirect URL based on role
-        $redirect = ($_SESSION['user_role'] === 'admin') ? 'admin_dashboard.php' : 'dashboard.php';
+        $redirects = [
+            'admin' => 'admin_dashboard.php',
+            'department' => 'department_dashboard.php',
+            'officer' => 'officer_dashboard.php',
+            'user' => 'dashboard.php'
+        ];
+        $redirect = $redirects[$_SESSION['user_role']] ?? 'dashboard.php';
 
         echo json_encode([
             'success' => true,

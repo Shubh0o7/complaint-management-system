@@ -3,7 +3,8 @@ session_start();
 
 // Redirect to dashboard if already logged in
 if (isset($_SESSION['user_id'])) {
-    header('Location: dashboard.php');
+    $role_redirects = ['admin' => 'admin_dashboard.php', 'department' => 'department_dashboard.php', 'officer' => 'officer_dashboard.php', 'user' => 'dashboard.php'];
+    header('Location: ' . ($role_redirects[$_SESSION['user_role'] ?? 'user'] ?? 'dashboard.php'));
     exit();
 }
 ?>

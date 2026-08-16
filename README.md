@@ -161,3 +161,25 @@ This project is for educational purposes.
 ## Author
 
 Shubham Shukla
+
+
+## Four-Role Workflow (Current)
+
+The application now supports four scoped roles: **user**, **admin**, **department**, and **officer**. A complainant submits and tracks a case; an administrator routes it to a department; the department manager assigns it to an officer; and the officer records investigation progress, remarks, and the final resolution. Notifications and timeline entries keep the complainant informed throughout the lifecycle.
+
+| Role | Main workspace | Scope |
+| --- | --- | --- |
+| User | `dashboard.php`, `complaints.php`, `view_complaint.php` | Own complaints, comments, attachments, notifications, and timeline |
+| Admin | `admin_dashboard.php`, `admin_complaints.php`, `admin_assignments.php`, `reports.php` | All complaints, routing, accounts, analytics, and system oversight |
+| Department manager | `department_dashboard.php` | Complaints routed to the manager's department; officer assignment and departmental remarks |
+| Complaint officer | `officer_dashboard.php` | Complaints assigned to the officer; investigation remarks and status progression |
+
+### Provisioning department and officer accounts
+
+Import the updated `database.sql`, sign in as the default administrator, and open **Workflow & Accounts**. The administrator can route complaints to active departments and create department-manager or complaint-officer accounts. Each account must be linked to a department so database queries remain scoped to the appropriate work queue.
+
+For an existing installation, back up the database first and apply the upgrade statements in the migration notes at the end of `database.sql` before using the new role dashboards. The new default admin credentials remain `admin@cms.com` / `admin123`; change them immediately in a real deployment.
+
+### Security and deployment notes
+
+The implementation uses PHP sessions, password hashing, prepared MySQLi statements, role guards, scoped complaint queries, server-side role validation, and notification/timeline writes for workflow actions. Configure production database credentials outside version control, disable directory listing for `uploads/`, enforce HTTPS, and add CSRF tokens before exposing write operations on an internet-facing deployment.
