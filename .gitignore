@@ -1,0 +1,22 @@
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+
+# Runtime and local development files
+*.log
+logs/
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Uploaded user content (keep the directory placeholder)
+uploads/*
+!uploads/.gitkeep
+
+# Local database and container artifacts
+*.sql.gz
+*.sqlite
+*.sqlite3
+coverage/
