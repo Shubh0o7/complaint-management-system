@@ -196,3 +196,10 @@ docker compose up --build
 Then open [http://localhost:8080](http://localhost:8080). The database, tables, departments, categories, application user, and default administrator account are initialized automatically. No manual SQL import, credential editing, or PHP configuration is required. Sign in with `admin@cms.com` and `admin123`, then change the password for any real deployment.
 
 To stop the application, press `Ctrl+C`; to remove the stored database and start completely fresh, run `docker compose down -v` followed by `docker compose up --build`.
+
+
+## Automated Testing and Deployment
+
+The repository includes `.github/workflows/ci-cd.yml`. Every pull request and every push runs PHP syntax checks, initializes a MariaDB test service from `database.sql`, starts the application, verifies the login endpoint, and checks the administrator dashboard. Pushes to `master` or `main` publish a tagged container image to the repository's GitHub Container Registry package after tests pass.
+
+For automatic deployment to a hosting provider that supports deploy hooks, add a repository secret named `DEPLOY_HOOK_URL`. The workflow will call it after the container image is published. If the secret is not configured, testing and registry publishing still complete successfully.

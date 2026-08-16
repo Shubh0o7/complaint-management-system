@@ -1,0 +1,140 @@
+name: Test and Deploy
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - main
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: cms-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: PHP and database smoke tests
+    runs-on: ubuntu-latest
+    services:
+      mariadb:
+        image: mariadb:11.4
+        env:
+          MARIADB_DATABASE: complaint_system
+          MARIADB_USER: complaint_user
+          MARIADB_PASSWORD: complaint_pass
+          MARIADB_ROOT_PASSWORD: root_pass
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mariadb-admin ping -h localhost -u root -proot_pass"
+          --health-interval=5s
+          --health-timeout=5s
+          --health-retries=20
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mysqli, pdo_mysql
+          coverage: none
+
+      - name: Lint PHP files
+        shell: bash
+        run: |
+          set -euo pipefail
+          while IFS= read -r -d '' file; do
+            php -l "$file"
+          done < <(find . -name '*.php' -not -path './.git/*' -print0)
+
+      - name: Install MariaDB client
+        run: sudo apt-get update && sudo apt-get install -y mariadb-client
+
+      - name: Initialize test database
+        env:
+          MYSQL_PWD: root_pass
+        run: mysql --protocol=tcp -h 127.0.0.1 -u root < database.sql
+
+      - name: Start application
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_USER: complaint_user
+          DB_PASS: complaint_pass
+          DB_NAME: complaint_system
+        run: |
+          php -S 127.0.0.1:8090 > /tmp/cms-php.log 2>&1 &
+          echo $! > /tmp/cms-php.pid
+          for attempt in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:8090/ > /tmp/cms-index.html; then exit 0; fi
+            sleep 1
+          done
+          cat /tmp/cms-php.log
+          exit 1
+
+      - name: Verify login and admin dashboard
+        env:
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_USER: complaint_user
+          DB_PASS: complaint_pass
+          DB_NAME: complaint_system
+        run: |
+          set -euo pipefail
+          curl --fail --silent http://127.0.0.1:8090/login.php | grep -q 'Login'
+          curl --fail --silent --cookie-jar /tmp/cms-cookie --cookie /tmp/cms-cookie \
+            -H 'Content-Type: application/json' \
+            --data '{"email":"admin@cms.com","password":"admin123"}' \
+            http://127.0.0.1:8090/api/login.php | grep -q '"success":true'
+          curl --fail --silent --cookie /tmp/cms-cookie \
+            http://127.0.0.1:8090/admin_dashboard.php | grep -q 'Admin Dashboard'
+
+  deploy:
+    name: Build and publish container
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract image metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
+          tags: |
+            type=raw,value=latest,enable={{is_default_branch}}
+            type=sha
+
+      - name: Build and publish Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Trigger hosting deployment
+        env:
+          DEPLOY_HOOK_URL: ${{ secrets.DEPLOY_HOOK_URL }}
+        run: |
+          if [ -n "${DEPLOY_HOOK_URL:-}" ]; then
+            curl --fail --retry 3 --retry-delay 5 -X POST "$DEPLOY_HOOK_URL"
+          else
+            echo "DEPLOY_HOOK_URL is not configured; container publishing is complete."
+          fi
