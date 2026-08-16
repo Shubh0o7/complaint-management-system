@@ -60,7 +60,6 @@ $old_status = $complaint_row['status'];
 $complaint_stmt->close();
 
 // Update complaint
-$resolved_at = ($new_status === 'Resolved') ? 'NOW()' : 'NULL';
 $stmt = $conn->prepare("UPDATE complaints SET status = ?, admin_remarks = ?, resolved_at = IF(? = 'Resolved', NOW(), resolved_at) WHERE id = ?");
 
 if ($stmt) {
@@ -69,20 +68,13 @@ if ($stmt) {
     if ($stmt->execute()) {
         // Log timeline entry
         $action = 'status_change';
-        $timeline_stmt = $conn->prepare("INSERT INTO complaint_timeline (complaint_id, user_id, action, old_value, new_value, description) VALUES (?, ?, ?, ?, ?, ?)");
+        $timeline_desc = 'Status changed from ' . $old_status . ' to ' . $new_status;
+        $timeline_stmt = $conn->prepare("INSERT INTO complaint_timeline (complaint_id, user_id, action, description) VALUES (?, ?, ?, ?)");
+        
         if ($timeline_stmt) {
-            $timeline_desc = 'Status changed from ' . $old_status . ' to ' . $new_status;
-            $timeline_stmt->bind_param('iisss', $complaint_id, $admin_id, $action, $old_status, $new_status);
-            // Hmm, we need to fix this bind - we have one extra parameter
+            $timeline_stmt->bind_param('iiss', $complaint_id, $admin_id, $action, $timeline_desc);
+            $timeline_stmt->execute();
             $timeline_stmt->close();
-            
-            // Use correct bind
-            $timeline_stmt = $conn->prepare("INSERT INTO complaint_timeline (complaint_id, user_id, action, description) VALUES (?, ?, ?, ?)");
-            if ($timeline_stmt) {
-                $timeline_stmt->bind_param('iiss', $complaint_id, $admin_id, $action, $timeline_desc);
-                $timeline_stmt->execute();
-                $timeline_stmt->close();
-            }
         }
         
         // Notify user

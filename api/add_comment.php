@@ -73,8 +73,7 @@ if ($stmt) {
             $timeline_stmt->close();
         }
         
-        // Notify other party
-        $notify_user = ($user_id === $complaint_user) ? $complaint_user : $complaint_user;
+        // Notify complaint owner if commenter is not the owner
         if ($user_id !== $complaint_user) {
             create_notification(
                 $conn,
