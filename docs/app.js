@@ -1,5 +1,6 @@
 const STORAGE_KEY = 'grievance-portal-demo-v1';
 const LOGIN_KEY = 'campusresolve-demo-auth-v1';
+const THEME_KEY = 'campusresolve-demo-theme-v1';
 const roles = { user: 'Complainant', admin: 'Administrator', department: 'Department Manager', officer: 'Complaint Officer' };
 const roleDescriptions = { user: 'Track your submitted complaints and communicate with the responsible team.', admin: 'Manage the complete complaint lifecycle across all departments.', department: 'Review department-routed complaints and coordinate officer assignments.', officer: 'Investigate assigned complaints and record resolution progress.' };
 const seed = {
@@ -23,6 +24,9 @@ if (previewRole && roles[previewRole]) state.role = previewRole;
 let currentView = 'overview';
 let loginRole = previewRole && roles[previewRole] ? previewRole : 'user';
 const $ = (selector) => document.querySelector(selector);
+function applyTheme(theme) { const dark = theme === 'dark'; document.body.classList.toggle('dark-mode', dark); document.documentElement.dataset.theme = dark ? 'dark' : 'light'; document.querySelectorAll('#themeToggle, #loginThemeToggle').forEach((button) => { const icon = button.querySelector('i'); const label = button.querySelector('span'); if (icon) icon.className = `bi ${dark ? 'bi-sun' : 'bi-moon-stars'}`; if (label) label.textContent = dark ? (button.id === 'loginThemeToggle' ? 'Light mode' : 'Light') : (button.id === 'loginThemeToggle' ? 'Dark mode' : 'Dark'); button.setAttribute('aria-label', dark ? 'Enable light mode' : 'Enable dark mode'); }); }
+function toggleTheme() { const next = document.body.classList.contains('dark-mode') ? 'light' : 'dark'; localStorage.setItem(THEME_KEY, next); applyTheme(next); showToast(next === 'dark' ? 'Dark mode enabled.' : 'Light mode enabled.'); }
+
 const esc = (value) => String(value ?? '').replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#039;', '"': '&quot;' }[char]));
 const statusClass = (status) => ({ Pending: 'pending', 'In Progress': 'progress', Resolved: 'resolved', Rejected: 'rejected' }[status] || 'pending');
 const priorityClass = (priority) => priority.toLowerCase();
@@ -95,5 +99,8 @@ $('#roleSelect').addEventListener('change', (event) => { state.role = event.targ
 document.querySelectorAll('.nav-item').forEach((item) => item.addEventListener('click', () => showView(item.dataset.view)));
 $('#resetDemo').addEventListener('click', () => { if (confirm('Reset the demo data to its original sample state?')) { state = structuredClone(seed); saveState(); render(); showToast('Demo data reset.'); } });
 $('#mobileMenu').addEventListener('click', () => $('#sidebar').classList.toggle('open'));
+$('#themeToggle').addEventListener('click', toggleTheme);
+$('#loginThemeToggle').addEventListener('click', toggleTheme);
+applyTheme(localStorage.getItem(THEME_KEY) || 'light');
 bindDemoLogin();
 if (sessionStorage.getItem(LOGIN_KEY) === '1') showApp(); else showLogin();
