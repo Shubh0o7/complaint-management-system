@@ -17,6 +17,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
+require_csrf_json();
+
 $complaint_id = intval($_POST['complaint_id'] ?? 0);
 $new_status = trim($_POST['status'] ?? '');
 $admin_remarks = trim($_POST['remarks'] ?? '');

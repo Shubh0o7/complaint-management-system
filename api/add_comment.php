@@ -16,6 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
+require_csrf_json();
+
 $complaint_id = intval($_POST['complaint_id'] ?? 0);
 $comment = trim($_POST['comment'] ?? '');
 $user_id = $_SESSION['user_id'];

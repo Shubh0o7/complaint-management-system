@@ -16,6 +16,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
+require_csrf_json();
+
 $complaint_id = intval($_POST['complaint_id'] ?? 0);
 $user_id = $_SESSION['user_id'];
 
@@ -66,12 +68,21 @@ if ($file['size'] > $max_size) {
     exit();
 }
 
-$allowed_types = ['image/jpeg', 'image/png', 'application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
-if (!in_array($file['type'], $allowed_types)) {
+$allowed_types = [
+    'image/jpeg' => 'jpg',
+    'image/png' => 'png',
+    'application/pdf' => 'pdf',
+    'application/msword' => 'doc',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document' => 'docx'
+];
+$finfo = new finfo(FILEINFO_MIME_TYPE);
+$detected_type = $finfo->file($file['tmp_name']);
+if (!isset($allowed_types[$detected_type])) {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'File type not allowed.']);
     exit();
 }
+$detected_extension = $allowed_types[$detected_type];
 
 $upload_dir = __DIR__ . '/../uploads/';
 if (!is_dir($upload_dir)) {
@@ -79,15 +90,15 @@ if (!is_dir($upload_dir)) {
 }
 
 // Generate unique filename
-$file_name = time() . '_' . bin2hex(random_bytes(8)) . '_' . basename($file['name']);
+$file_name = time() . '_' . bin2hex(random_bytes(8)) . '.' . $detected_extension;
 $file_path = $upload_dir . $file_name;
 
 if (move_uploaded_file($file['tmp_name'], $file_path)) {
     // Insert attachment record
     $stmt = $conn->prepare("INSERT INTO complaint_attachments (complaint_id, user_id, file_name, original_name, file_type, file_size, uploaded_at) VALUES (?, ?, ?, ?, ?, ?, NOW())");
     if ($stmt) {
-        $original_name = $file['name'];
-        $file_type = $file['type'];
+        $original_name = basename($file['name']);
+        $file_type = $detected_type;
         $file_size = $file['size'];
         
         $stmt->bind_param('iisssi', $complaint_id, $user_id, $file_name, $original_name, $file_type, $file_size);

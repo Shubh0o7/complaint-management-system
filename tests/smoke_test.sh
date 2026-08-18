@@ -19,6 +19,11 @@ pass "PHP syntax (${#php_files[@]} files)"
 
 node --check docs/app.js >/dev/null
 pass "GitHub Pages demo JavaScript syntax"
+for file in api/add_comment.php api/mark_notification_read.php api/update_complaint_status.php api/upload_attachment.php; do
+  grep -q 'require_csrf_json' "$file" || fail "Missing CSRF guard: $file"
+done
+grep -q 'new finfo(FILEINFO_MIME_TYPE)' api/upload_attachment.php || fail "Upload MIME detection missing"
+pass "Mutating API CSRF and upload MIME guards"
 
 for file in index.html docs/index.html docs/styles.css docs/app.js docs/.nojekyll database.sql Dockerfile docker-compose.yml package.json package-lock.json tests/e2e-auth-theme.mjs .github/workflows/ci-cd.yml includes/security.php includes/pdf_helper.php profile.php settings.php change_password.php forgot_password.php reset_password.php feedback.php receipt.php admin_export.php admin_audit.php escalate_complaint.php; do
   test -e "$file" || fail "Missing required file: $file"

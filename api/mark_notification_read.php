@@ -14,6 +14,8 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
+require_csrf_json();
+
 $notification_id = intval($_POST['notification_id'] ?? 0);
 $user_id = $_SESSION['user_id'];
 
