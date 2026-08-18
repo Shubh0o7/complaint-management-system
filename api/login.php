@@ -81,13 +81,8 @@ if ($result->num_rows === 1) {
         if ($updateLogin) { $updateLogin->bind_param('i', $user['id']); $updateLogin->execute(); $updateLogin->close(); }
         audit_log($conn, 'login', 'user', (int)$user['id'], 'Successful login');
 
-        $redirects = [
-            'admin' => 'admin_dashboard.php',
-            'department' => 'department_dashboard.php',
-            'officer' => 'officer_dashboard.php',
-            'user' => 'dashboard.php'
-        ];
-        $redirect = $redirects[$_SESSION['user_role']] ?? 'dashboard.php';
+        // Resolve the destination from the authenticated role using the shared allow-list.
+        $redirect = role_home($_SESSION['user_role']);
 
         echo json_encode([
             'success' => true,

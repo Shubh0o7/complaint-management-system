@@ -1,16 +1,9 @@
 <?php
 require_once 'config.php';
-// Session is started in config.php
-// If user is already logged in, redirect to dashboard
+require_once 'includes/security.php';
+// If user is already logged in, send them to the correct role workspace.
 if (isset($_SESSION['user_id'])) {
-    $redirect = match ($_SESSION['user_role'] ?? 'user') {
-        'admin' => 'admin_dashboard.php',
-        'department' => 'department_dashboard.php',
-        'officer' => 'officer_dashboard.php',
-        default => 'dashboard.php',
-    };
-    header('Location: ' . $redirect);
-    exit();
+    redirect_role_home();
 }
 ?>
 <!DOCTYPE html>
