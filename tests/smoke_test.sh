@@ -20,7 +20,7 @@ pass "PHP syntax (${#php_files[@]} files)"
 node --check docs/app.js >/dev/null
 pass "GitHub Pages demo JavaScript syntax"
 
-for file in index.html docs/index.html docs/styles.css docs/app.js docs/.nojekyll database.sql Dockerfile docker-compose.yml .github/workflows/ci-cd.yml includes/security.php includes/pdf_helper.php profile.php change_password.php forgot_password.php reset_password.php feedback.php receipt.php admin_export.php admin_audit.php escalate_complaint.php; do
+for file in index.html docs/index.html docs/styles.css docs/app.js docs/.nojekyll database.sql Dockerfile docker-compose.yml .github/workflows/ci-cd.yml includes/security.php includes/pdf_helper.php profile.php settings.php change_password.php forgot_password.php reset_password.php feedback.php receipt.php admin_export.php admin_audit.php escalate_complaint.php; do
   test -e "$file" || fail "Missing required file: $file"
 done
 for file in docs/SRS.md docs/TEST-CASES.md docs/TEST-RESULTS.md docs/DATABASE-DESIGN.md docs/INSTALLATION.md docs/DEPLOYMENT.md docs/FUTURE-SCOPE.md docs/PROJECT-REPORT.md; do
@@ -37,6 +37,8 @@ grep -q "CREATE TABLE.*audit_logs" database.sql || fail "Audit schema is missing
 grep -q "reference_no" database.sql || fail "Complaint reference schema is missing"
 grep -q "feedback_rating" database.sql || fail "Feedback schema is missing"
 grep -q "sla_due_at" database.sql || fail "SLA schema is missing"
+grep -q 'CREATE TABLE IF NOT EXISTS `user_preferences`' database.sql || fail "User preferences schema is missing"
+grep -q 'CREATE TABLE IF NOT EXISTS `system_settings`' database.sql || fail "System settings schema is missing"
 grep -q "packages: write" .github/workflows/ci-cd.yml || fail "Container publishing permission is missing"
 pass "Database and CI/CD markers"
 

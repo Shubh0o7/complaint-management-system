@@ -137,6 +137,29 @@ ALTER TABLE `users`
   ADD COLUMN IF NOT EXISTS `last_login_at` TIMESTAMP NULL DEFAULT NULL,
   ADD COLUMN IF NOT EXISTS `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP;
 
+CREATE TABLE IF NOT EXISTS `user_preferences` (
+  `user_id` INT PRIMARY KEY,
+  `email_notifications` TINYINT(1) NOT NULL DEFAULT 1,
+  `notification_digest` ENUM('instant','daily','off') NOT NULL DEFAULT 'instant',
+  `theme` ENUM('system','light','dark') NOT NULL DEFAULT 'system',
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT `fk_preferences_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `system_settings` (
+  `setting_key` VARCHAR(80) PRIMARY KEY,
+  `setting_value` VARCHAR(255) NOT NULL,
+  `updated_by` INT DEFAULT NULL,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT `fk_settings_user` FOREIGN KEY (`updated_by`) REFERENCES `users`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+INSERT IGNORE INTO `system_settings` (`setting_key`, `setting_value`) VALUES
+  ('portal_name', 'CampusResolve'),
+  ('support_email', 'support@campus.edu'),
+  ('default_sla_hours', '72'),
+  ('email_notifications_enabled', '1');
+
 ALTER TABLE `complaints`
   ADD COLUMN IF NOT EXISTS `reference_no` VARCHAR(30) DEFAULT NULL,
   ADD COLUMN IF NOT EXISTS `is_anonymous` TINYINT(1) NOT NULL DEFAULT 0,

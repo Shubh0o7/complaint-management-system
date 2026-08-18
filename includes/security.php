@@ -77,15 +77,26 @@ function generate_reference_no(mysqli $conn, int $complaintId, ?string $year = n
     return $reference;
 }
 
+function system_setting(mysqli $conn, string $key, string $fallback = ''): string
+{
+    $stmt = $conn->prepare('SELECT setting_value FROM system_settings WHERE setting_key = ? LIMIT 1');
+    if (!$stmt) return $fallback;
+    $stmt->bind_param('s', $key);
+    $stmt->execute();
+    $row = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+    return (string)($row['setting_value'] ?? $fallback);
+}
+
 function sla_hours_for(mysqli $conn, string $priority): int
 {
     $stmt = $conn->prepare('SELECT resolution_hours FROM sla_policies WHERE priority = ? AND is_active = 1 LIMIT 1');
-    if (!$stmt) return 120;
+    if (!$stmt) return max(1, (int)system_setting($conn, 'default_sla_hours', '120'));
     $stmt->bind_param('s', $priority);
     $stmt->execute();
     $row = $stmt->get_result()->fetch_assoc();
     $stmt->close();
-    return (int)($row['resolution_hours'] ?? 120);
+    return max(1, (int)($row['resolution_hours'] ?? system_setting($conn, 'default_sla_hours', '120')));
 }
 
 function calculate_sla_due_at(mysqli $conn, string $priority, ?string $createdAt = null): string

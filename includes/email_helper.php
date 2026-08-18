@@ -7,8 +7,22 @@
 function send_email_notification(mysqli $conn, ?int $userId, ?int $complaintId, string $to, string $subject, string $body): bool
 {
     $status = 'logged'; $error = null; $sentAt = null;
+    $notificationsEnabled = true;
+    $settingStmt = $conn->prepare('SELECT setting_value FROM system_settings WHERE setting_key = ? LIMIT 1');
+    if ($settingStmt) {
+        $settingKey = 'email_notifications_enabled';
+        $settingStmt->bind_param('s', $settingKey);
+        $settingStmt->execute();
+        $settingRow = $settingStmt->get_result()->fetch_assoc();
+        $settingStmt->close();
+        if ($settingRow !== null) $notificationsEnabled = filter_var($settingRow['setting_value'], FILTER_VALIDATE_BOOLEAN);
+    }
+    if (!$notificationsEnabled) {
+        $status = 'disabled';
+        $error = 'Disabled by administrator settings';
+    }
     $mailEnabled = filter_var(getenv('MAIL_ENABLED') ?: '0', FILTER_VALIDATE_BOOLEAN);
-    if ($mailEnabled) {
+    if ($notificationsEnabled && $mailEnabled) {
         $from = getenv('MAIL_FROM') ?: 'noreply@grievance-portal.local';
         $headers = "From: {$from}\r\nContent-Type: text/plain; charset=UTF-8\r\n";
         $sent = @mail($to, $subject, $body, $headers);

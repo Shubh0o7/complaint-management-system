@@ -83,7 +83,7 @@ Complainant
 
 ### Complainant experience
 
-Users can register and log in, submit complaints with subjects, categories, priorities, descriptions, and attachments, then search and filter their complaint history. Each case includes status badges, metadata, evidence, comments, notifications, and a chronological activity timeline.
+Users can register and log in, manage their profile and contact information, update notification and appearance preferences, submit complaints with subjects, categories, priorities, descriptions, and attachments, then search and filter their complaint history. Each case includes status badges, metadata, evidence, comments, notifications, and a chronological activity timeline.
 
 ### Department and officer operations
 
@@ -91,7 +91,7 @@ Department managers see only cases routed to their department and can assign ava
 
 ### Administration and reporting
 
-Administrators have system-wide oversight, complaint routing, role-account management, status updates, notification review, and reporting views with Chart.js visualizations. Server-side role guards prevent users from accessing workspaces outside their assigned scope.
+Administrators have system-wide oversight, complaint routing, role-account management, status updates, notification review, reporting views with Chart.js visualizations, and institution settings for the portal name, support email, default SLA fallback, and system email controls. Server-side role guards prevent users from accessing workspaces outside their assigned scope.
 
 ## Technology
 

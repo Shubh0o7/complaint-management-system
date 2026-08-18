@@ -49,15 +49,18 @@ if (isset($_SESSION['user_id'])) {
             </a>
         </li>
         <li class="nav-item mb-1"><a class="nav-link rounded <?= basename($_SERVER['PHP_SELF']) === 'admin_audit.php' ? 'active bg-dark text-white' : 'text-dark' ?>" href="admin_audit.php"><i class="bi bi-clipboard2-data me-2"></i> Audit & Analytics</a></li>
+        <li class="nav-item mb-1"><a class="nav-link rounded <?= basename($_SERVER['PHP_SELF']) === 'settings.php' ? 'active bg-dark text-white' : 'text-dark' ?>" href="settings.php"><i class="bi bi-sliders2-vertical me-2"></i> Settings</a></li>
         <li class="nav-item mb-2"><hr class="my-1"></li>
         <?php elseif (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'department'): ?>
         <li class="nav-item mb-1"><a class="nav-link rounded <?= basename($_SERVER['PHP_SELF']) === 'department_dashboard.php' ? 'active bg-dark text-white' : 'text-dark' ?>" href="department_dashboard.php"><i class="bi bi-building me-2"></i> Department Queue</a></li>
         <li class="nav-item mb-1"><a class="nav-link rounded <?= basename($_SERVER['PHP_SELF']) === 'notifications.php' ? 'active bg-primary text-white' : 'text-dark' ?>" href="notifications.php"><i class="bi bi-bell me-2"></i> Notifications <?php if ($unread_count > 0): ?><span class="badge bg-danger rounded-pill ms-1"><?= $unread_count > 99 ? '99+' : $unread_count ?></span><?php endif; ?></a></li>
         <li class="nav-item mb-1"><a class="nav-link rounded <?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'active bg-primary text-white' : 'text-dark' ?>" href="profile.php"><i class="bi bi-person-circle me-2"></i> My Profile</a></li>
+        <li class="nav-item mb-1"><a class="nav-link rounded <?= basename($_SERVER['PHP_SELF']) === 'settings.php' ? 'active bg-primary text-white' : 'text-dark' ?>" href="settings.php"><i class="bi bi-sliders2-vertical me-2"></i> Settings</a></li>
         <?php elseif (isset($_SESSION['user_role']) && $_SESSION['user_role'] === 'officer'): ?>
         <li class="nav-item mb-1"><a class="nav-link rounded <?= basename($_SERVER['PHP_SELF']) === 'officer_dashboard.php' ? 'active bg-dark text-white' : 'text-dark' ?>" href="officer_dashboard.php"><i class="bi bi-person-badge me-2"></i> Assigned Cases</a></li>
         <li class="nav-item mb-1"><a class="nav-link rounded <?= basename($_SERVER['PHP_SELF']) === 'notifications.php' ? 'active bg-primary text-white' : 'text-dark' ?>" href="notifications.php"><i class="bi bi-bell me-2"></i> Notifications <?php if ($unread_count > 0): ?><span class="badge bg-danger rounded-pill ms-1"><?= $unread_count > 99 ? '99+' : $unread_count ?></span><?php endif; ?></a></li>
         <li class="nav-item mb-1"><a class="nav-link rounded <?= basename($_SERVER['PHP_SELF']) === 'profile.php' ? 'active bg-primary text-white' : 'text-dark' ?>" href="profile.php"><i class="bi bi-person-circle me-2"></i> My Profile</a></li>
+        <li class="nav-item mb-1"><a class="nav-link rounded <?= basename($_SERVER['PHP_SELF']) === 'settings.php' ? 'active bg-primary text-white' : 'text-dark' ?>" href="settings.php"><i class="bi bi-sliders2-vertical me-2"></i> Settings</a></li>
         <?php else: ?>
         <!-- User Navigation -->
         <li class="nav-item mb-1">
@@ -83,6 +86,7 @@ if (isset($_SESSION['user_id'])) {
                 <?php endif; ?>
             </a>
         </li>
+        <li class="nav-item mb-1"><a class="nav-link rounded <?= basename($_SERVER['PHP_SELF']) === 'settings.php' ? 'active bg-primary text-white' : 'text-dark' ?>" href="settings.php"><i class="bi bi-sliders2-vertical me-2"></i> Settings</a></li>
         <?php endif; ?>
     </ul>
     <div class="mt-auto p-3 border-top">
