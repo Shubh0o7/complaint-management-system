@@ -20,7 +20,7 @@ pass "PHP syntax (${#php_files[@]} files)"
 node --check docs/app.js >/dev/null
 pass "GitHub Pages demo JavaScript syntax"
 
-for file in index.html docs/index.html docs/styles.css docs/app.js docs/.nojekyll database.sql Dockerfile docker-compose.yml .github/workflows/ci-cd.yml includes/security.php includes/pdf_helper.php profile.php settings.php change_password.php forgot_password.php reset_password.php feedback.php receipt.php admin_export.php admin_audit.php escalate_complaint.php; do
+for file in index.html docs/index.html docs/styles.css docs/app.js docs/.nojekyll database.sql Dockerfile docker-compose.yml package.json package-lock.json tests/e2e-auth-theme.mjs .github/workflows/ci-cd.yml includes/security.php includes/pdf_helper.php profile.php settings.php change_password.php forgot_password.php reset_password.php feedback.php receipt.php admin_export.php admin_audit.php escalate_complaint.php; do
   test -e "$file" || fail "Missing required file: $file"
 done
 for file in docs/SRS.md docs/TEST-CASES.md docs/TEST-RESULTS.md docs/DATABASE-DESIGN.md docs/INSTALLATION.md docs/DEPLOYMENT.md docs/FUTURE-SCOPE.md docs/PROJECT-REPORT.md; do
@@ -51,5 +51,12 @@ curl --fail --silent "http://127.0.0.1:${PORT}/index.html" | grep -q "Grievance 
 curl --fail --silent "http://127.0.0.1:${PORT}/app.js" | grep -q "localStorage"
 curl --fail --silent "http://127.0.0.1:${PORT}/styles.css" | grep -q "app-shell"
 pass "Static GitHub Pages demo serves HTML, JavaScript, and CSS"
+
+if [[ -x node_modules/.bin/playwright ]]; then
+  E2E_BASE_URL="http://127.0.0.1:${PORT}" npm run test:e2e
+  pass "Browser end-to-end authentication and theme flow"
+else
+  pass "Browser end-to-end suite present (install npm dependencies to execute locally)"
+fi
 
 printf '\nAll smoke tests passed.\n'

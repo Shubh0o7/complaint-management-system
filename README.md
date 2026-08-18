@@ -109,7 +109,7 @@ Administrators have system-wide oversight, complaint routing, role-account manag
 
 ## Automated testing
 
-The repository includes a reproducible smoke-test script at [`tests/smoke_test.sh`](tests/smoke_test.sh). It checks the same project qualities that matter during evaluation: PHP syntax, JavaScript syntax, required deployment files, database and CI/CD markers, and successful serving of the GitHub Pages HTML, CSS, and JavaScript assets.
+The repository includes a reproducible smoke-test script at [`tests/smoke_test.sh`](tests/smoke_test.sh). It checks the same project qualities that matter during evaluation: PHP syntax, JavaScript syntax, required deployment files, database and CI/CD markers, successful serving of the GitHub Pages HTML, CSS, and JavaScript assets, and the browser end-to-end authentication/theme flow when Playwright dependencies are installed.
 
 Run it locally with:
 
@@ -121,8 +121,9 @@ A successful run currently verifies:
 
 | Test area | Result |
 | --- | --- |
-| PHP syntax | **45 PHP files passed** |
+| PHP syntax | **46 PHP files passed** |
 | GitHub Pages JavaScript syntax | **Passed with Node.js `--check`** |
+| Browser end-to-end flow | **14 assertions: login, role switching, logout, dark mode, persistence** |
 | Application, documentation, diagrams, and deployment files | **Passed** |
 | Database and CI/CD configuration markers | **Passed** |
 | Static HTML, CSS, and JavaScript serving | **Passed** |

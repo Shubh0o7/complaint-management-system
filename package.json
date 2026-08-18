@@ -1,0 +1,12 @@
+{
+  "name": "campusresolve-e2e-tests",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Browser end-to-end tests for the CampusResolve public demo",
+  "scripts": {
+    "test:e2e": "node tests/e2e-auth-theme.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.52.0"
+  }
+}
