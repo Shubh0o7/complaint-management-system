@@ -23,6 +23,7 @@ This project digitizes the full complaint lifecycle. A complainant submits a cas
 | **Complaint lifecycle** | Submission, routing, assignment, investigation, resolution, and rejection |
 | **Traceability** | Status history, activity timeline, comments, remarks, notifications, and audit logs |
 | **Multi-channel alerts** | Status-triggered in-app notifications, logged/SMTP-ready email alerts, and optional standards-based browser push alerts |
+| **Delivery operations** | Retryable email/push queue, stale-claim recovery, delivery history, and administrator monitoring |
 | **Evidence handling** | MIME-validated private uploads, authorized downloads, PDF receipts, and reference numbers |
 | **Public presentation** | GitHub Pages interactive demo with local browser persistence |
 | **Production-style runtime** | PHP 8.3-compatible application, MariaDB, Docker Compose, CI/CD, SLA monitoring, and exports |
@@ -240,6 +241,12 @@ composer install --no-dev --prefer-dist
 # Set these outside version control when enabling real email/push delivery
 # MAIL_ENABLED=1 MAIL_FROM=noreply@example.edu
 # VAPID_PUBLIC_KEY=... VAPID_PRIVATE_KEY=... VAPID_SUBJECT=mailto:support@example.edu
+
+# Process up to 25 queued email/push notifications
+php bin/process_notification_queue.php 25
+
+# Run the worker every minute in production using cron
+# * * * * * cd /path/to/project && php bin/process_notification_queue.php 50 >> logs/queue-worker.log 2>&1
 
 # Start the complete server-backed application
 docker compose up --build

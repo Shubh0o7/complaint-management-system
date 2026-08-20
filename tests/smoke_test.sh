@@ -27,6 +27,11 @@ grep -q 'notify_complaint_status_change' includes/notification_helper.php || fai
 grep -q 'notify_complaint_status_change' admin_complaints.php || fail "Administrator status alert integration missing"
 grep -q 'notify_complaint_status_change' officer_dashboard.php || fail "Officer status alert integration missing"
 grep -q 'notify_complaint_status_change' api/update_complaint_status.php || fail "API status alert integration missing"
+grep -q 'queue_notification' includes/notification_helper.php || fail "Notification queue enqueue missing"
+grep -q 'queue_next_item' includes/notification_queue.php || fail "Notification queue claim missing"
+grep -q 'queue_mark_result' includes/notification_queue.php || fail "Notification queue result handling missing"
+grep -q 'process_notification_queue' README.md || fail "Notification queue worker documentation missing"
+grep -q 'deliveryRows' admin_audit.php || fail "Admin delivery-status dashboard missing"
 grep -q 'random_bytes(32)' forgot_password.php || fail "Password reset token generation missing"
 grep -q "hash('sha256'" forgot_password.php || fail "Password reset token hashing missing"
 grep -q 'expires_at > NOW()' reset_password.php || fail "Password reset expiry validation missing"
@@ -34,7 +39,7 @@ grep -q 'used_at = NOW()' reset_password.php || fail "Password reset token revoc
 grep -q 'require_csrf' forgot_password.php reset_password.php || fail "Password reset CSRF guard missing"
 pass "Mutating API CSRF, upload MIME, multi-channel alerts, and password-reset guards"
 
-for file in index.html docs/index.html docs/styles.css docs/app.js docs/.nojekyll database.sql Dockerfile docker-compose.yml package.json package-lock.json tests/e2e-auth-theme.mjs .github/workflows/ci-cd.yml includes/security.php includes/pdf_helper.php includes/push_helper.php profile.php settings.php change_password.php forgot_password.php reset_password.php feedback.php receipt.php admin_export.php admin_audit.php escalate_complaint.php api/push_subscribe.php service-worker.js assets/js/push-notifications.js composer.json; do
+for file in index.html docs/index.html docs/styles.css docs/app.js docs/.nojekyll database.sql Dockerfile docker-compose.yml package.json package-lock.json tests/e2e-auth-theme.mjs .github/workflows/ci-cd.yml includes/security.php includes/pdf_helper.php includes/push_helper.php includes/notification_queue.php profile.php settings.php change_password.php forgot_password.php reset_password.php feedback.php receipt.php admin_export.php admin_audit.php escalate_complaint.php api/push_subscribe.php bin/process_notification_queue.php service-worker.js assets/js/push-notifications.js composer.json; do
   test -e "$file" || fail "Missing required file: $file"
 done
 for file in docs/SRS.md docs/TEST-CASES.md docs/TEST-RESULTS.md docs/DATABASE-DESIGN.md docs/INSTALLATION.md docs/DEPLOYMENT.md docs/FUTURE-SCOPE.md docs/PROJECT-REPORT.md; do

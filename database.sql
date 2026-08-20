@@ -283,6 +283,49 @@ CREATE TABLE IF NOT EXISTS `email_notifications` (
   CONSTRAINT `fk_email_complaint` FOREIGN KEY (`complaint_id`) REFERENCES `complaints`(`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+CREATE TABLE IF NOT EXISTS `notification_queue` (
+  `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+  `channel` ENUM('email','push') NOT NULL,
+  `user_id` INT NOT NULL,
+  `complaint_id` INT DEFAULT NULL,
+  `recipient` VARCHAR(255) DEFAULT NULL,
+  `title` VARCHAR(255) NOT NULL,
+  `body` TEXT NOT NULL,
+  `payload_json` TEXT DEFAULT NULL,
+  `status` ENUM('queued','processing','sent','failed','disabled') NOT NULL DEFAULT 'queued',
+  `attempts` TINYINT UNSIGNED NOT NULL DEFAULT 0,
+  `max_attempts` TINYINT UNSIGNED NOT NULL DEFAULT 5,
+  `available_at` DATETIME NOT NULL,
+  `locked_at` DATETIME DEFAULT NULL,
+  `locked_by` VARCHAR(100) DEFAULT NULL,
+  `last_error` VARCHAR(500) DEFAULT NULL,
+  `sent_at` DATETIME DEFAULT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  INDEX `idx_queue_ready` (`status`,`available_at`,`id`),
+  INDEX `idx_queue_channel_status` (`channel`,`status`,`created_at`),
+  INDEX `idx_queue_user` (`user_id`),
+  CONSTRAINT `fk_queue_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_queue_complaint` FOREIGN KEY (`complaint_id`) REFERENCES `complaints`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `notification_delivery_logs` (
+  `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+  `queue_id` BIGINT DEFAULT NULL,
+  `channel` ENUM('email','push') NOT NULL,
+  `user_id` INT DEFAULT NULL,
+  `complaint_id` INT DEFAULT NULL,
+  `status` VARCHAR(40) NOT NULL,
+  `attempt` TINYINT UNSIGNED NOT NULL DEFAULT 1,
+  `message` VARCHAR(500) DEFAULT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  INDEX `idx_delivery_created` (`created_at`),
+  INDEX `idx_delivery_status_channel` (`status`,`channel`),
+  CONSTRAINT `fk_delivery_queue` FOREIGN KEY (`queue_id`) REFERENCES `notification_queue`(`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_delivery_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_delivery_complaint` FOREIGN KEY (`complaint_id`) REFERENCES `complaints`(`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- Existing installations receive generated references and SLA dates on first upgrade.
 UPDATE `complaints` c
 LEFT JOIN `sla_policies` s ON s.`priority` = c.`priority`
