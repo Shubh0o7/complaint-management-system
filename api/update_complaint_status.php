@@ -79,15 +79,8 @@ if ($stmt) {
             $timeline_stmt->close();
         }
         
-        // Notify user
-        create_notification(
-            $conn,
-            $complaint_user,
-            $complaint_id,
-            'Status Updated',
-            'Your complaint status has been updated to: ' . $new_status,
-            'status_change'
-        );
+        // Notify the complaint owner through all enabled delivery channels.
+        notify_complaint_status_change($conn, (int)$complaint_id, $old_status, $new_status, $admin_remarks);
         
         echo json_encode([
             'success' => true,

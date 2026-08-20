@@ -47,15 +47,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_status'])) {
         $t_stmt->execute();
         $t_stmt->close();
         
-        // Notify the complaint owner
+        // Notify the complaint owner through in-app, email, and browser push channels.
         if ($complaint_user_id) {
-            $notif_msg = "Your complaint \"$complaint_subject\" status changed to $new_status";
-            create_notification($conn, (int)$complaint_user_id, $complaint_id, 'Complaint Status Updated', $notif_msg, 'status_change');
-            
-            // Send a mock/logged email notification when email is configured.
-            if ($complaint_user_email !== '') {
-                send_email_notification($conn, (int)$complaint_user_id, $complaint_id, $complaint_user_email, 'Complaint Status Update: ' . $complaint_subject, "Hello {$complaint_user_name},\n\nComplaint #{$complaint_id} changed from {$old_status} to {$new_status}.\nPlease sign in to view the latest details.");
-            }
+            notify_complaint_status_change($conn, $complaint_id, $old_status, $new_status, $admin_remarks);
         }
     }
     

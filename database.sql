@@ -140,11 +140,15 @@ ALTER TABLE `users`
 CREATE TABLE IF NOT EXISTS `user_preferences` (
   `user_id` INT PRIMARY KEY,
   `email_notifications` TINYINT(1) NOT NULL DEFAULT 1,
+  `push_notifications` TINYINT(1) NOT NULL DEFAULT 1,
   `notification_digest` ENUM('instant','daily','off') NOT NULL DEFAULT 'instant',
   `theme` ENUM('system','light','dark') NOT NULL DEFAULT 'system',
   `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   CONSTRAINT `fk_preferences_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+ALTER TABLE `user_preferences`
+  ADD COLUMN IF NOT EXISTS `push_notifications` TINYINT(1) NOT NULL DEFAULT 1;
 
 CREATE TABLE IF NOT EXISTS `system_settings` (
   `setting_key` VARCHAR(80) PRIMARY KEY,
@@ -229,6 +233,38 @@ CREATE TABLE IF NOT EXISTS `complaint_escalations` (
   CONSTRAINT `fk_escalation_from_user` FOREIGN KEY (`from_user_id`) REFERENCES `users`(`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_escalation_to_user` FOREIGN KEY (`to_user_id`) REFERENCES `users`(`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_escalation_creator` FOREIGN KEY (`created_by`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `push_subscriptions` (
+  `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+  `user_id` INT NOT NULL,
+  `endpoint` TEXT NOT NULL,
+  `p256dh` VARCHAR(255) NOT NULL,
+  `auth` VARCHAR(255) NOT NULL,
+  `is_active` TINYINT(1) NOT NULL DEFAULT 1,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY `uq_push_endpoint` (`endpoint`(191)),
+  INDEX `idx_push_user` (`user_id`),
+  CONSTRAINT `fk_push_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS `push_notifications` (
+  `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+  `user_id` INT NOT NULL,
+  `complaint_id` INT DEFAULT NULL,
+  `subscription_id` BIGINT DEFAULT NULL,
+  `title` VARCHAR(255) NOT NULL,
+  `body` TEXT NOT NULL,
+  `status` ENUM('sent','failed','not_configured') NOT NULL DEFAULT 'not_configured',
+  `error_message` VARCHAR(255) DEFAULT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  `sent_at` DATETIME DEFAULT NULL,
+  INDEX `idx_push_notification_user` (`user_id`),
+  INDEX `idx_push_notification_created` (`created_at`),
+  CONSTRAINT `fk_push_notification_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_push_notification_complaint` FOREIGN KEY (`complaint_id`) REFERENCES `complaints`(`id`) ON DELETE SET NULL,
+  CONSTRAINT `fk_push_notification_subscription` FOREIGN KEY (`subscription_id`) REFERENCES `push_subscriptions`(`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `email_notifications` (

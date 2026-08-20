@@ -23,9 +23,13 @@ for file in api/add_comment.php api/mark_notification_read.php api/update_compla
   grep -q 'require_csrf_json' "$file" || fail "Missing CSRF guard: $file"
 done
 grep -q 'new finfo(FILEINFO_MIME_TYPE)' api/upload_attachment.php || fail "Upload MIME detection missing"
-pass "Mutating API CSRF and upload MIME guards"
+grep -q 'notify_complaint_status_change' includes/notification_helper.php || fail "Unified status notification dispatcher missing"
+grep -q 'notify_complaint_status_change' admin_complaints.php || fail "Administrator status alert integration missing"
+grep -q 'notify_complaint_status_change' officer_dashboard.php || fail "Officer status alert integration missing"
+grep -q 'notify_complaint_status_change' api/update_complaint_status.php || fail "API status alert integration missing"
+pass "Mutating API CSRF, upload MIME, and multi-channel alert guards"
 
-for file in index.html docs/index.html docs/styles.css docs/app.js docs/.nojekyll database.sql Dockerfile docker-compose.yml package.json package-lock.json tests/e2e-auth-theme.mjs .github/workflows/ci-cd.yml includes/security.php includes/pdf_helper.php profile.php settings.php change_password.php forgot_password.php reset_password.php feedback.php receipt.php admin_export.php admin_audit.php escalate_complaint.php; do
+for file in index.html docs/index.html docs/styles.css docs/app.js docs/.nojekyll database.sql Dockerfile docker-compose.yml package.json package-lock.json tests/e2e-auth-theme.mjs .github/workflows/ci-cd.yml includes/security.php includes/pdf_helper.php includes/push_helper.php profile.php settings.php change_password.php forgot_password.php reset_password.php feedback.php receipt.php admin_export.php admin_audit.php escalate_complaint.php api/push_subscribe.php service-worker.js assets/js/push-notifications.js composer.json; do
   test -e "$file" || fail "Missing required file: $file"
 done
 for file in docs/SRS.md docs/TEST-CASES.md docs/TEST-RESULTS.md docs/DATABASE-DESIGN.md docs/INSTALLATION.md docs/DEPLOYMENT.md docs/FUTURE-SCOPE.md docs/PROJECT-REPORT.md; do
@@ -44,6 +48,9 @@ grep -q "feedback_rating" database.sql || fail "Feedback schema is missing"
 grep -q "sla_due_at" database.sql || fail "SLA schema is missing"
 grep -q 'CREATE TABLE IF NOT EXISTS `user_preferences`' database.sql || fail "User preferences schema is missing"
 grep -q 'CREATE TABLE IF NOT EXISTS `system_settings`' database.sql || fail "System settings schema is missing"
+grep -q 'CREATE TABLE IF NOT EXISTS `push_subscriptions`' database.sql || fail "Push subscriptions schema is missing"
+grep -q 'CREATE TABLE IF NOT EXISTS `push_notifications`' database.sql || fail "Push delivery schema is missing"
+grep -q 'minishlink/web-push' composer.json || fail "Web Push dependency manifest is missing"
 grep -q "packages: write" .github/workflows/ci-cd.yml || fail "Container publishing permission is missing"
 pass "Database and CI/CD markers"
 

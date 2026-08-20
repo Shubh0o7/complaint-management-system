@@ -1,4 +1,7 @@
 <?php
+require_once __DIR__ . '/email_helper.php';
+require_once __DIR__ . '/push_helper.php';
+
 /**
  * Notification Helper Functions
  * Handles creation and management of in-app notifications
@@ -34,6 +37,37 @@ function create_notification($conn, $user_id, $complaint_id, $title, $message, $
  * @param int $limit Number of notifications to retrieve
  * @return array Array of notifications
  */
+function notify_complaint_status_change(mysqli $conn, int $complaintId, string $oldStatus, string $newStatus, string $remarks = ''): array
+{
+    $stmt = $conn->prepare('SELECT c.reference_no, c.subject, c.user_id, u.full_name, u.email FROM complaints c JOIN users u ON u.id = c.user_id WHERE c.id = ? LIMIT 1');
+    if (!$stmt) return ['in_app' => false, 'email' => false, 'push' => 0];
+    $stmt->bind_param('i', $complaintId);
+    $stmt->execute();
+    $complaint = $stmt->get_result()->fetch_assoc();
+    $stmt->close();
+    if (!$complaint) return ['in_app' => false, 'email' => false, 'push' => 0];
+
+    $message = 'Your complaint ' . ($complaint['reference_no'] ?: ('#' . $complaintId)) . ' status changed from ' . $oldStatus . ' to ' . $newStatus . '.';
+    if ($remarks !== '') $message .= ' ' . $remarks;
+    $inApp = create_notification($conn, (int)$complaint['user_id'], $complaintId, 'Complaint Status Updated', $message, 'status_change');
+
+    $emailEnabled = true;
+    $pref = $conn->prepare('SELECT email_notifications, notification_digest FROM user_preferences WHERE user_id = ? LIMIT 1');
+    if ($pref) {
+        $pref->bind_param('i', $complaint['user_id']);
+        $pref->execute();
+        $row = $pref->get_result()->fetch_assoc();
+        $pref->close();
+        if ($row) $emailEnabled = (bool)$row['email_notifications'] && $row['notification_digest'] === 'instant';
+    }
+    $email = false;
+    if ($emailEnabled && !empty($complaint['email'])) {
+        $email = send_email_notification($conn, (int)$complaint['user_id'], $complaintId, $complaint['email'], 'Complaint Status Update: ' . $complaint['subject'], "Hello {$complaint['full_name']},\n\n{$message}\n\nPlease sign in to view the latest details.");
+    }
+    $push = send_push_notification($conn, (int)$complaint['user_id'], $complaintId, 'Complaint status updated', $message, ['url' => 'view_complaint.php?id=' . $complaintId]);
+    return ['in_app' => $inApp, 'email' => $email, 'push' => $push];
+}
+
 function get_unread_notifications($conn, $user_id, $limit = 10) {
     $stmt = $conn->prepare("SELECT * FROM notifications WHERE user_id = ? AND is_read = 0 ORDER BY created_at DESC LIMIT ?");
     

@@ -22,6 +22,7 @@ This project digitizes the full complaint lifecycle. A complainant submits a cas
 | **Four role workspaces** | Complainant, administrator, department manager, and complaint officer |
 | **Complaint lifecycle** | Submission, routing, assignment, investigation, resolution, and rejection |
 | **Traceability** | Status history, activity timeline, comments, remarks, notifications, and audit logs |
+| **Multi-channel alerts** | Status-triggered in-app notifications, logged/SMTP-ready email alerts, and optional standards-based browser push alerts |
 | **Evidence handling** | MIME-validated private uploads, authorized downloads, PDF receipts, and reference numbers |
 | **Public presentation** | GitHub Pages interactive demo with local browser persistence |
 | **Production-style runtime** | PHP 8.3-compatible application, MariaDB, Docker Compose, CI/CD, SLA monitoring, and exports |
@@ -218,10 +219,12 @@ The schema is organized around the complaint lifecycle. `users` stores all four 
 | `complaint_comments` | Conversation between complainants and staff |
 | `complaint_attachments` | Evidence and supporting files |
 | `notifications` | In-app status, assignment, comment, and system alerts |
+| `push_subscriptions` | Browser endpoint and encryption keys for optional Web Push delivery |
+| `push_notifications` | Auditable browser push delivery attempts and outcomes |
 
 ## Security and deployment notes
 
-The application uses prepared MySQLi statements, password hashing, PHP session authentication, role guards, CSRF protection, expiring password-reset tokens, scoped complaint queries, MIME-detected uploads with random filenames, private download authorization, audit logs, SLA monitoring, and timeline records. For production use, place secrets outside version control, enforce HTTPS, change the seeded administrator password, configure real SMTP, disable directory listing, and use a private database account with only the required permissions.
+The application uses prepared MySQLi statements, password hashing, PHP session authentication, role guards, CSRF protection, expiring password-reset tokens, scoped complaint queries, MIME-detected uploads with random filenames, private download authorization, audit logs, SLA monitoring, and timeline records. Status changes flow through in-app notifications and the shared delivery dispatcher. Email attempts are stored in `email_notifications`; local mode logs messages, while production can enable `MAIL_ENABLED=1` and `MAIL_FROM` or replace the adapter with SMTP. Browser push subscriptions are stored in `push_subscriptions` and deliveries in `push_notifications`. For real push delivery, install Composer dependencies and configure `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, and `VAPID_SUBJECT` outside version control. For production use, place secrets outside version control, enforce HTTPS, change the seeded administrator password, disable directory listing, and use a private database account with only the required permissions.
 
 GitHub Pages is appropriate for the static project preview only. The PHP application must be deployed to a PHP-capable host with MariaDB, Docker, or the published container image. The GitHub Actions workflow supports an optional `DEPLOY_HOOK_URL` repository secret for hosting providers that expose a deployment hook.
 
@@ -230,6 +233,13 @@ GitHub Pages is appropriate for the static project preview only. The PHP applica
 ```bash
 # Run the local repository smoke tests
 ./tests/smoke_test.sh
+
+# Install the optional Web Push provider for real browser push delivery
+composer install --no-dev --prefer-dist
+
+# Set these outside version control when enabling real email/push delivery
+# MAIL_ENABLED=1 MAIL_FROM=noreply@example.edu
+# VAPID_PUBLIC_KEY=... VAPID_PRIVATE_KEY=... VAPID_SUBJECT=mailto:support@example.edu
 
 # Start the complete server-backed application
 docker compose up --build

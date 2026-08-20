@@ -2,6 +2,7 @@
 require_once 'config.php';
 require_once 'includes/auth_check.php';
 require_once 'includes/security.php';
+require_once 'includes/push_helper.php';
 
 $userId = (int)($_SESSION['user_id'] ?? 0);
 $role = $_SESSION['user_role'] ?? 'user';
@@ -36,14 +37,15 @@ try {
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         require_csrf();
         $emailNotifications = !empty($_POST['email_notifications']) ? 1 : 0;
+        $pushNotifications = !empty($_POST['push_notifications']) ? 1 : 0;
         $digest = $_POST['notification_digest'] ?? 'instant';
         $theme = $_POST['theme'] ?? 'system';
         if (!in_array($digest, ['instant', 'daily', 'off'], true)) throw new RuntimeException('Choose a valid notification frequency.');
         if (!in_array($theme, ['system', 'light', 'dark'], true)) throw new RuntimeException('Choose a valid appearance preference.');
 
         $conn->begin_transaction();
-        $stmt = $conn->prepare('UPDATE user_preferences SET email_notifications = ?, notification_digest = ?, theme = ? WHERE user_id = ?');
-        $stmt->bind_param('issi', $emailNotifications, $digest, $theme, $userId);
+        $stmt = $conn->prepare('UPDATE user_preferences SET email_notifications = ?, push_notifications = ?, notification_digest = ?, theme = ? WHERE user_id = ?');
+        $stmt->bind_param('iissi', $emailNotifications, $pushNotifications, $digest, $theme, $userId);
         $stmt->execute();
         $stmt->close();
 
@@ -70,10 +72,10 @@ try {
     $error = $e->getMessage();
 }
 
-$stmt = $conn->prepare('SELECT email_notifications, notification_digest, theme FROM user_preferences WHERE user_id = ? LIMIT 1');
+$stmt = $conn->prepare('SELECT email_notifications, push_notifications, notification_digest, theme FROM user_preferences WHERE user_id = ? LIMIT 1');
 $stmt->bind_param('i', $userId);
 $stmt->execute();
-$preferences = $stmt->get_result()->fetch_assoc() ?: ['email_notifications' => 1, 'notification_digest' => 'instant', 'theme' => 'system'];
+$preferences = $stmt->get_result()->fetch_assoc() ?: ['email_notifications' => 1, 'push_notifications' => 1, 'notification_digest' => 'instant', 'theme' => 'system'];
 $stmt->close();
 
 $system = [
@@ -88,6 +90,7 @@ $system = [
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="vapid-public-key" content="<?= e(push_public_key()) ?>">
 <title>Settings | CampusResolve</title>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
@@ -110,6 +113,8 @@ $system = [
     <div class="card border-0 shadow-sm mb-4"><div class="card-body p-4">
       <div class="d-flex align-items-start gap-3 mb-4"><div class="rounded-3 bg-primary-subtle text-primary p-3"><i class="bi bi-bell fs-4"></i></div><div><h5 class="mb-1">Notification preferences</h5><p class="text-muted mb-0">Choose how updates about complaint activity should reach you.</p></div></div>
       <div class="form-check form-switch mb-3"><input class="form-check-input" type="checkbox" role="switch" id="email_notifications" name="email_notifications" value="1" <?= !empty($preferences['email_notifications']) ? 'checked' : '' ?>><label class="form-check-label" for="email_notifications"><strong>Email notifications</strong><small class="d-block text-muted">Receive status changes, assignments, comments, and escalation updates.</small></label></div>
+      <div class="form-check form-switch mb-3"><input class="form-check-input" type="checkbox" role="switch" id="push_notifications" name="push_notifications" value="1" <?= !empty($preferences['push_notifications']) ? 'checked' : '' ?>><label class="form-check-label" for="push_notifications"><strong>Browser push alerts</strong><small class="d-block text-muted">Receive an alert when a complaint status changes, even when this page is not open.</small></label></div>
+      <div class="d-flex align-items-center gap-2 mb-3"><button type="button" class="btn btn-outline-primary btn-sm" id="enablePushNotifications"><i class="bi bi-broadcast-pin me-1"></i>Enable browser alerts</button><span class="small text-muted" id="pushSubscriptionStatus"><?= push_public_key() !== '' ? 'Provider key available.' : 'Provider setup is optional.' ?></span></div>
       <div class="mb-3"><label class="form-label fw-semibold" for="notification_digest">Notification frequency</label><select class="form-select" id="notification_digest" name="notification_digest"><option value="instant" <?= ($preferences['notification_digest'] ?? '') === 'instant' ? 'selected' : '' ?>>Instant updates</option><option value="daily" <?= ($preferences['notification_digest'] ?? '') === 'daily' ? 'selected' : '' ?>>Daily digest</option><option value="off" <?= ($preferences['notification_digest'] ?? '') === 'off' ? 'selected' : '' ?>>In-app only</option></select></div>
       <div><label class="form-label fw-semibold" for="theme">Appearance</label><select class="form-select" id="theme" name="theme"><option value="system" <?= ($preferences['theme'] ?? '') === 'system' ? 'selected' : '' ?>>Use device preference</option><option value="light" <?= ($preferences['theme'] ?? '') === 'light' ? 'selected' : '' ?>>Light interface</option><option value="dark" <?= ($preferences['theme'] ?? '') === 'dark' ? 'selected' : '' ?>>Dark interface</option></select><div class="form-text">Theme preference is stored for future interface personalization.</div></div>
     </div></div>
@@ -133,5 +138,6 @@ $system = [
 </div>
 </main>
 </div>
+<script src="assets/js/push-notifications.js"></script>
 </body>
 </html>

@@ -1,0 +1,9 @@
+{
+  "name": "campusresolve/grievance-management-system",
+  "description": "CampusResolve online complaint and grievance management system",
+  "type": "project",
+  "require": {
+    "php": ">=8.1",
+    "minishlink/web-push": "^9.0"
+  }
+}
