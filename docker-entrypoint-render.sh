@@ -23,10 +23,6 @@ for attempt in {1..60}; do
   if mariadb-admin ping --user=root --protocol=socket --socket=/run/mysqld/mysqld.sock >/dev/null 2>&1; then
     break
   fi
-  if ! kill -0 "${DB_PID}" 2>/dev/null; then
-    cat /tmp/mariadb.log >&2 || true
-    exit 1
-  fi
   sleep 1
 done
 
