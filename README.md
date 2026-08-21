@@ -61,7 +61,7 @@ The project includes a complete academic documentation pack. The database schema
 
 ## Demo login accounts
 
-The GitHub Pages preview accepts only the exact email and password combination assigned to each demonstration role. For the direct SQL-backed PHP deployment, visitors can use `register.php` to create a Complainant account; the record is stored in the MySQL/MariaDB `users` table and can be used from another device connected to the same deployed application. These are demonstration credentials, not production accounts, and they are intentionally documented here so a professor can test every dashboard without registration.
+The GitHub Pages preview accepts only the exact email and password combination assigned to each demonstration role, entered manually. For the direct SQL-backed PHP deployment, visitors can use `register.php` to create a Complainant account; the record is stored in the MySQL/MariaDB `users` table and can be used from another device connected to the same deployed application. These are demonstration credentials, not production accounts, and they are intentionally documented here so a professor can test every dashboard without registration.
 
 | Dashboard | Email | Password |
 |---|---|---|
@@ -70,7 +70,7 @@ The GitHub Pages preview accepts only the exact email and password combination a
 | Department Manager | `manager@campus.edu` | `Manager@1234` |
 | Complaint Officer | `officer@campus.edu` | `Officer@1234` |
 
-The role buttons on the static preview fill the matching email and password automatically. If the credentials do not match the selected role, login is rejected. The preview uses local sample records for demonstration; the complete PHP application reads and writes Case records directly through MySQL/MariaDB.
+The login form requires the visitor to enter an email address and password manually. There is no role selector and no automatic credential filling. The authenticated PHP account determines the dashboard redirect; the preview uses local sample records, while the complete PHP application reads and writes Case records directly through MySQL/MariaDB.
 
 ## Role-based workflow
 
@@ -161,7 +161,7 @@ The GitHub Actions workflow in `.github/workflows/ci-cd.yml` runs PHP validation
 No installation is required for the browser demo:
 
 1. Open the [live GitHub Pages website](https://shubh0o7.github.io/complaint-management-system/).
-2. Use the GitHub Pages preview with an exact role credential from the table above. For SQL-backed registration, open `register.php` in the deployed PHP application.
+2. Enter an exact role credential from the table above manually. For a new user, open `register.php` in the deployed PHP application first, complete registration, then return to `login.php` and enter the new account details.
 3. The dashboard shown is determined by the authenticated email account; there is no post-login role switch. Each role uses a different layout pattern: split-screen for the complainant, asymmetrical mosaic for the administrator, command board for the department manager, and featured-workbench layout for the officer.
 4. Open **Submit Case** to create a demo case.
 5. Open **Cases** to search, filter, and inspect a case.

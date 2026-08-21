@@ -21,6 +21,8 @@ try {
   check(await page.locator('body').evaluate((body) => body.classList.contains('dark-mode')), 'dark mode activates from login');
   check(await page.evaluate(() => localStorage.getItem('campusresolve-demo-theme-v1')) === 'dark', 'dark mode persists to localStorage');
 
+  await page.locator('#demoEmail').fill('student@campus.edu');
+  await page.locator('#demoPassword').fill('Student@1234');
   await page.locator('#demoLoginForm button[type="submit"]').click();
   await page.locator('.app-shell').waitFor({ state: 'visible' });
   check(await page.locator('#accountRole').textContent() === 'Complainant', 'student credentials open complainant workspace');
@@ -38,17 +40,18 @@ try {
   check(await page.locator('.app-shell').evaluate((el) => el.classList.contains('hidden')), 'logout returns to login screen');
   check(await page.evaluate(() => sessionStorage.getItem('campusresolve-demo-auth-v1')) === null, 'logout clears demo session storage');
 
+  check(await page.locator('[data-demo-role]').count() === 0, 'login has no role selector or auto-fill controls');
   const roleAccounts = [
-    ['admin', 'admin@campus.edu', 'Administrator'],
-    ['department', 'manager@campus.edu', 'Department Manager'],
-    ['officer', 'officer@campus.edu', 'Complaint Officer']
+    ['admin@campus.edu', 'Admin@1234', 'Administrator'],
+    ['manager@campus.edu', 'Manager@1234', 'Department Manager'],
+    ['officer@campus.edu', 'Officer@1234', 'Complaint Officer']
   ];
-  for (const [role, email, label] of roleAccounts) {
-    await page.locator(`[data-demo-role="${role}"]`).click();
-    check(await page.locator('#demoEmail').inputValue() === email, `${label} email is prefilled`);
+  for (const [email, password, label] of roleAccounts) {
+    await page.locator('#demoEmail').fill(email);
+    await page.locator('#demoPassword').fill(password);
     await page.locator('#demoLoginForm button[type="submit"]').click();
     await page.locator('.app-shell').waitFor({ state: 'visible' });
-    check(await page.locator('#accountRole').textContent() === label, `${label} credentials open only the assigned dashboard`);
+    check(await page.locator('#accountRole').textContent() === label, `${label} manual credentials open only the assigned dashboard`);
     check(await page.locator('#roleSelectLabel').textContent() === label, `${label} dashboard role remains locked`);
     await page.locator('#accountToggle').click();
     await page.locator('[data-account-action="logout"]').click();
