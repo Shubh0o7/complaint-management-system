@@ -24,7 +24,7 @@ try {
   await page.locator('#demoLoginForm button[type="submit"]').click();
   await page.locator('.app-shell').waitFor({ state: 'visible' });
   check(await page.locator('#accountRole').textContent() === 'Complainant', 'student credentials open complainant workspace');
-  check((await page.locator('#overviewView').textContent()).includes('Complainant workspace'), 'complainant workspace content is rendered');
+  check((await page.locator('#overviewView').textContent()).includes('My case journey'), 'complainant dashboard layout is rendered');
   check(await page.locator('#roleSelectLabel').textContent() === 'Complainant', 'authenticated role is displayed as locked');
   check(await page.locator('#roleSelect').count() === 0, 'post-login role selector is not available');
 

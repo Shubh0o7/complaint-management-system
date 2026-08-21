@@ -15,12 +15,12 @@
 
 ## Project at a glance
 
-This project digitizes the full complaint lifecycle. A complainant submits a case, an administrator routes it to the correct department, a department manager assigns an officer, and the officer records investigation progress and resolution. Every important action is represented through status updates, comments, notifications, and a chronological timeline.
+This project digitizes the full grievance lifecycle. In the public interface, a complaint is presented as a simpler **Case**: a complainant submits a case, an administrator routes it to the correct department, a department manager assigns an officer, and the officer records investigation progress and resolution. Every important action is represented through status updates, comments, notifications, and a chronological timeline.
 
 | Capability | Implementation |
 | --- | --- |
-| **Four role workspaces** | Complainant, administrator, department manager, and complaint officer |
-| **Complaint lifecycle** | Submission, routing, assignment, investigation, resolution, and rejection |
+| **Four role workspaces** | Complainant, administrator, department manager, and complaint officer, each with a distinct dashboard layout |
+| **Case lifecycle** | Submission, routing, assignment, investigation, resolution, and rejection |
 | **Traceability** | Status history, activity timeline, comments, remarks, notifications, and audit logs |
 | **Multi-channel alerts** | Status-triggered in-app notifications, logged/SMTP-ready email alerts, and optional standards-based browser push alerts |
 | **Delivery operations** | Retryable email/push queue, stale-claim recovery, delivery history, and administrator monitoring |
@@ -33,7 +33,7 @@ This project digitizes the full complaint lifecycle. A complainant submits a cas
 
 ### [Open the working website on GitHub Pages](https://shubh0o7.github.io/complaint-management-system/)
 
-The public demo is designed for quick evaluation. Visitors can switch between the four roles, inspect complaint queues, submit new complaints, update statuses, view notification activity, and open complaint timelines. The dashboard sidebar collapses on desktop and opens as a slide-in drawer on mobile; a dimmed backdrop closes the mobile drawer when tapped. Complaint records are synchronized through a restricted shared demo table, so a complaint submitted from one device can be loaded from another device. A local browser cache remains available as a fallback if the shared service is temporarily unavailable.
+The public demo is designed for quick evaluation. Visitors can authenticate into the four role dashboards, each with a distinct layout, inspect case queues, submit new cases, update statuses, view notification activity, and open case timelines. The dashboard sidebar collapses on desktop and opens as a slide-in drawer on mobile; a dimmed backdrop closes the mobile drawer when tapped. Complaint records are synchronized through a restricted shared demo table, so a complaint submitted from one device can be loaded from another device. A local browser cache remains available as a fallback if the shared service is temporarily unavailable.
 
 GitHub Pages is static hosting and cannot execute PHP or MySQL. For that reason, the public site is a browser-based presentation version, while the complete server-backed project remains available through Docker Compose.
 
@@ -51,7 +51,7 @@ The public preview includes a consistent interface for each operational role. Th
 
 ## Design evidence
 
-The project includes a complete academic documentation pack: [SRS](docs/SRS.md), [project report](docs/PROJECT-REPORT.md), [test cases](docs/TEST-CASES.md), [test results](docs/TEST-RESULTS.md), [database design](docs/DATABASE-DESIGN.md), [workflow and dashboard guide](docs/WORKFLOWS-AND-DASHBOARDS.md), [installation guide](docs/INSTALLATION.md), [deployment guide](docs/DEPLOYMENT.md), and [future scope](docs/FUTURE-SCOPE.md). The [diagram gallery](docs/diagrams/) contains the ER diagram, detailed ER diagram, DFD Levels 0–2, use-case diagram, system architecture, and complaint-submission sequence diagram.
+The project includes a complete academic documentation pack. The database schema is defined in the version-controlled [`database.sql`](database.sql) file and is provisioned automatically by the Docker setup. Documentation includes: [SRS](docs/SRS.md), [project report](docs/PROJECT-REPORT.md), [test cases](docs/TEST-CASES.md), [test results](docs/TEST-RESULTS.md), [database design](docs/DATABASE-DESIGN.md), [workflow and dashboard guide](docs/WORKFLOWS-AND-DASHBOARDS.md), [installation guide](docs/INSTALLATION.md), [deployment guide](docs/DEPLOYMENT.md), and [future scope](docs/FUTURE-SCOPE.md). The [diagram gallery](docs/diagrams/) contains the ER diagram, detailed ER diagram, DFD Levels 0–2, use-case diagram, system architecture, and complaint-submission sequence diagram.
 
 ## Demo login accounts
 
@@ -156,9 +156,9 @@ No installation is required for the browser demo:
 
 1. Open the [live GitHub Pages website](https://shubh0o7.github.io/complaint-management-system/).
 2. Choose a role on the login page or use the exact credentials in the table above.
-3. The dashboard shown is determined by the authenticated email account; there is no post-login role switch.
-4. Open **Submit Complaint** to create a demo complaint.
-5. Open **Complaints** to search, filter, and inspect a case.
+3. The dashboard shown is determined by the authenticated email account; there is no post-login role switch. Each role uses a different layout pattern: split-screen for the complainant, asymmetrical mosaic for the administrator, command board for the department manager, and featured-workbench layout for the officer.
+4. Open **Submit Case** to create a demo case.
+5. Open **Cases** to search, filter, and inspect a case.
 6. Open **Notifications** to review activity.
 7. Use the top-left sidebar control to collapse or reopen navigation. On mobile, tap the dimmed backdrop to close the drawer.
 
