@@ -6,7 +6,8 @@
 </p>
 
 <p align="center">
-  <a href="https://shubh0o7.github.io/complaint-management-system/"><img src="https://img.shields.io/website?url=https%3A%2F%2Fshubh0o7.github.io%2Fcomplaint-management-system%2F&label=live%20demo&style=for-the-badge" alt="Live demo"></a>
+  <a href="https://campusresolve-php.onrender.com/login.php"><img src="https://img.shields.io/website?url=https%3A%2F%2Fcampusresolve-php.onrender.com%2Flogin.php&label=live%20PHP%20app&style=for-the-badge" alt="Live PHP app"></a>
+  <a href="https://shubh0o7.github.io/complaint-management-system/"><img src="https://img.shields.io/website?url=https%3A%2F%2Fshubh0o7.github.io%2Fcomplaint-management-system%2F&label=static%20preview&style=for-the-badge" alt="Static preview"></a>
   <a href="https://github.com/Shubh0o7/complaint-management-system/actions/workflows/ci-cd.yml"><img src="https://img.shields.io/github/actions/workflow/status/Shubh0o7/complaint-management-system/ci-cd.yml?branch=master&label=CI%2FCD&style=for-the-badge" alt="CI/CD status"></a>
   <a href="https://github.com/Shubh0o7/complaint-management-system"><img src="https://img.shields.io/github/last-commit/Shubh0o7/complaint-management-system?style=for-the-badge" alt="Last commit"></a>
 </p>
@@ -29,9 +30,13 @@ This project digitizes the full grievance lifecycle. In the public interface, a 
 | **Responsive navigation** | Slideable sidebar with desktop collapse, mobile drawer, backdrop dismissal, and accessible controls |
 | **Production-style runtime** | PHP 8.3-compatible application, MariaDB, Docker Compose, CI/CD, SLA monitoring, and exports |
 
-## Live demo
+## Live application
 
-### [Open the working website on GitHub Pages](https://shubh0o7.github.io/complaint-management-system/)
+### [Open the working PHP + MariaDB website on Render](https://campusresolve-php.onrender.com/login.php)
+
+The server-backed application is live on Render and uses the direct SQL/MariaDB architecture described in this repository. Render's free service can spin down when idle, so the first request after inactivity may take longer than a warm request. The bundled database is intended for college-project evaluation; production use should move MariaDB to a managed persistent database and configure durable file storage.
+
+### [Open the browser-based preview on GitHub Pages](https://shubh0o7.github.io/complaint-management-system/)
 
 The GitHub Pages preview is designed for quick evaluation. Its login screen follows a split-screen reference layout and demonstrates the four locked role accounts. Account registration and shared Case persistence are handled by the direct SQL-backed PHP application, not by GitHub Pages. Visitors can authenticate into the four role dashboards, each with a distinct layout, inspect case queues, submit new cases, update statuses, view notification activity, and open case timelines. The dashboard sidebar collapses on desktop and opens as a slide-in drawer on mobile; a dimmed backdrop closes the mobile drawer when tapped. The static preview keeps sample Case records in the browser for presentation. Cross-device Case persistence is provided by the direct PHP/MariaDB application, where records are stored in the SQL database.
 
@@ -61,11 +66,11 @@ The project includes a complete academic documentation pack. The database schema
 
 ## Demo login accounts
 
-The GitHub Pages preview accepts only the exact email and password combination assigned to the three staff demonstration roles, entered manually. Students do not receive a pre-seeded login: they must register through `register.php`, then sign in with the new account to access Student Dashboard. The account is stored in the MySQL/MariaDB `users` table and can be used from another device connected to the same deployed application.
+The live PHP application accepts only the exact email and password combination assigned to each seeded role, entered manually. Students may also register through `register.php`; new accounts are stored in the MySQL/MariaDB `users` table and can be used from another device connected to the same deployed application.
 
 | Dashboard | Email | Password |
 |---|---|---|
-| Student Dashboard | Register first through `register.php` | Create your own password |
+| Student Dashboard | `student@campus.edu` | `Student@1234` |
 | Administrator | `admin@campus.edu` | `Admin@1234` |
 | Department Manager | `manager@campus.edu` | `Manager@1234` |
 | Complaint Officer | `officer@campus.edu` | `Officer@1234` |
