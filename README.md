@@ -26,13 +26,14 @@ This project digitizes the full complaint lifecycle. A complainant submits a cas
 | **Delivery operations** | Retryable email/push queue, stale-claim recovery, delivery history, and administrator monitoring |
 | **Evidence handling** | MIME-validated private uploads, authorized downloads, PDF receipts, and reference numbers |
 | **Public presentation** | GitHub Pages interactive demo with local browser persistence |
+| **Responsive navigation** | Slideable sidebar with desktop collapse, mobile drawer, backdrop dismissal, and accessible controls |
 | **Production-style runtime** | PHP 8.3-compatible application, MariaDB, Docker Compose, CI/CD, SLA monitoring, and exports |
 
 ## Live demo
 
 ### [Open the working website on GitHub Pages](https://shubh0o7.github.io/complaint-management-system/)
 
-The public demo is designed for quick evaluation. Visitors can switch between the four roles, inspect complaint queues, submit new complaints, update statuses, view notification activity, and open complaint timelines. Demo changes are saved in the visitor's browser using `localStorage`, so the interface remains interactive without requiring a hosted PHP runtime or database.
+The public demo is designed for quick evaluation. Visitors can switch between the four roles, inspect complaint queues, submit new complaints, update statuses, view notification activity, and open complaint timelines. The dashboard sidebar collapses on desktop and opens as a slide-in drawer on mobile; a dimmed backdrop closes the mobile drawer when tapped. Demo changes are saved in the visitor's browser using `localStorage`, so the interface remains interactive without requiring a hosted PHP runtime or database.
 
 GitHub Pages is static hosting and cannot execute PHP or MySQL. For that reason, the public site is a browser-based presentation version, while the complete server-backed project remains available through Docker Compose.
 
@@ -83,6 +84,10 @@ Complainant
 
 ## Features
 
+### Responsive dashboard navigation
+
+The demo dashboard uses a responsive sidebar designed for both desktop and mobile evaluation. The top-left control collapses or reopens the navigation rail on desktop screens. On mobile screens it opens a slide-in drawer with a backdrop overlay, closes when the backdrop is tapped, and automatically dismisses after a navigation item is selected. The control exposes its state through `aria-expanded`, `aria-label`, and tooltip text.
+
 ### Complainant experience
 
 Users can register and log in, manage their profile and contact information, update notification and appearance preferences, submit complaints with subjects, categories, priorities, descriptions, and attachments, then search and filter their complaint history. Each case includes status badges, metadata, evidence, comments, notifications, and a chronological activity timeline.
@@ -123,7 +128,7 @@ A successful run currently verifies:
 
 | Test area | Result |
 | --- | --- |
-| PHP syntax | **46 PHP files passed** |
+| PHP syntax | **50 PHP files passed** |
 | GitHub Pages JavaScript syntax | **Passed with Node.js `--check`** |
 | Browser end-to-end flow | **14 assertions: login, role switching, logout, dark mode, persistence** |
 | Application, documentation, diagrams, and deployment files | **Passed** |
@@ -141,6 +146,7 @@ No installation is required for the browser demo:
 3. Open **Submit Complaint** to create a demo complaint.
 4. Open **Complaints** to search, filter, and inspect a case.
 5. Open **Notifications** to review activity.
+6. Use the top-left sidebar control to collapse or reopen navigation. On mobile, tap the dimmed backdrop to close the drawer.
 
 > Demo changes are stored only in the current browser. Use **Reset demo data** in the sidebar to restore the original sample records.
 
