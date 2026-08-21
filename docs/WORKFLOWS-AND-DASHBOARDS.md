@@ -4,16 +4,16 @@ CampusResolve is an institutional complaint and grievance management system. The
 
 ## 1. Authentication and access workflow
 
-Every dashboard is protected by authentication. A user must submit the email and password assigned to the intended role. The PHP application validates the account against the database, creates a session, records the login event, and redirects the user to the role-specific home page. The public GitHub Pages demonstration applies the same rule in browser JavaScript and does not expose a post-login role selector.
+Every dashboard is protected by authentication. Students must first create an account through `register.php`; the registration is stored in the SQL `users` table with the `user` role. Staff use the seeded demonstration credentials listed below. After a successful login, the PHP application validates the account against the database, creates a session, records the login event, and redirects the user to the role-specific home page. The public GitHub Pages demonstration keeps the same registration-first message for students and does not expose a post-login role selector.
 
 | Role | Login email | Login password | Dashboard destination |
 |---|---|---|---|
-| Complainant | `student@campus.edu` | `Student@1234` | `dashboard.php` |
+| Student Dashboard | Register first through `register.php` | Create your own password | `dashboard.php` |
 | Administrator | `admin@campus.edu` | `Admin@1234` | `admin_dashboard.php` |
 | Department Manager | `manager@campus.edu` | `Manager@1234` | `department_dashboard.php` |
 | Complaint Officer | `officer@campus.edu` | `Officer@1234` | `officer_dashboard.php` |
 
-These are college demonstration credentials only. They must be replaced before production use. A role cannot be selected after login to bypass the account's assigned permissions. Direct access to another PHP dashboard is checked again by server-side role guards and is rejected or redirected when unauthorized.
+The three staff credentials are college demonstration credentials only and must be replaced before production use. Students are intentionally not seeded: they must register their own account and then log in. A role cannot be selected after login to bypass the account's assigned permissions. Direct access to another PHP dashboard is checked again by server-side role guards and is rejected or redirected when unauthorized.
 
 ## 2. Complaint lifecycle workflow
 
