@@ -18,7 +18,7 @@ cleanup() {
 trap cleanup EXIT TERM INT
 
 for attempt in {1..60}; do
-  if mariadb-admin ping --host=127.0.0.1 --user=root --protocol=tcp >/dev/null 2>&1; then
+  if mariadb-admin ping --user=root --protocol=socket >/dev/null 2>&1; then
     break
   fi
   if ! kill -0 "${DB_PID}" 2>/dev/null; then
@@ -28,13 +28,13 @@ for attempt in {1..60}; do
   sleep 1
 done
 
-if ! mariadb-admin ping --host=127.0.0.1 --user=root --protocol=tcp >/dev/null 2>&1; then
+if ! mariadb-admin ping --user=root --protocol=socket >/dev/null 2>&1; then
   cat /tmp/mariadb.log >&2 || true
   exit 1
 fi
 
 if [[ ! -f "${INIT_MARKER}" ]]; then
-  mariadb --host=127.0.0.1 --user=root --protocol=tcp < /var/www/html/database.sql
+  mariadb --user=root --protocol=socket < /var/www/html/database.sql
   touch "${INIT_MARKER}"
 fi
 
