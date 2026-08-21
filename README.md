@@ -33,13 +33,13 @@ This project digitizes the full complaint lifecycle. A complainant submits a cas
 
 ### [Open the working website on GitHub Pages](https://shubh0o7.github.io/complaint-management-system/)
 
-The public demo is designed for quick evaluation. Visitors can switch between the four roles, inspect complaint queues, submit new complaints, update statuses, view notification activity, and open complaint timelines. The dashboard sidebar collapses on desktop and opens as a slide-in drawer on mobile; a dimmed backdrop closes the mobile drawer when tapped. Demo changes are saved in the visitor's browser using `localStorage`, so the interface remains interactive without requiring a hosted PHP runtime or database.
+The public demo is designed for quick evaluation. Visitors can switch between the four roles, inspect complaint queues, submit new complaints, update statuses, view notification activity, and open complaint timelines. The dashboard sidebar collapses on desktop and opens as a slide-in drawer on mobile; a dimmed backdrop closes the mobile drawer when tapped. Complaint records are synchronized through a restricted shared demo table, so a complaint submitted from one device can be loaded from another device. A local browser cache remains available as a fallback if the shared service is temporarily unavailable.
 
 GitHub Pages is static hosting and cannot execute PHP or MySQL. For that reason, the public site is a browser-based presentation version, while the complete server-backed project remains available through Docker Compose.
 
 ## Interface screenshots
 
-The public preview includes a consistent interface for each operational role. These captures use seeded demonstration data and are stored in the repository for academic evaluation.
+The public preview includes a consistent interface for each operational role. These captures were refreshed from the current authenticated demo after the shared-storage and responsive-navigation updates; they use seeded demonstration data and are stored in the repository for academic evaluation.
 
 | Complainant | Administrator |
 | --- | --- |
@@ -52,6 +52,19 @@ The public preview includes a consistent interface for each operational role. Th
 ## Design evidence
 
 The project includes a complete academic documentation pack: [SRS](docs/SRS.md), [project report](docs/PROJECT-REPORT.md), [test cases](docs/TEST-CASES.md), [test results](docs/TEST-RESULTS.md), [database design](docs/DATABASE-DESIGN.md), [installation guide](docs/INSTALLATION.md), [deployment guide](docs/DEPLOYMENT.md), and [future scope](docs/FUTURE-SCOPE.md). The [diagram gallery](docs/diagrams/) contains the ER diagram, DFD Levels 0–2, use-case diagram, system architecture, and complaint-submission sequence diagram.
+
+## Demo login accounts
+
+The public demo accepts only the exact email and password combination assigned to each role. These are demonstration credentials, not production accounts, and they are intentionally documented here so a professor can test every dashboard without registration.
+
+| Dashboard | Email | Password |
+|---|---|---|
+| Complainant | `student@campus.edu` | `Student@1234` |
+| Administrator | `admin@campus.edu` | `Admin@1234` |
+| Department Manager | `manager@campus.edu` | `Manager@1234` |
+| Complaint Officer | `officer@campus.edu` | `Officer@1234` |
+
+The role selector on the login page fills the matching email and password automatically. If the credentials do not match the selected role, login is rejected. After login, the demo reads and writes complaint records through the shared CampusResolve storage table and refreshes open dashboards periodically, allowing submissions and status changes to appear across devices.
 
 ## Role-based workflow
 
@@ -142,11 +155,12 @@ The GitHub Actions workflow in `.github/workflows/ci-cd.yml` runs PHP validation
 No installation is required for the browser demo:
 
 1. Open the [live GitHub Pages website](https://shubh0o7.github.io/complaint-management-system/).
-2. Switch roles with the **Viewing as** selector.
-3. Open **Submit Complaint** to create a demo complaint.
-4. Open **Complaints** to search, filter, and inspect a case.
-5. Open **Notifications** to review activity.
-6. Use the top-left sidebar control to collapse or reopen navigation. On mobile, tap the dimmed backdrop to close the drawer.
+2. Choose a role on the login page or use the exact credentials in the table above.
+3. Switch roles with the **Viewing as** selector.
+4. Open **Submit Complaint** to create a demo complaint.
+5. Open **Complaints** to search, filter, and inspect a case.
+6. Open **Notifications** to review activity.
+7. Use the top-left sidebar control to collapse or reopen navigation. On mobile, tap the dimmed backdrop to close the drawer.
 
 > Demo changes are stored only in the current browser. Use **Reset demo data** in the sidebar to restore the original sample records.
 
@@ -231,7 +245,7 @@ The schema is organized around the complaint lifecycle. `users` stores all four 
 
 ## Security and deployment notes
 
-The application uses prepared MySQLi statements, password hashing, PHP session authentication, role guards, CSRF protection, expiring password-reset tokens, scoped complaint queries, MIME-detected uploads with random filenames, private download authorization, audit logs, SLA monitoring, and timeline records. Status changes flow through in-app notifications and the shared delivery dispatcher. Email attempts are stored in `email_notifications`; local mode logs messages, while production can enable `MAIL_ENABLED=1` and `MAIL_FROM` or replace the adapter with SMTP. Browser push subscriptions are stored in `push_subscriptions` and deliveries in `push_notifications`. For real push delivery, install Composer dependencies and configure `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, and `VAPID_SUBJECT` outside version control. For production use, place secrets outside version control, enforce HTTPS, change the seeded administrator password, disable directory listing, and use a private database account with only the required permissions.
+The application uses prepared MySQLi statements, password hashing, PHP session authentication, role guards, CSRF protection, expiring password-reset tokens, scoped complaint queries, MIME-detected uploads with random filenames, private download authorization, audit logs, SLA monitoring, and timeline records. The public demo adds strict role credential matching and uses a dedicated Supabase table with row-level security policies for shared complaint reads, inserts, and status updates; the public publishable key does not grant access to the rest of the approved project. Status changes flow through in-app notifications and the shared delivery dispatcher. Email attempts are stored in `email_notifications`; local mode logs messages, while production can enable `MAIL_ENABLED=1` and `MAIL_FROM` or replace the adapter with SMTP. Browser push subscriptions are stored in `push_subscriptions` and deliveries in `push_notifications`. For real push delivery, install Composer dependencies and configure `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, and `VAPID_SUBJECT` outside version control. For production use, place secrets outside version control, enforce HTTPS, change the seeded administrator password, disable directory listing, and use a private database account with only the required permissions.
 
 GitHub Pages is appropriate for the static project preview only. The PHP application must be deployed to a PHP-capable host with MariaDB, Docker, or the published container image. The GitHub Actions workflow supports an optional `DEPLOY_HOOK_URL` repository secret for hosting providers that expose a deployment hook.
 

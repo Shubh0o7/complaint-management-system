@@ -15,4 +15,13 @@ This directory contains the design evidence and operational documentation for th
 | [Diagrams](diagrams/) | ER, DFD 0–2, use case, architecture, and sequence diagrams |
 | [Screenshots](screenshots/modules/) | Four role-specific interface captures |
 
-The public browser demo is available at [shubh0o7.github.io/complaint-management-system](https://shubh0o7.github.io/complaint-management-system/). The demo is static and browser-persistent; the full server-backed application is started with Docker.
+The public browser demo is available at [shubh0o7.github.io/complaint-management-system](https://shubh0o7.github.io/complaint-management-system/). The demo uses strict role-specific credentials and a dedicated shared complaint table, so complaints submitted from one device can be viewed from another. A local browser cache is retained only as a fallback; the full server-backed application is started with Docker.
+
+| Demo role | Email | Password |
+|---|---|---|
+| Complainant | `student@campus.edu` | `Student@1234` |
+| Administrator | `admin@campus.edu` | `Admin@1234` |
+| Department Manager | `manager@campus.edu` | `Manager@1234` |
+| Complaint Officer | `officer@campus.edu` | `Officer@1234` |
+
+The role screenshots in [screenshots/modules](screenshots/modules/) were refreshed after the shared-storage, role-login, slideable-sidebar, and mobile-backdrop updates.
