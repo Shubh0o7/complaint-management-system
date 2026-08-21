@@ -51,7 +51,7 @@ The public preview includes a consistent interface for each operational role. Th
 
 ## Design evidence
 
-The project includes a complete academic documentation pack: [SRS](docs/SRS.md), [project report](docs/PROJECT-REPORT.md), [test cases](docs/TEST-CASES.md), [test results](docs/TEST-RESULTS.md), [database design](docs/DATABASE-DESIGN.md), [installation guide](docs/INSTALLATION.md), [deployment guide](docs/DEPLOYMENT.md), and [future scope](docs/FUTURE-SCOPE.md). The [diagram gallery](docs/diagrams/) contains the ER diagram, DFD Levels 0–2, use-case diagram, system architecture, and complaint-submission sequence diagram.
+The project includes a complete academic documentation pack: [SRS](docs/SRS.md), [project report](docs/PROJECT-REPORT.md), [test cases](docs/TEST-CASES.md), [test results](docs/TEST-RESULTS.md), [database design](docs/DATABASE-DESIGN.md), [workflow and dashboard guide](docs/WORKFLOWS-AND-DASHBOARDS.md), [installation guide](docs/INSTALLATION.md), [deployment guide](docs/DEPLOYMENT.md), and [future scope](docs/FUTURE-SCOPE.md). The [diagram gallery](docs/diagrams/) contains the ER diagram, detailed ER diagram, DFD Levels 0–2, use-case diagram, system architecture, and complaint-submission sequence diagram.
 
 ## Demo login accounts
 
@@ -156,13 +156,13 @@ No installation is required for the browser demo:
 
 1. Open the [live GitHub Pages website](https://shubh0o7.github.io/complaint-management-system/).
 2. Choose a role on the login page or use the exact credentials in the table above.
-3. Switch roles with the **Viewing as** selector.
+3. The dashboard shown is determined by the authenticated email account; there is no post-login role switch.
 4. Open **Submit Complaint** to create a demo complaint.
 5. Open **Complaints** to search, filter, and inspect a case.
 6. Open **Notifications** to review activity.
 7. Use the top-left sidebar control to collapse or reopen navigation. On mobile, tap the dimmed backdrop to close the drawer.
 
-> Demo changes are stored only in the current browser. Use **Reset demo data** in the sidebar to restore the original sample records.
+> Demo complaint records are shared across devices through the dedicated demo table. A local browser cache is used only as a fallback. Use **Reset demo data** in the sidebar to restore the original sample records.
 
 ## Quick start: complete PHP application
 
@@ -217,7 +217,7 @@ The repository is organized so a professor can inspect both the running system a
 ├── api/                               JSON and form-processing endpoints
 ├── includes/                          Auth, layout, notification, and workflow helpers
 ├── assets/                            Shared PHP application styles and scripts
-├── docs/                              GitHub Pages demo source and screenshots
+├── docs/                              GitHub Pages demo, screenshots, diagrams, and guides
 ├── tests/smoke_test.sh                Reproducible local audit test
 ├── uploads/                           Local attachment storage
 ├── database.sql                       Complete schema and seed data

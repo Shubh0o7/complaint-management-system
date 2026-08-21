@@ -23,15 +23,10 @@ try {
 
   await page.locator('#demoLoginForm button[type="submit"]').click();
   await page.locator('.app-shell').waitFor({ state: 'visible' });
-  check(await page.locator('#accountRole').textContent() === 'Complainant', 'demo authentication opens complainant workspace');
+  check(await page.locator('#accountRole').textContent() === 'Complainant', 'student credentials open complainant workspace');
   check((await page.locator('#overviewView').textContent()).includes('Complainant workspace'), 'complainant workspace content is rendered');
-
-  await page.locator('#roleSelect').selectOption('department');
-  check((await page.locator('#overviewView').textContent()).includes('Department queue + officer workload'), 'department role renders operations workspace');
-  await page.locator('#roleSelect').selectOption('officer');
-  check((await page.locator('#overviewView').textContent()).includes('Investigation workspace'), 'officer role renders case-management workspace');
-  await page.locator('#roleSelect').selectOption('admin');
-  check((await page.locator('#overviewView').textContent()).includes('System-wide visibility'), 'admin role renders control-center workspace');
+  check(await page.locator('#roleSelectLabel').textContent() === 'Complainant', 'authenticated role is displayed as locked');
+  check(await page.locator('#roleSelect').count() === 0, 'post-login role selector is not available');
 
   await page.locator('#themeToggle').click();
   check(!(await page.locator('body').evaluate((body) => body.classList.contains('dark-mode'))), 'light mode restores from authenticated shell');
@@ -42,6 +37,23 @@ try {
   await page.locator('#demoLogin').waitFor({ state: 'visible' });
   check(await page.locator('.app-shell').evaluate((el) => el.classList.contains('hidden')), 'logout returns to login screen');
   check(await page.evaluate(() => sessionStorage.getItem('campusresolve-demo-auth-v1')) === null, 'logout clears demo session storage');
+
+  const roleAccounts = [
+    ['admin', 'admin@campus.edu', 'Administrator'],
+    ['department', 'manager@campus.edu', 'Department Manager'],
+    ['officer', 'officer@campus.edu', 'Complaint Officer']
+  ];
+  for (const [role, email, label] of roleAccounts) {
+    await page.locator(`[data-demo-role="${role}"]`).click();
+    check(await page.locator('#demoEmail').inputValue() === email, `${label} email is prefilled`);
+    await page.locator('#demoLoginForm button[type="submit"]').click();
+    await page.locator('.app-shell').waitFor({ state: 'visible' });
+    check(await page.locator('#accountRole').textContent() === label, `${label} credentials open only the assigned dashboard`);
+    check(await page.locator('#roleSelectLabel').textContent() === label, `${label} dashboard role remains locked`);
+    await page.locator('#accountToggle').click();
+    await page.locator('[data-account-action="logout"]').click();
+    await page.locator('#demoLogin').waitFor({ state: 'visible' });
+  }
 
   await page.reload({ waitUntil: 'networkidle' });
   await page.locator('#demoLogin').waitFor({ state: 'visible' });

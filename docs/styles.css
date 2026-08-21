@@ -39,3 +39,10 @@ body.dark-mode{--ink:#edf4f5;--muted:#afc0c8;--line:#40596a;--surface:#24394d;--
 .sidebar-backdrop{display:none}
 @media(max-width:760px){.sidebar-backdrop{display:block;position:fixed;inset:0;z-index:19;border:0;background:rgba(10,25,44,.48);opacity:0;pointer-events:none;transition:opacity .24s ease;cursor:pointer}.app-shell.sidebar-open .sidebar-backdrop{opacity:1;pointer-events:auto}}
 @media(prefers-reduced-motion:reduce){.sidebar-backdrop{transition:none}}
+
+
+/* Authenticated role lock indicator */
+.role-locked{display:inline-flex;align-items:center;gap:8px;color:var(--blue);background:#f7faff;border-color:#dbe6f3;padding:8px 12px}
+.role-locked i{font-size:13px;color:var(--green)}
+.role-locked strong{font-weight:800}
+@media(max-width:760px){.role-locked span{display:inline}.role-locked{padding:8px 10px}.role-locked strong{display:none}}

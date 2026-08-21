@@ -1,0 +1,133 @@
+erDiagram
+    USERS ||--o{ COMPLAINTS : submits
+    DEPARTMENTS ||--o{ USERS : contains
+    DEPARTMENTS ||--o{ COMPLAINTS : receives
+    USERS ||--o{ COMPLAINTS : assigned_officer
+    COMPLAINTS ||--o{ COMPLAINT_TIMELINE : records
+    USERS ||--o{ COMPLAINT_TIMELINE : performs
+    COMPLAINTS ||--o{ COMPLAINT_COMMENTS : has
+    USERS ||--o{ COMPLAINT_COMMENTS : writes
+    COMPLAINTS ||--o{ COMPLAINT_ATTACHMENTS : includes
+    USERS ||--o{ COMPLAINT_ATTACHMENTS : uploads
+    COMPLAINTS ||--o{ NOTIFICATIONS : triggers
+    USERS ||--o{ NOTIFICATIONS : receives
+    COMPLAINTS ||--o{ COMPLAINT_ESCALATIONS : may_have
+    USERS ||--o{ COMPLAINT_ESCALATIONS : creates
+    SLA_POLICIES ||--o{ COMPLAINTS : governs
+    USERS ||--o{ AUDIT_LOGS : creates
+    USERS ||--o{ USER_PREFERENCES : configures
+    USERS ||--o{ PASSWORD_RESETS : requests
+    USERS ||--o{ EMAIL_NOTIFICATIONS : receives
+    COMPLAINTS ||--o{ EMAIL_NOTIFICATIONS : triggers
+
+    USERS {
+      int id PK
+      string full_name
+      string email UK
+      string password_hash
+      enum role
+      int department_id FK
+      boolean is_active
+      datetime last_login_at
+    }
+    DEPARTMENTS {
+      int id PK
+      string name UK
+      string description
+      boolean is_active
+    }
+    COMPLAINTS {
+      int id PK
+      string reference_no UK
+      int user_id FK
+      int department_id FK
+      int officer_id FK
+      string subject
+      string category
+      enum priority
+      enum status
+      boolean is_anonymous
+      datetime sla_due_at
+      datetime resolved_at
+      int feedback_rating
+    }
+    COMPLAINT_TIMELINE {
+      int id PK
+      int complaint_id FK
+      int user_id FK
+      string action
+      string old_value
+      string new_value
+      datetime created_at
+    }
+    COMPLAINT_COMMENTS {
+      int id PK
+      int complaint_id FK
+      int user_id FK
+      text comment
+      datetime created_at
+    }
+    COMPLAINT_ATTACHMENTS {
+      int id PK
+      int complaint_id FK
+      int user_id FK
+      string stored_filename
+      string original_filename
+      string mime_type
+      int file_size
+    }
+    SLA_POLICIES {
+      int id PK
+      enum priority UK
+      int response_hours
+      int resolution_hours
+    }
+    COMPLAINT_ESCALATIONS {
+      bigint id PK
+      int complaint_id FK
+      int from_user_id FK
+      int to_user_id FK
+      int created_by FK
+      string reason
+      datetime resolved_at
+    }
+    NOTIFICATIONS {
+      int id PK
+      int user_id FK
+      int complaint_id FK
+      string title
+      text message
+      enum type
+      boolean is_read
+    }
+    EMAIL_NOTIFICATIONS {
+      bigint id PK
+      int user_id FK
+      int complaint_id FK
+      string recipient
+      string status
+      datetime sent_at
+    }
+    AUDIT_LOGS {
+      bigint id PK
+      int user_id FK
+      string action
+      string entity_type
+      bigint entity_id
+      string ip_address
+      datetime created_at
+    }
+    USER_PREFERENCES {
+      int userId PK
+      string emailAlerts
+      string pushAlerts
+      string digestMode
+      string themePreference
+    }
+    PASSWORD_RESETS {
+      bigint id PK
+      int user_id FK
+      string token_hash UK
+      datetime expires_at
+      datetime used_at
+    }
