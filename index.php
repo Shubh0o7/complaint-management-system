@@ -1,11 +1,8 @@
 <?php
-session_start();
-
-// Redirect to dashboard if already logged in
+require_once 'config.php';
+require_once 'includes/security.php';
 if (isset($_SESSION['user_id'])) {
-    $role_redirects = ['admin' => 'admin_dashboard.php', 'department' => 'department_dashboard.php', 'officer' => 'officer_dashboard.php', 'user' => 'dashboard.php'];
-    header('Location: ' . ($role_redirects[$_SESSION['user_role'] ?? 'user'] ?? 'dashboard.php'));
-    exit();
+    redirect_role_home();
 }
 ?>
 <!DOCTYPE html>
@@ -13,33 +10,18 @@ if (isset($_SESSION['user_id'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Complaint Management System</title>
+    <title>CampusResolve | Student Grievance Portal</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        :root{--navy:#2f4156;--teal:#567c8d;--mint:#53bbae;--beige:#f5f2eb;--sky:#c8d9e6}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:linear-gradient(135deg,#eaf7f6,#f8fbfb 52%,#d8efed);color:var(--navy);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}.landing{width:min(1180px,calc(100% - 40px));margin:auto;padding:22px 0 48px}.nav{display:flex;align-items:center;justify-content:space-between;min-height:58px}.brand{display:flex;align-items:center;gap:11px;color:var(--navy);text-decoration:none}.brand-mark{width:42px;height:42px;border-radius:12px;background:var(--navy);color:#fff;display:grid;place-items:center;font-size:20px}.brand strong,.brand small{display:block}.brand strong{font-size:16px}.brand small{font-size:10px;color:#6f8790}.nav-links{display:flex;align-items:center;gap:25px}.nav-links a{font-size:12px;color:var(--teal);text-decoration:none;font-weight:700}.nav-cta{border-radius:999px;background:var(--teal);color:#fff!important;padding:10px 18px}.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:34px;align-items:center;margin-top:48px}.eyebrow{font-size:10px;letter-spacing:2.4px;color:#5b9b98;font-weight:800;margin-bottom:15px}.hero h1{font-size:clamp(43px,6vw,78px);line-height:.98;letter-spacing:-3px;margin:0 0 22px;max-width:650px}.hero h1 span{color:var(--mint)}.lead{font-size:17px;line-height:1.6;color:#6d8187;max-width:570px}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:28px}.btn-main,.btn-ghost{border-radius:999px;padding:13px 22px;font-weight:800;text-decoration:none;font-size:13px}.btn-main{background:var(--mint);color:#fff;box-shadow:0 12px 25px rgba(83,187,174,.25)}.btn-ghost{border:1px solid #9bc6c5;color:#438b88;background:#fff}.visual{min-height:430px;position:relative;overflow:hidden;border-radius:10px;background:linear-gradient(145deg,#d2efed,#8ad3cf 48%,#53bbae);display:flex;align-items:center;justify-content:center;box-shadow:0 25px 70px rgba(47,65,86,.13)}.orbit{position:absolute;border:34px solid rgba(255,255,255,.24);border-radius:50%}.orbit.a{width:560px;height:560px;right:-260px;bottom:-235px}.orbit.b{width:430px;height:430px;right:-182px;bottom:-150px;border-width:27px}.orbit.c{width:320px;height:320px;right:-110px;bottom:-90px;border-width:18px}.window{width:255px;height:198px;background:rgba(255,255,255,.9);border-radius:10px 10px 24px 24px;padding:12px;transform:rotate(-8deg);box-shadow:0 25px 35px rgba(37,111,109,.22);z-index:1}.screen{height:136px;border:4px solid #55417a;background:#e2f5f3;color:#55417a;display:flex;flex-direction:column;justify-content:center;align-items:center}.screen i{font-size:56px}.screen span{font-size:10px;font-weight:800}.visual-copy{position:absolute;bottom:30px;color:#fff;text-align:center;z-index:2}.visual-copy strong,.visual-copy span{display:block}.visual-copy strong{font-size:20px}.visual-copy span{font-size:11px;margin-top:4px}.feature-row{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:55px;border-top:1px solid #c9e1e1;padding-top:22px}.feature{display:flex;gap:10px;align-items:flex-start}.feature i{color:var(--mint);font-size:18px}.feature strong{display:block;font-size:13px}.feature span{display:block;color:#789096;font-size:11px;line-height:1.35;margin-top:3px}@media(max-width:820px){.landing{width:calc(100% - 28px);padding-top:14px}.nav-links a:not(.nav-cta){display:none}.hero{grid-template-columns:1fr;margin-top:30px}.visual{min-height:310px;order:-1}.feature-row{grid-template-columns:1fr 1fr;margin-top:35px}.hero h1{letter-spacing:-2px}}@media(max-width:480px){.feature-row{grid-template-columns:1fr}.visual{min-height:270px}.window{transform:scale(.78) rotate(-8deg)}}
+    </style>
 </head>
-<body class="bg-light">
-    <div class="container">
-        <div class="row min-vh-100 align-items-center justify-content-center">
-            <div class="col-md-8 col-lg-6">
-                <div class="text-center mb-4">
-                    <h1 class="text-primary fw-bold">Complaint Management System</h1>
-                    <p class="text-muted">Submit and track your complaints efficiently</p>
-                </div>
-                <div class="card shadow-sm border-0">
-                    <div class="card-body p-5 text-center">
-                        <i class="bi bi-shield-check display-1 text-primary mb-3"></i>
-                        <h3 class="mb-3">Welcome</h3>
-                        <p class="text-muted mb-4">Please login or register to access the complaint portal.</p>
-                        <div class="d-grid gap-2">
-                            <a href="login.php" class="btn btn-primary btn-lg">Login</a>
-                            <a href="register.php" class="btn btn-outline-primary btn-lg">Register</a>
-                        </div>
-                    </div>
-                </div>
-                <p class="text-center text-muted mt-3">&copy; <?= date('Y') ?> Complaint Management System</p>
-            </div>
-        </div>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<body>
+<main class="landing">
+    <header class="nav"><a class="brand" href="index.php"><span class="brand-mark"><i class="bi bi-shield-check"></i></span><span><strong>CampusResolve</strong><small>Student Grievance Portal</small></span></a><nav class="nav-links"><a href="#features">How it works</a><a href="register.php">Create account</a><a class="nav-cta" href="login.php">Sign in <i class="bi bi-arrow-right"></i></a></nav></header>
+    <section class="hero"><div><p class="eyebrow">A CLEARER CAMPUS EXPERIENCE</p><h1>Every concern deserves a <span>clear next step.</span></h1><p class="lead">CampusResolve gives students and institutional teams one secure place to submit, route, investigate, and resolve campus Cases with a complete evidence trail.</p><div class="actions"><a class="btn-main" href="login.php">Open the portal <i class="bi bi-arrow-up-right"></i></a><a class="btn-ghost" href="register.php">Create a Complainant account</a></div></div><div class="visual"><div class="orbit a"></div><div class="orbit b"></div><div class="orbit c"></div><div class="window"><div class="screen"><i class="bi bi-laptop"></i><span>Secure campus access</span></div></div><div class="visual-copy"><strong>Submit. Track. Resolve.</strong><span>One clear place for every campus Case.</span></div></div></section>
+    <section class="feature-row" id="features"><div class="feature"><i class="bi bi-fingerprint"></i><div><strong>Secure access</strong><span>Session-based role protection for every workspace.</span></div></div><div class="feature"><i class="bi bi-diagram-3"></i><div><strong>Smart routing</strong><span>Cases move to the right department and officer.</span></div></div><div class="feature"><i class="bi bi-clock-history"></i><div><strong>Full history</strong><span>Reference numbers, timelines, SLAs, and audit records.</span></div></div><div class="feature"><i class="bi bi-chat-square-heart"></i><div><strong>Closed-loop feedback</strong><span>Resolution updates and post-closure ratings.</span></div></div></section>
+</main>
 </body>
 </html>
