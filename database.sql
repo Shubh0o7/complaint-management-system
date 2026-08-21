@@ -333,3 +333,17 @@ UPDATE `complaints` c
 LEFT JOIN `sla_policies` s ON s.`priority` = c.`priority`
 SET c.`sla_due_at` = DATE_ADD(c.`created_at`, INTERVAL s.`resolution_hours` HOUR)
 WHERE c.`sla_due_at` IS NULL;
+
+-- Seed role-specific accounts for the college demonstration environment.
+-- Passwords are bcrypt hashes; change them from the application after first login.
+INSERT INTO `users` (`full_name`, `email`, `password`, `role`, `department_id`, `is_active`) VALUES
+('Campus Student', 'student@campus.edu', '$2y$10$5LQrmA0rTDbEhYTdxbC86u.Nk9Uu.vXRh3u61Y3/9bXc/c4MVwVAC', 'user', NULL, 1),
+('Campus Administrator', 'admin@campus.edu', '$2y$10$birxZ1iB6hKDNRz6rFUqGee2Jfu2wIpfJgCuckz/DNPuTOpc/vr4W', 'admin', NULL, 1),
+('Department Manager', 'manager@campus.edu', '$2y$10$SsAWTqgf.4BptNetbXfOC.HYtG6aST3QgoX/gPcVaXJb5HUBpOCea', 'department', 1, 1),
+('Complaint Officer', 'officer@campus.edu', '$2y$10$0o.7b3.DaS3LhYsIHjqxCu/YWR8N..NvXYTjlA2rONyCQvU90/B2G', 'officer', 1, 1)
+ON DUPLICATE KEY UPDATE
+  `full_name` = VALUES(`full_name`),
+  `password` = VALUES(`password`),
+  `role` = VALUES(`role`),
+  `department_id` = VALUES(`department_id`),
+  `is_active` = VALUES(`is_active`);
