@@ -33,11 +33,17 @@ This project digitizes the full grievance lifecycle. In the public interface, a 
 
 ### [Open the working website on GitHub Pages](https://shubh0o7.github.io/complaint-management-system/)
 
-The public demo is designed for quick evaluation. Visitors can authenticate into the four role dashboards, each with a distinct layout, inspect case queues, submit new cases, update statuses, view notification activity, and open case timelines. The dashboard sidebar collapses on desktop and opens as a slide-in drawer on mobile; a dimmed backdrop closes the mobile drawer when tapped. Complaint records are synchronized through a restricted shared demo table, so a complaint submitted from one device can be loaded from another device. A local browser cache remains available as a fallback if the shared service is temporarily unavailable.
+The public demo is designed for quick evaluation. Its login screen follows a split-screen reference layout, and its Sign up form creates database-backed Complainant accounts. Visitors can authenticate into the four role dashboards, each with a distinct layout, inspect case queues, submit new cases, update statuses, view notification activity, and open case timelines. The dashboard sidebar collapses on desktop and opens as a slide-in drawer on mobile; a dimmed backdrop closes the mobile drawer when tapped. Complaint records are synchronized through a restricted shared demo table, so a complaint submitted from one device can be loaded from another device. A local browser cache remains available as a fallback if the shared service is temporarily unavailable.
 
 GitHub Pages is static hosting and cannot execute PHP or MySQL. For that reason, the public site is a browser-based presentation version, while the complete server-backed project remains available through Docker Compose.
 
 ## Interface screenshots
+
+The authentication screen now uses a reference-inspired split layout with a soft teal visual panel, Login and Sign up tabs, rounded field treatment, and a responsive mobile arrangement.
+
+![CampusResolve Login](docs/screenshots/login.png)
+
+![CampusResolve Sign up](docs/screenshots/signup.png)
 
 The public preview includes a consistent interface for each operational role. These captures were refreshed from the current authenticated demo after the shared-storage and responsive-navigation updates; they use seeded demonstration data and are stored in the repository for academic evaluation.
 
@@ -55,7 +61,7 @@ The project includes a complete academic documentation pack. The database schema
 
 ## Demo login accounts
 
-The public demo accepts only the exact email and password combination assigned to each role. These are demonstration credentials, not production accounts, and they are intentionally documented here so a professor can test every dashboard without registration.
+The public demo accepts only the exact email and password combination assigned to each staff or demo role. Visitors may also use the Sign up tab to create a new Complainant account; the account record is stored in the shared database and can be used from another device. These are demonstration credentials, not production accounts, and they are intentionally documented here so a professor can test every dashboard without registration.
 
 | Dashboard | Email | Password |
 |---|---|---|
@@ -155,7 +161,7 @@ The GitHub Actions workflow in `.github/workflows/ci-cd.yml` runs PHP validation
 No installation is required for the browser demo:
 
 1. Open the [live GitHub Pages website](https://shubh0o7.github.io/complaint-management-system/).
-2. Choose a role on the login page or use the exact credentials in the table above.
+2. Use the Login tab with an exact role credential from the table above, or use the Sign up tab to create a new Complainant account.
 3. The dashboard shown is determined by the authenticated email account; there is no post-login role switch. Each role uses a different layout pattern: split-screen for the complainant, asymmetrical mosaic for the administrator, command board for the department manager, and featured-workbench layout for the officer.
 4. Open **Submit Case** to create a demo case.
 5. Open **Cases** to search, filter, and inspect a case.
