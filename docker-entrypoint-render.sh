@@ -12,7 +12,7 @@ fi
 
 mkdir -p /run/mysqld
 chown mysql:mysql /run/mysqld
-mariadbd --user=mysql --datadir="${DATA_DIR}" --socket=/run/mysqld/mysqld.sock --pid-file=/run/mysqld/mysqld.pid --bind-address=127.0.0.1 --skip-name-resolve >/tmp/mariadb.log 2>&1 &
+mariadbd --user=mysql --datadir="${DATA_DIR}" --socket=/run/mysqld/mysqld.sock --pid-file=/run/mysqld/mysqld.pid --bind-address=127.0.0.1 --skip-name-resolve --console >/tmp/mariadb.log 2>&1 &
 DB_PID=$!
 cleanup() {
   kill "${DB_PID}" 2>/dev/null || true
