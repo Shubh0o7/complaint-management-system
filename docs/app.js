@@ -98,7 +98,14 @@ function bindDemoLogin() { document.querySelectorAll('[data-demo-role]').forEach
 $('#roleSelect').addEventListener('change', (event) => { state.role = event.target.value; saveState(); currentView = 'overview'; render(); showToast(`Switched to ${roles[state.role]} view.`); }); $('#accountToggle').addEventListener('click', () => { const menu = $('#accountMenu'); const open = menu.classList.toggle('hidden') === false; $('#accountToggle').setAttribute('aria-expanded', String(open)); }); document.addEventListener('click', (event) => { if (!event.target.closest('.account-wrap')) { $('#accountMenu').classList.add('hidden'); $('#accountToggle').setAttribute('aria-expanded', 'false'); } }); document.querySelectorAll('[data-account-action]').forEach((button) => button.addEventListener('click', () => { const action = button.dataset.accountAction; $('#accountMenu').classList.add('hidden'); if (action === 'complaints' || action === 'notifications') showView(action); else if (action === 'logout') { sessionStorage.removeItem(LOGIN_KEY); showLogin(); } else if (action === 'password') showToast('Use Change Password in the full PHP application.'); else showToast('Profile details are available in the full PHP application.'); }));
 document.querySelectorAll('.nav-item').forEach((item) => item.addEventListener('click', () => showView(item.dataset.view)));
 $('#resetDemo').addEventListener('click', () => { if (confirm('Reset the demo data to its original sample state?')) { state = structuredClone(seed); saveState(); render(); showToast('Demo data reset.'); } });
-$('#mobileMenu').addEventListener('click', () => $('#sidebar').classList.toggle('open'));
+const sidebarToggle = $('#mobileMenu');
+const sidebar = $('#sidebar');
+const appShell = document.querySelector('.app-shell');
+function syncSidebarToggle() { const mobile = window.matchMedia('(max-width: 760px)').matches; const open = mobile ? sidebar.classList.contains('open') : !appShell.classList.contains('sidebar-collapsed'); sidebarToggle.setAttribute('aria-expanded', String(open)); sidebarToggle.setAttribute('aria-label', open ? 'Collapse sidebar' : 'Open sidebar'); sidebarToggle.setAttribute('title', open ? 'Collapse sidebar' : 'Open sidebar'); sidebarToggle.innerHTML = `<i class="bi ${open ? 'bi-layout-sidebar-inset' : 'bi-layout-sidebar'}"></i>`; }
+sidebarToggle.addEventListener('click', () => { const mobile = window.matchMedia('(max-width: 760px)').matches; if (mobile) sidebar.classList.toggle('open'); else appShell.classList.toggle('sidebar-collapsed'); syncSidebarToggle(); });
+window.addEventListener('resize', syncSidebarToggle);
+document.querySelectorAll('.nav-item').forEach((item) => item.addEventListener('click', () => { if (window.matchMedia('(max-width: 760px)').matches) { sidebar.classList.remove('open'); syncSidebarToggle(); } }));
+syncSidebarToggle();
 $('#themeToggle').addEventListener('click', toggleTheme);
 $('#loginThemeToggle').addEventListener('click', toggleTheme);
 applyTheme(localStorage.getItem(THEME_KEY) || 'light');
