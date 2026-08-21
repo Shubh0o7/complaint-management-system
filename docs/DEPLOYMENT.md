@@ -19,7 +19,7 @@ The workflow at `.github/workflows/ci-cd.yml` runs syntax checks, MariaDB initia
 
 ## Email delivery
 
-Set `MAIL_ENABLED=1` and `MAIL_FROM` only when a configured server-side mail transport is available. For a production implementation, replace the adapter with SMTP, an institutional mail relay, or a transactional provider and keep credentials in deployment secrets. Local and academic-demo mode records messages in `logs/emails.log` and in the `email_notifications` table.
+Set `MAIL_ENABLED=1` and `MAIL_FROM` only when a configured server-side mail transport is available. For a production implementation, replace the adapter with SMTP, an institutional mail relay, or a transactional provider and keep credentials in deployment secrets. The `forgot_password.php` flow creates a SHA-256 token with a one-hour expiry, stores only the token hash in `password_resets`, and marks tokens as single-use after a successful password update. Local and academic-demo mode records messages in `logs/emails.log` and in the `email_notifications` table; the Render college demo also displays the generated one-hour reset link on the recovery page because outbound email is disabled there.
 
 ## GitHub Pages limitation
 
