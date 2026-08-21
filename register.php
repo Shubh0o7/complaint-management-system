@@ -53,6 +53,7 @@ if (isset($_SESSION['user_id'])) {
                                     <span class="input-group-text"><i class="bi bi-lock"></i></span>
                                     <input type="password" class="form-control" id="password" name="password" 
                                            placeholder="Enter password (min 6 chars)" required>
+                                    <button type="button" class="password-toggle" data-password-toggle="password" aria-label="Show password" aria-pressed="false" title="Show password"><i class="bi bi-eye"></i></button>
                                 </div>
                                 <div class="invalid-feedback">Please enter a password.</div>
                             </div>
@@ -62,6 +63,7 @@ if (isset($_SESSION['user_id'])) {
                                     <span class="input-group-text"><i class="bi bi-lock-check"></i></span>
                                     <input type="password" class="form-control" id="confirm_password" name="confirm_password" 
                                            placeholder="Confirm your password" required>
+                                    <button type="button" class="password-toggle" data-password-toggle="confirm_password" aria-label="Show password" aria-pressed="false" title="Show password"><i class="bi bi-eye"></i></button>
                                 </div>
                                 <div class="invalid-feedback">Passwords must match.</div>
                             </div>
@@ -78,12 +80,29 @@ if (isset($_SESSION['user_id'])) {
             </div>
         </div>
     </div>
+    <style>
+        .password-toggle { border: 0; background: transparent; color: #6c757d; padding: 0 .65rem; line-height: 1; }
+        .password-toggle:hover, .password-toggle:focus-visible { color: #0d6efd; }
+        .password-toggle:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; border-radius: .25rem; }
+    </style>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
         const registerForm = document.getElementById('registerForm');
         const registerBtn = document.getElementById('registerBtn');
         const messageDiv = document.getElementById('registerMessage');
+
+        document.querySelectorAll('[data-password-toggle]').forEach(function(toggle) {
+            toggle.addEventListener('click', function() {
+                const input = document.getElementById(toggle.dataset.passwordToggle);
+                const isVisible = input.type === 'text';
+                input.type = isVisible ? 'password' : 'text';
+                toggle.setAttribute('aria-pressed', String(!isVisible));
+                toggle.setAttribute('aria-label', isVisible ? 'Show password' : 'Hide password');
+                toggle.title = isVisible ? 'Show password' : 'Hide password';
+                toggle.innerHTML = `<i class="bi bi-eye${isVisible ? '' : '-slash'}"></i>`;
+            });
+        });
 
         function showMessage(type, text) {
             messageDiv.className = `alert alert-${type} alert-dismissible fade show`;
