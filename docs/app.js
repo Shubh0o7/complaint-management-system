@@ -101,10 +101,13 @@ $('#resetDemo').addEventListener('click', () => { if (confirm('Reset the demo da
 const sidebarToggle = $('#mobileMenu');
 const sidebar = $('#sidebar');
 const appShell = document.querySelector('.app-shell');
-function syncSidebarToggle() { const mobile = window.matchMedia('(max-width: 760px)').matches; const open = mobile ? sidebar.classList.contains('open') : !appShell.classList.contains('sidebar-collapsed'); sidebarToggle.setAttribute('aria-expanded', String(open)); sidebarToggle.setAttribute('aria-label', open ? 'Collapse sidebar' : 'Open sidebar'); sidebarToggle.setAttribute('title', open ? 'Collapse sidebar' : 'Open sidebar'); sidebarToggle.innerHTML = `<i class="bi ${open ? 'bi-layout-sidebar-inset' : 'bi-layout-sidebar'}"></i>`; }
+const sidebarBackdrop = $('#sidebarBackdrop');
+function syncSidebarToggle() { const mobile = window.matchMedia('(max-width: 760px)').matches; const open = mobile ? sidebar.classList.contains('open') : !appShell.classList.contains('sidebar-collapsed'); appShell.classList.toggle('sidebar-open', mobile && open); sidebarToggle.setAttribute('aria-expanded', String(open)); sidebarToggle.setAttribute('aria-label', open ? 'Collapse sidebar' : 'Open sidebar'); sidebarToggle.setAttribute('title', open ? 'Collapse sidebar' : 'Open sidebar'); sidebarToggle.innerHTML = `<i class="bi ${open ? 'bi-layout-sidebar-inset' : 'bi-layout-sidebar'}"></i>`; }
+function closeMobileSidebar() { sidebar.classList.remove('open'); syncSidebarToggle(); }
 sidebarToggle.addEventListener('click', () => { const mobile = window.matchMedia('(max-width: 760px)').matches; if (mobile) sidebar.classList.toggle('open'); else appShell.classList.toggle('sidebar-collapsed'); syncSidebarToggle(); });
+sidebarBackdrop.addEventListener('click', closeMobileSidebar);
 window.addEventListener('resize', syncSidebarToggle);
-document.querySelectorAll('.nav-item').forEach((item) => item.addEventListener('click', () => { if (window.matchMedia('(max-width: 760px)').matches) { sidebar.classList.remove('open'); syncSidebarToggle(); } }));
+document.querySelectorAll('.nav-item').forEach((item) => item.addEventListener('click', () => { if (window.matchMedia('(max-width: 760px)').matches) closeMobileSidebar(); }));
 syncSidebarToggle();
 $('#themeToggle').addEventListener('click', toggleTheme);
 $('#loginThemeToggle').addEventListener('click', toggleTheme);

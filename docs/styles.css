@@ -33,3 +33,9 @@ body.dark-mode{--ink:#edf4f5;--muted:#afc0c8;--line:#40596a;--surface:#24394d;--
 .app-shell.sidebar-collapsed .sidebar:after{display:none}
 @media(max-width:760px){.mobile-menu{display:inline-flex}.sidebar{flex:0 0 274px;width:274px;position:fixed;left:-274px;top:0;bottom:0;transform:translateX(0);transition:left .24s cubic-bezier(.23,1,.32,1),box-shadow .24s ease}.sidebar.open{left:0;box-shadow:18px 0 42px rgba(13,35,64,.24)}.app-shell.sidebar-collapsed .sidebar{flex-basis:274px;width:274px;padding-left:18px;padding-right:18px;transform:translateX(0)}}
 @media(prefers-reduced-motion:reduce){.sidebar,.mobile-menu{transition:none}}
+
+
+/* Mobile sidebar backdrop */
+.sidebar-backdrop{display:none}
+@media(max-width:760px){.sidebar-backdrop{display:block;position:fixed;inset:0;z-index:19;border:0;background:rgba(10,25,44,.48);opacity:0;pointer-events:none;transition:opacity .24s ease;cursor:pointer}.app-shell.sidebar-open .sidebar-backdrop{opacity:1;pointer-events:auto}}
+@media(prefers-reduced-motion:reduce){.sidebar-backdrop{transition:none}}
