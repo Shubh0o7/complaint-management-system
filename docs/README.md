@@ -16,7 +16,7 @@ This directory contains the design evidence and operational documentation for th
 | [Diagrams](diagrams/) | ER, DFD 0–2, use case, architecture, and sequence diagrams |
 | [Screenshots](screenshots/modules/) | Login, signup, and four role-specific interface captures |
 
-The public browser demo is available at [shubh0o7.github.io/complaint-management-system](https://shubh0o7.github.io/complaint-management-system/). Its authentication screen follows a clean split Login/Sign up layout inspired by the supplied reference. The Sign up flow creates a database-backed Complainant account; new accounts cannot select or access staff roles. The demo uses strict role-specific credentials and a dedicated shared complaint table, so complaints submitted from one device can be viewed from another. A local browser cache is retained only as a fallback; the full server-backed application is started with Docker. Review [Workflows and Dashboards](WORKFLOWS-AND-DASHBOARDS.md) for the ER model and the complete role-by-role explanation.
+The public browser demo is available at [shubh0o7.github.io/complaint-management-system](https://shubh0o7.github.io/complaint-management-system/). Its authentication screen follows a clean split Login/Sign up layout inspired by the supplied reference, but GitHub Pages is a static preview and does not connect directly to SQL. The complete PHP application uses direct MySQL/MariaDB persistence: `register.php` creates Complainant accounts in the `users` table, and the authenticated dashboards read and write Cases through PHP sessions and prepared SQL queries. Review [Workflows and Dashboards](WORKFLOWS-AND-DASHBOARDS.md) for the ER model and the complete role-by-role explanation.
 
 | Demo role | Email | Password |
 |---|---|---|
@@ -25,4 +25,4 @@ The public browser demo is available at [shubh0o7.github.io/complaint-management
 | Department Manager | `manager@campus.edu` | `Manager@1234` |
 | Complaint Officer | `officer@campus.edu` | `Officer@1234` |
 
-The role screenshots in [screenshots/modules](screenshots/modules/) were refreshed after the shared-storage, role-login, slideable-sidebar, and mobile-backdrop updates.
+The screenshots in [screenshots](screenshots/) cover the reference-inspired Login and Sign up screens, while [screenshots/modules](screenshots/modules/) contains the four role-specific layouts. They were refreshed after the role-login, slideable-sidebar, and mobile-backdrop updates.

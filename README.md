@@ -33,7 +33,7 @@ This project digitizes the full grievance lifecycle. In the public interface, a 
 
 ### [Open the working website on GitHub Pages](https://shubh0o7.github.io/complaint-management-system/)
 
-The public demo is designed for quick evaluation. Its login screen follows a split-screen reference layout, and its Sign up form creates database-backed Complainant accounts. Visitors can authenticate into the four role dashboards, each with a distinct layout, inspect case queues, submit new cases, update statuses, view notification activity, and open case timelines. The dashboard sidebar collapses on desktop and opens as a slide-in drawer on mobile; a dimmed backdrop closes the mobile drawer when tapped. Complaint records are synchronized through a restricted shared demo table, so a complaint submitted from one device can be loaded from another device. A local browser cache remains available as a fallback if the shared service is temporarily unavailable.
+The GitHub Pages preview is designed for quick evaluation. Its login screen follows a split-screen reference layout and demonstrates the four locked role accounts. Account registration and shared Case persistence are handled by the direct SQL-backed PHP application, not by GitHub Pages. Visitors can authenticate into the four role dashboards, each with a distinct layout, inspect case queues, submit new cases, update statuses, view notification activity, and open case timelines. The dashboard sidebar collapses on desktop and opens as a slide-in drawer on mobile; a dimmed backdrop closes the mobile drawer when tapped. The static preview keeps sample Case records in the browser for presentation. Cross-device Case persistence is provided by the direct PHP/MariaDB application, where records are stored in the SQL database.
 
 GitHub Pages is static hosting and cannot execute PHP or MySQL. For that reason, the public site is a browser-based presentation version, while the complete server-backed project remains available through Docker Compose.
 
@@ -61,7 +61,7 @@ The project includes a complete academic documentation pack. The database schema
 
 ## Demo login accounts
 
-The public demo accepts only the exact email and password combination assigned to each staff or demo role. Visitors may also use the Sign up tab to create a new Complainant account; the account record is stored in the shared database and can be used from another device. These are demonstration credentials, not production accounts, and they are intentionally documented here so a professor can test every dashboard without registration.
+The GitHub Pages preview accepts only the exact email and password combination assigned to each demonstration role. For the direct SQL-backed PHP deployment, visitors can use `register.php` to create a Complainant account; the record is stored in the MySQL/MariaDB `users` table and can be used from another device connected to the same deployed application. These are demonstration credentials, not production accounts, and they are intentionally documented here so a professor can test every dashboard without registration.
 
 | Dashboard | Email | Password |
 |---|---|---|
@@ -70,7 +70,7 @@ The public demo accepts only the exact email and password combination assigned t
 | Department Manager | `manager@campus.edu` | `Manager@1234` |
 | Complaint Officer | `officer@campus.edu` | `Officer@1234` |
 
-The role selector on the login page fills the matching email and password automatically. If the credentials do not match the selected role, login is rejected. After login, the demo reads and writes complaint records through the shared CampusResolve storage table and refreshes open dashboards periodically, allowing submissions and status changes to appear across devices.
+The role buttons on the static preview fill the matching email and password automatically. If the credentials do not match the selected role, login is rejected. The preview uses local sample records for demonstration; the complete PHP application reads and writes Case records directly through MySQL/MariaDB.
 
 ## Role-based workflow
 
@@ -161,14 +161,14 @@ The GitHub Actions workflow in `.github/workflows/ci-cd.yml` runs PHP validation
 No installation is required for the browser demo:
 
 1. Open the [live GitHub Pages website](https://shubh0o7.github.io/complaint-management-system/).
-2. Use the Login tab with an exact role credential from the table above, or use the Sign up tab to create a new Complainant account.
+2. Use the GitHub Pages preview with an exact role credential from the table above. For SQL-backed registration, open `register.php` in the deployed PHP application.
 3. The dashboard shown is determined by the authenticated email account; there is no post-login role switch. Each role uses a different layout pattern: split-screen for the complainant, asymmetrical mosaic for the administrator, command board for the department manager, and featured-workbench layout for the officer.
 4. Open **Submit Case** to create a demo case.
 5. Open **Cases** to search, filter, and inspect a case.
 6. Open **Notifications** to review activity.
 7. Use the top-left sidebar control to collapse or reopen navigation. On mobile, tap the dimmed backdrop to close the drawer.
 
-> Demo complaint records are shared across devices through the dedicated demo table. A local browser cache is used only as a fallback. Use **Reset demo data** in the sidebar to restore the original sample records.
+> The direct PHP application stores Case records in MySQL/MariaDB. GitHub Pages is only a static preview and does not write directly to SQL. Use **Reset demo data** in the preview sidebar to restore its local sample records.
 
 ## Quick start: complete PHP application
 
@@ -251,7 +251,7 @@ The schema is organized around the complaint lifecycle. `users` stores all four 
 
 ## Security and deployment notes
 
-The application uses prepared MySQLi statements, password hashing, PHP session authentication, role guards, CSRF protection, expiring password-reset tokens, scoped complaint queries, MIME-detected uploads with random filenames, private download authorization, audit logs, SLA monitoring, and timeline records. The public demo adds strict role credential matching and uses a dedicated Supabase table with row-level security policies for shared complaint reads, inserts, and status updates; the public publishable key does not grant access to the rest of the approved project. Status changes flow through in-app notifications and the shared delivery dispatcher. Email attempts are stored in `email_notifications`; local mode logs messages, while production can enable `MAIL_ENABLED=1` and `MAIL_FROM` or replace the adapter with SMTP. Browser push subscriptions are stored in `push_subscriptions` and deliveries in `push_notifications`. For real push delivery, install Composer dependencies and configure `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, and `VAPID_SUBJECT` outside version control. For production use, place secrets outside version control, enforce HTTPS, change the seeded administrator password, disable directory listing, and use a private database account with only the required permissions.
+The application uses prepared MySQLi statements, password hashing, PHP session authentication, role guards, CSRF protection, expiring password-reset tokens, scoped complaint queries, MIME-detected uploads with random filenames, private download authorization, audit logs, SLA monitoring, and timeline records. The GitHub Pages preview adds strict role credential matching for demonstration. The full PHP deployment uses the version-controlled SQL schema as its source of truth for account, Case, notification, and audit data. Status changes flow through in-app notifications and the shared delivery dispatcher. Email attempts are stored in `email_notifications`; local mode logs messages, while production can enable `MAIL_ENABLED=1` and `MAIL_FROM` or replace the adapter with SMTP. Browser push subscriptions are stored in `push_subscriptions` and deliveries in `push_notifications`. For real push delivery, install Composer dependencies and configure `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, and `VAPID_SUBJECT` outside version control. For production use, place secrets outside version control, enforce HTTPS, change the seeded administrator password, disable directory listing, and use a private database account with only the required permissions.
 
 GitHub Pages is appropriate for the static project preview only. The PHP application must be deployed to a PHP-capable host with MariaDB, Docker, or the published container image. The GitHub Actions workflow supports an optional `DEPLOY_HOOK_URL` repository secret for hosting providers that expose a deployment hook.
 
