@@ -109,7 +109,7 @@ jobs:
 
           curl --fail --silent --show-error --cookie-jar /tmp/cms-cookie --cookie /tmp/cms-cookie \
             -H 'Content-Type: application/json' \
-            --data '{"email":"admin@cms.com","password":"admin123"}' \
+            --data '{"email":"admin@campus.edu","password":"Admin@1234"}' \
             http://127.0.0.1:8090/api/login.php > /tmp/cms-login-response.json
           grep -Fq '"success":true' /tmp/cms-login-response.json
 
