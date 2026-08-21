@@ -21,13 +21,13 @@ try {
   check(await page.locator('body').evaluate((body) => body.classList.contains('dark-mode')), 'dark mode activates from login');
   check(await page.evaluate(() => localStorage.getItem('campusresolve-demo-theme-v1')) === 'dark', 'dark mode persists to localStorage');
 
-  await page.locator('#demoEmail').fill('student@campus.edu');
-  await page.locator('#demoPassword').fill('Student@1234');
+  await page.locator('#demoEmail').fill('admin@campus.edu');
+  await page.locator('#demoPassword').fill('Admin@1234');
   await page.locator('#demoLoginForm button[type="submit"]').click();
   await page.locator('.app-shell').waitFor({ state: 'visible' });
-  check(await page.locator('#accountRole').textContent() === 'Complainant', 'student credentials open complainant workspace');
-  check((await page.locator('#overviewView').textContent()).includes('My case journey'), 'complainant dashboard layout is rendered');
-  check(await page.locator('#roleSelectLabel').textContent() === 'Complainant', 'authenticated role is displayed as locked');
+  check(await page.locator('#accountRole').textContent() === 'Administrator', 'administrator credentials open administrator workspace');
+  check((await page.locator('#overviewView').textContent()).includes('INSTITUTION CONTROL CENTER'), 'administrator dashboard layout is rendered');
+  check(await page.locator('#roleSelectLabel').textContent() === 'Administrator', 'authenticated role is displayed as locked');
   check(await page.locator('#roleSelect').count() === 0, 'post-login role selector is not available');
 
   await page.locator('#themeToggle').click();
@@ -41,6 +41,7 @@ try {
   check(await page.evaluate(() => sessionStorage.getItem('campusresolve-demo-auth-v1')) === null, 'logout clears demo session storage');
 
   check(await page.locator('[data-demo-role]').count() === 0, 'login has no role selector or auto-fill controls');
+  check(await page.locator('#signupPane').textContent().then((text) => text.includes('Students must create an account first')), 'student registration is required for Student Dashboard');
   const roleAccounts = [
     ['admin@campus.edu', 'Admin@1234', 'Administrator'],
     ['manager@campus.edu', 'Manager@1234', 'Department Manager'],

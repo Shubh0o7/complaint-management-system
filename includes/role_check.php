@@ -12,7 +12,7 @@ function require_role(array $roles): void {
 }
 
 function role_label(string $role): string {
-    return ['user' => 'Complainant', 'admin' => 'Administrator', 'department' => 'Department Manager', 'officer' => 'Complaint Officer'][$role] ?? ucfirst($role);
+    return ['user' => 'Student Dashboard', 'admin' => 'Administrator', 'department' => 'Department Manager', 'officer' => 'Complaint Officer'][$role] ?? ucfirst($role);
 }
 
 function status_badge_class(string $status): string {

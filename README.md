@@ -19,7 +19,7 @@ This project digitizes the full grievance lifecycle. In the public interface, a 
 
 | Capability | Implementation |
 | --- | --- |
-| **Four role workspaces** | Complainant, administrator, department manager, and complaint officer, each with a distinct dashboard layout |
+| **Four role workspaces** | Student Dashboard, administrator, department manager, and complaint officer, each with a distinct dashboard layout |
 | **Case lifecycle** | Submission, routing, assignment, investigation, resolution, and rejection |
 | **Traceability** | Status history, activity timeline, comments, remarks, notifications, and audit logs |
 | **Multi-channel alerts** | Status-triggered in-app notifications, logged/SMTP-ready email alerts, and optional standards-based browser push alerts |
@@ -61,11 +61,11 @@ The project includes a complete academic documentation pack. The database schema
 
 ## Demo login accounts
 
-The GitHub Pages preview accepts only the exact email and password combination assigned to each demonstration role, entered manually. For the direct SQL-backed PHP deployment, visitors can use `register.php` to create a Complainant account; the record is stored in the MySQL/MariaDB `users` table and can be used from another device connected to the same deployed application. These are demonstration credentials, not production accounts, and they are intentionally documented here so a professor can test every dashboard without registration.
+The GitHub Pages preview accepts only the exact email and password combination assigned to the three staff demonstration roles, entered manually. Students do not receive a pre-seeded login: they must register through `register.php`, then sign in with the new account to access Student Dashboard. The account is stored in the MySQL/MariaDB `users` table and can be used from another device connected to the same deployed application.
 
 | Dashboard | Email | Password |
 |---|---|---|
-| Complainant | `student@campus.edu` | `Student@1234` |
+| Student Dashboard | Register first through `register.php` | Create your own password |
 | Administrator | `admin@campus.edu` | `Admin@1234` |
 | Department Manager | `manager@campus.edu` | `Manager@1234` |
 | Complaint Officer | `officer@campus.edu` | `Officer@1234` |
@@ -107,7 +107,7 @@ Complainant
 
 The demo dashboard uses a responsive sidebar designed for both desktop and mobile evaluation. The top-left control collapses or reopens the navigation rail on desktop screens. On mobile screens it opens a slide-in drawer with a backdrop overlay, closes when the backdrop is tapped, and automatically dismisses after a navigation item is selected. The control exposes its state through `aria-expanded`, `aria-label`, and tooltip text.
 
-### Complainant experience
+### Student Dashboard experience
 
 Users can register and log in, manage their profile and contact information, update notification and appearance preferences, submit complaints with subjects, categories, priorities, descriptions, and attachments, then search and filter their complaint history. Each case includes status badges, metadata, evidence, comments, notifications, and a chronological activity timeline.
 
@@ -162,7 +162,7 @@ No installation is required for the browser demo:
 
 1. Open the [live GitHub Pages website](https://shubh0o7.github.io/complaint-management-system/).
 2. Enter an exact role credential from the table above manually. For a new user, open `register.php` in the deployed PHP application first, complete registration, then return to `login.php` and enter the new account details.
-3. The dashboard shown is determined by the authenticated email account; there is no post-login role switch. Each role uses a different layout pattern: split-screen for the complainant, asymmetrical mosaic for the administrator, command board for the department manager, and featured-workbench layout for the officer.
+3. The dashboard shown is determined by the authenticated email account; there is no post-login role switch. Students must register before entering Student Dashboard. Each role uses a different layout pattern: split-screen student workspace, asymmetrical mosaic for the administrator, command board for the department manager, and featured-workbench layout for the officer.
 4. Open **Submit Case** to create a demo case.
 5. Open **Cases** to search, filter, and inspect a case.
 6. Open **Notifications** to review activity.
@@ -209,9 +209,9 @@ The repository is organized so a professor can inspect both the running system a
 ├── index.php                         PHP landing page and role redirect
 ├── index.html                        GitHub Pages demo entrypoint
 ├── login.php / register.php           Authentication screens
-├── dashboard.php                      Complainant dashboard
+├── dashboard.php                      Student Dashboard
 ├── add_complaint.php                  Complaint submission form
-├── complaints.php                     Complainant complaint list
+├── complaints.php                     Student Case list
 ├── view_complaint.php                 Complaint detail, comments, files, timeline
 ├── department_dashboard.php           Department queue and officer assignment
 ├── officer_dashboard.php              Officer investigation queue
