@@ -51,10 +51,9 @@ if (isset($_SESSION['user_id'])) {
                                 </button>
                             </div>
                         </form>
+                        <div class="campus-auth-links"><a href="forgot_password.php">Forgot password?</a><span>Use the email assigned to your role.</span></div>
+                        <p class="campus-auth-note"><i class="bi bi-database-check"></i> Accounts and Case records are stored directly in the MySQL/MariaDB database.</p>
                     </div>
-                    <div class="campus-auth-links"><a href="forgot_password.php">Forgot password?</a><span>Use the email assigned to your role.</span></div>
-                    <p class="campus-auth-note"><i class="bi bi-database-check"></i> Accounts and Case records are stored directly in the MySQL/MariaDB database.</p>
-            </div>
             <aside class="campus-auth-visual"><div class="campus-orbit orbit-a"></div><div class="campus-orbit orbit-b"></div><div class="campus-orbit orbit-c"></div><div class="campus-laptop"><div class="campus-screen"><i class="bi bi-laptop"></i><span>Secure campus access</span></div></div><div class="campus-auth-caption"><strong>Submit. Track. Resolve.</strong><span>One clear place for every campus case.</span></div></aside>
         </section>
     </main>
