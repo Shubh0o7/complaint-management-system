@@ -1,8 +1,9 @@
 <?php
 require_once 'config.php';
-require_once 'includes/auth_check.php';
+require_once 'includes/role_check.php';
 require_once 'includes/notification_helper.php';
 require_once 'includes/workflow_helper.php';
+require_role(['user']);
 
 // Get categories from database
 $categories = [];

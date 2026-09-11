@@ -1,6 +1,7 @@
 <?php
 require_once 'config.php';
-require_once 'includes/auth_check.php';
+require_once 'includes/role_check.php';
+require_role(['user']);
 
 // Get categories for filter dropdown
 $categories = [];

@@ -121,6 +121,17 @@ function role_home(?string $role = null): string
     };
 }
 
+function role_complaints_page(?string $role = null): string
+{
+    $role = $role ?? ($_SESSION['user_role'] ?? 'user');
+    return match ($role) {
+        'admin' => 'admin_complaints.php',
+        'department' => 'department_dashboard.php',
+        'officer' => 'officer_dashboard.php',
+        default => 'complaints.php',
+    };
+}
+
 function redirect_role_home(): never
 {
     header('Location: ' . role_home());

@@ -36,6 +36,7 @@ if (!$complaint) {
     exit();
 }
 $display_user_name = $is_admin ? ($complaint['user_name'] ?? '') : (((int)($complaint['is_anonymous'] ?? 0) === 1) ? 'Anonymous complainant' : ($complaint['user_name'] ?? ''));
+$is_owner = (int)($complaint['user_id'] ?? 0) === (int)($_SESSION['user_id'] ?? 0);
 
 // Fetch timeline
 $timeline = get_complaint_timeline($conn, $complaint_id);
@@ -108,8 +109,8 @@ function format_file_size($bytes) {
                 <!-- Breadcrumb -->
                 <nav aria-label="breadcrumb" class="mb-3">
                     <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="<?= $is_admin ? 'admin_dashboard.php' : 'dashboard.php' ?>">Dashboard</a></li>
-                        <li class="breadcrumb-item"><a href="<?= $is_admin ? 'admin_complaints.php' : 'complaints.php' ?>">Complaints</a></li>
+                        <li class="breadcrumb-item"><a href="<?= htmlspecialchars(role_home($role)) ?>">Dashboard</a></li>
+                        <li class="breadcrumb-item"><a href="<?= htmlspecialchars(role_complaints_page($role)) ?>">Complaints</a></li>
                         <li class="breadcrumb-item active">Complaint #<?= $complaint_id ?></li>
                     </ol>
                 </nav>
@@ -131,8 +132,8 @@ function format_file_size($bytes) {
                             </div>
                             <div class="text-end">
                                 <small class="text-muted d-block">Reference: <strong><?= htmlspecialchars($complaint['reference_no'] ?? ('#' . $complaint_id)) ?></strong></small>
-                                <a class="btn btn-sm btn-outline-primary mt-2" href="receipt.php?id=<?= $complaint_id ?>"><i class="bi bi-file-earmark-pdf me-1"></i>PDF receipt</a>
-                                <?php if ($complaint['status'] === 'Resolved' && !$is_admin): ?><a class="btn btn-sm btn-outline-success mt-2" href="feedback.php?id=<?= $complaint_id ?>"><i class="bi bi-star me-1"></i><?= $complaint['feedback_rating'] ? 'Update feedback' : 'Rate resolution' ?></a><?php endif; ?>
+                                <?php if ($is_admin || $is_owner): ?><a class="btn btn-sm btn-outline-primary mt-2" href="receipt.php?id=<?= $complaint_id ?>"><i class="bi bi-file-earmark-pdf me-1"></i>PDF receipt</a><?php endif; ?>
+                                <?php if ($complaint['status'] === 'Resolved' && $is_owner): ?><a class="btn btn-sm btn-outline-success mt-2" href="feedback.php?id=<?= $complaint_id ?>"><i class="bi bi-star me-1"></i><?= $complaint['feedback_rating'] ? 'Update feedback' : 'Rate resolution' ?></a><?php endif; ?>
                                 <?php if ($is_admin): ?>
                                 <small class="text-muted">By: <?= htmlspecialchars($display_user_name) ?></small>
                                 <?php endif; ?>

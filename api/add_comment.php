@@ -9,6 +9,7 @@ header('Content-Type: application/json');
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../includes/auth_check.php';
 require_once __DIR__ . '/../includes/notification_helper.php';
+require_once __DIR__ . '/../includes/workflow_helper.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -65,8 +66,7 @@ if ($complaint_result->num_rows === 0) {
     exit();
 }
 
-$complaint_row = $complaint_result->fetch_assoc();
-$complaint_user = $complaint_row['user_id'];
+$complaint_result->fetch_assoc();
 $complaint_stmt->close();
 
 // Insert comment
@@ -77,27 +77,8 @@ if ($stmt) {
     $stmt->bind_param('iisi', $complaint_id, $user_id, $comment, $is_admin);
     
     if ($stmt->execute()) {
-        // Log timeline entry
-        $action = 'comment';
-        $timeline_stmt = $conn->prepare("INSERT INTO complaint_timeline (complaint_id, user_id, action, description) VALUES (?, ?, ?, ?)");
-        if ($timeline_stmt) {
-            $timeline_desc = 'New comment added';
-            $timeline_stmt->bind_param('iiss', $complaint_id, $user_id, $action, $timeline_desc);
-            $timeline_stmt->execute();
-            $timeline_stmt->close();
-        }
-        
-        // Notify complaint owner if commenter is not the owner
-        if ($user_id !== $complaint_user) {
-            create_notification(
-                $conn,
-                $complaint_user,
-                $complaint_id,
-                'New Comment',
-                'A new comment has been added to your complaint.',
-                'comment'
-            );
-        }
+        $is_staff = in_array($role, ['admin', 'department', 'officer'], true);
+        notify_new_comment($conn, $complaint_id, $user_id, $_SESSION['user_name'] ?? 'User', $comment, $is_staff);
         
         echo json_encode([
             'success' => true,
