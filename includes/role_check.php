@@ -5,8 +5,7 @@ function require_role(array $roles): void {
     $role = $_SESSION['user_role'] ?? '';
     if (!in_array($role, $roles, true)) {
         http_response_code(403);
-        $home = ['admin' => 'admin_dashboard.php', 'department' => 'department_dashboard.php', 'officer' => 'officer_dashboard.php'][$role] ?? 'dashboard.php';
-        header('Location: ' . $home . '?error=unauthorized');
+        header('Location: ' . role_home($role) . '?error=unauthorized');
         exit;
     }
 }

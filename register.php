@@ -1,9 +1,9 @@
 <?php
 require_once 'config.php';
+require_once 'includes/security.php';
 
 if (isset($_SESSION['user_id'])) {
-    header('Location: dashboard.php');
-    exit();
+    redirect_role_home();
 }
 ?>
 <!DOCTYPE html>

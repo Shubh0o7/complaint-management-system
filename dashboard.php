@@ -1,6 +1,7 @@
 <?php
 require_once 'config.php';
-require_once 'includes/auth_check.php';
+require_once 'includes/role_check.php';
+require_role(['user']);
 
 // Get complaint count for logged-in user
 $stmt = $conn->prepare("SELECT COUNT(*) as total FROM complaints WHERE user_id = ?");
