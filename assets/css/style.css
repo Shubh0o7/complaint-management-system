@@ -710,3 +710,100 @@ main.p-4 { padding-top: 34px !important; }
     .card-body { padding: 17px; }
     .role-user main > .card.bg-primary, .role-admin main > .card.bg-dark { min-height: 150px; }
 }
+
+
+/* Smooth aqua theme — inspired by the supplied rounded wave reference */
+:root {
+    --cr-ink: #234451;
+    --cr-muted: #78929a;
+    --cr-line: #dceeed;
+    --cr-wash: #f2fbfa;
+    --cr-navy: #2a8f8a;
+    --cr-navy-2: #3cb3aa;
+    --cr-blue: #36b5a6;
+    --cr-blue-soft: #e1f7f3;
+    --cr-green: #2ca99b;
+    --design-accent: #39b6a8;
+    --design-accent-dark: #238e87;
+    --design-surface: #ffffff;
+    --design-border: #dbeeed;
+    --design-shadow: 0 18px 42px rgba(47, 135, 135, .12);
+}
+body {
+    background-color: #edf9f8;
+    background-image:
+        radial-gradient(ellipse 42% 32% at 2% 8%, rgba(125, 203, 205, .30) 0 62%, transparent 63%),
+        radial-gradient(ellipse 34% 28% at 103% 86%, rgba(112, 202, 192, .22) 0 61%, transparent 62%),
+        linear-gradient(135deg, #f7fcfc 0%, #eef9f8 52%, #e8f6f4 100%);
+    color: var(--cr-ink);
+}
+body::before { content: ''; position: fixed; pointer-events: none; z-index: -1; inset: 0; opacity: .55; background: radial-gradient(ellipse 31% 25% at 99% 10%, rgba(95, 192, 185, .20) 0 61%, transparent 62%); }
+.sidebar { background: linear-gradient(180deg, #287f82 0%, #236b73 100%) !important; box-shadow: 10px 0 34px rgba(34, 113, 119, .14); }
+.brand-mark { background: linear-gradient(135deg, #8be0d3, #4ebdb6) !important; color: #1c6d72; box-shadow: 0 8px 18px rgba(0,0,0,.10); }
+.brand-lockup small { color: #b8e5e3; }
+.sidebar-label { color: #aee0dd; }
+.sidebar-nav .nav-link { color: #d2eeec !important; }
+.sidebar-nav .nav-link:hover, .sidebar-nav .nav-link.active { background: rgba(198, 246, 239, .18) !important; color: #fff !important; }
+.sidebar-nav .nav-link.active { box-shadow: inset 3px 0 #b7f0df, 0 8px 20px rgba(16, 75, 82, .16); }
+.nav-count { background: #9ee4d8; color: #226b70; }
+.sidebar-footer { border-top-color: rgba(221, 255, 250, .20); }
+.sidebar-user small, .sidebar-footer-links a { color: #bce4e2; }
+.sidebar-footer-links i { color: #a7e1da; }
+.app-topbar { background: rgba(255,255,255,.89); border-bottom-color: #d9eeeb; }
+.topbar-eyebrow { color: #54a9a3; }
+.topbar-notifications:hover, .account-trigger:hover { color: #218f8a; }
+.topbar-avatar, .sidebar-avatar { background: #d8f4ef; color: #238f89; }
+.card { border-color: #dceeed !important; border-radius: 20px !important; box-shadow: 0 16px 38px rgba(58, 139, 139, .09) !important; }
+.card-header { background: rgba(255,255,255,.86) !important; border-bottom-color: #e1f0ee !important; }
+.btn { border-radius: 999px; }
+.btn-primary { background: linear-gradient(135deg, #48c4b2, #32a99f); border-color: #39b6a8; box-shadow: 0 7px 16px rgba(55, 176, 163, .20); }
+.btn-primary:hover, .btn-primary:focus { background: linear-gradient(135deg, #2d9f99, #238e87); border-color: #238e87; }
+.btn-outline-primary { color: #258f89; border-color: #a9dcd7; }
+.btn-outline-primary:hover { background: #e2f7f3; color: #1f7e7b; border-color: #79c8c1; }
+.form-control, .form-select { border-color: #d6ece9; background: rgba(255,255,255,.82); border-radius: 999px; }
+textarea.form-control { border-radius: 16px; }
+.form-control:focus, .form-select:focus { border-color: #69c7bf; box-shadow: 0 0 0 4px rgba(80, 191, 178, .16); }
+.table thead th { color: #6b9999; background: #f0faf9; }
+.table tbody tr:hover { background: #effaf8; }
+.badge { background-color: #e6f7f4; color: #287e7d; }
+.complaint-hero { background: linear-gradient(135deg, #f4fcfb 0%, #fff 68%); border-top-color: #50bfb1 !important; }
+.complaint-reference { color: #2d9d95; }
+.complaint-meta-grid > div { background: #eff9f7; border-color: #dcefed; }
+.empty-state-icon { background: #e0f6f1; color: #2ca99b; }
+.account-menu { border-color: #d9eeeb; }
+.account-menu .dropdown-item:hover { background: #e5f7f4; color: #238e87; }
+.account-menu .dropdown-item i { color: #39a79f; }
+
+/* Keep role identities distinct inside the shared aqua theme */
+.role-user { background-color: transparent !important; }
+.role-user main > .card.bg-primary { background: linear-gradient(120deg, #41b9ae, #6bcfc0) !important; }
+.role-department { background-color: transparent !important; }
+.role-department main > header.bg-white { background: linear-gradient(100deg, #e1f7f3, #fff) !important; border-bottom-color: #40b6a9 !important; }
+.role-department main > .container-fluid > .row:first-of-type .card { border-top-color: #39b6a8 !important; }
+.role-department main > .container-fluid > .card { border-left-color: #39b6a8 !important; }
+.role-department .btn-primary { background: linear-gradient(135deg, #39b6a8, #258f89); border-color: #39b6a8; }
+.role-officer { background-color: transparent !important; }
+.role-officer main > header.bg-white { background: linear-gradient(100deg, #edf4ff, #fff) !important; border-bottom-color: #668dd7 !important; }
+.role-officer main > .container-fluid > .row:first-of-type .card { border-top-color: #668dd7 !important; }
+.role-officer main > .container-fluid > .card { border-color: #d8e2f4 !important; }
+.role-officer .btn-primary { background: linear-gradient(135deg, #638bd7, #4d72bd); border-color: #638bd7; }
+.role-admin { background-color: transparent !important; }
+.role-admin main > .card.bg-dark { background: linear-gradient(120deg, #235b70, #287f82) !important; border-left-color: #a5e4d7 !important; }
+.role-admin main > .row .card { border-top-color: #a7d9d6 !important; }
+.role-admin main > .row:first-of-type .card { border-top-color: #39aaa5 !important; }
+.role-admin main > .card:last-child .card-header { background: #e9f7f5 !important; }
+
+/* Reference-inspired aqua auth shell overrides */
+.campus-auth-page { background: linear-gradient(135deg, #eefafa, #fbfefe 48%, #d8f2f0) !important; }
+.campus-auth-card { border-radius: 22px !important; box-shadow: 0 28px 70px rgba(52, 135, 137, .16) !important; }
+.campus-auth-visual { background: linear-gradient(145deg, #d8f3ef, #86d9d0 48%, #53bbae) !important; }
+.campus-auth-mark { background: #287f82 !important; }
+.campus-auth-tabs a.active { color: #2f9e95 !important; }
+.campus-auth-tabs a.active:after { background: #51bbae !important; }
+.campus-auth-form .btn-primary { background: linear-gradient(135deg, #54c5b4, #36aa9e) !important; }
+.campus-auth-form .input-group { border-bottom-color: #cfe8e5 !important; }
+
+@media (max-width: 760px) {
+    body::before { opacity: .35; }
+    .card { border-radius: 16px !important; }
+}
