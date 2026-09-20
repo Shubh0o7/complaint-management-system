@@ -31,7 +31,7 @@ $stmt->close();
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body>
+<body class="role-layout role-user">
     <div class="d-flex">
         <?php include 'includes/sidebar.php'; ?>
         <div class="flex-grow-1">
@@ -51,7 +51,7 @@ $stmt->close();
                         <div class="card border-0 shadow-sm h-100">
                             <div class="card-body text-center">
                                 <div class="display-6 text-primary fw-bold"><?= $complaint_count ?></div>
-                                <p class="text-muted mb-0">Total Complaints</p>
+                                <p class="text-muted mb-0">Total Cases</p>
                             </div>
                         </div>
                     </div>

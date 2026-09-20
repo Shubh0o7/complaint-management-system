@@ -41,7 +41,7 @@ while ($row = $result->fetch_assoc()) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
-<body>
+<body class="role-layout role-admin">
     <div class="d-flex">
         <?php include 'includes/sidebar.php'; ?>
         <div class="flex-grow-1">
@@ -51,7 +51,7 @@ while ($row = $result->fetch_assoc()) {
                 <div class="card border-0 bg-dark text-white mb-4">
                     <div class="card-body p-4">
                         <h3 class="fw-bold"><i class="bi bi-shield-lock me-2"></i>Admin Dashboard</h3>
-                        <p class="mb-0 opacity-75">Manage all complaints, users, and system settings.</p>
+                        <p class="mb-0 opacity-75">Manage all cases, users, and system settings.</p>
                     </div>
                 </div>
 
@@ -61,7 +61,7 @@ while ($row = $result->fetch_assoc()) {
                         <div class="card border-0 shadow-sm h-100">
                             <div class="card-body text-center">
                                 <div class="display-6 text-primary fw-bold"><?= $total_complaints ?></div>
-                                <p class="text-muted mb-0">Total Complaints</p>
+                                <p class="text-muted mb-0">Total Cases</p>
                             </div>
                         </div>
                     </div>
@@ -127,10 +127,10 @@ while ($row = $result->fetch_assoc()) {
                     </div>
                 </div>
 
-                <!-- Recent Complaints -->
+                <!-- Recent Cases -->
                 <div class="card border-0 shadow-sm">
                     <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Recent Complaints</h5>
+                        <h5 class="mb-0"><i class="bi bi-clock-history me-2"></i>Recent Cases</h5>
                         <a href="admin_complaints.php" class="btn btn-sm btn-outline-primary">View All</a>
                     </div>
                     <div class="card-body p-0">

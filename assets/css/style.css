@@ -593,3 +593,41 @@ main > .container-fluid.p-4, main > .container.p-4 { max-width: 1500px; padding:
 main .card h2, main .card h4 { color: var(--cr-ink); }
 main .card .text-muted { color: var(--cr-muted) !important; }
 @media (max-width: 760px) { main > header.bg-white.border-bottom { min-height: 72px; padding: 16px 18px !important; } main > header.bg-white.border-bottom h4 { font-size: 17px; } main > .container-fluid.p-4, main > .container.p-4 { padding: 19px 15px 36px !important; } }
+
+
+/* Four-module layouts inspired by the reference layout families */
+.role-layout { min-height: 100vh; }
+.role-user { background: linear-gradient(135deg, #f5f9ff 0%, #f8fbfd 52%, #eef8f4 100%) !important; }
+.role-user main > .card.bg-primary { background: linear-gradient(120deg, #0d65c9, #1688d8) !important; border-radius: 22px !important; box-shadow: 0 18px 35px rgba(13,101,201,.18) !important; }
+.role-user main > .row .card { border-radius: 18px !important; }
+.role-user main > .row:first-of-type .card { background: rgba(255,255,255,.9); }
+.role-user main > .row:first-of-type .card .display-6 { font-size: 2.4rem; }
+.role-user main > .row:last-of-type .card-header { background: transparent !important; border-bottom: 1px solid #e7edf5 !important; }
+
+.role-department { background: #f4f8f8 !important; }
+.role-department main > header.bg-white { background: linear-gradient(100deg, #e7f7f4, #fff) !important; border-bottom: 3px solid #1ca894 !important; }
+.role-department main > .container-fluid > .row:first-of-type .card { border-top: 3px solid #1ca894 !important; border-radius: 8px !important; }
+.role-department main > .container-fluid > .card { border-left: 5px solid #1ca894 !important; border-radius: 8px !important; }
+.role-department main > .container-fluid > .card .card-body { padding: 22px; }
+.role-department table thead { background: #e9f6f4; }
+.role-department table tbody tr:hover { background: #f0fbf9; }
+.role-department .btn-primary { background: #138f80; border-color: #138f80; }
+
+.role-officer { background: #f7f5fb !important; }
+.role-officer main > header.bg-white { background: linear-gradient(100deg, #f0eafd, #fff) !important; border-bottom: 3px solid #7654b8 !important; }
+.role-officer main > .container-fluid > .row:first-of-type .card { border-radius: 14px !important; border-top: 3px solid #7654b8 !important; }
+.role-officer main > .container-fluid > .card { border: 1px solid #e4dcf3 !important; border-radius: 14px !important; box-shadow: 0 10px 24px rgba(61,41,104,.08) !important; }
+.role-officer main > .container-fluid > .card .card-body { padding: 24px; }
+.role-officer table thead { background: #f1ecfb; }
+.role-officer .btn-primary { background: #63449d; border-color: #63449d; }
+.role-officer .table tbody tr td:first-child { border-left: 3px solid #b49bdf; padding-left: 14px; }
+
+.role-admin { background: #f1f4f8 !important; }
+.role-admin main > .card.bg-dark { background: linear-gradient(120deg, #112c50, #1c456f) !important; border-radius: 5px !important; border-left: 7px solid #70c3bd !important; }
+.role-admin main > .row .card { border-radius: 5px !important; border-top: 2px solid #d6e1ec !important; }
+.role-admin main > .row:first-of-type .card { border-top-color: #2a75b9 !important; }
+.role-admin main > .card:last-child { border-radius: 5px !important; box-shadow: 0 8px 22px rgba(17,44,80,.08) !important; }
+.role-admin main > .card:last-child .card-header { background: #eaf1f8 !important; }
+.role-admin table thead { background: #dfeaf4 !important; color: #163b62; }
+
+.case-label { color: var(--cr-blue); font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }

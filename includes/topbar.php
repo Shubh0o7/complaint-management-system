@@ -1,10 +1,10 @@
 <?php
 $page_titles = [
     'dashboard.php' => ['My overview', 'Your complaint activity at a glance'],
-    'add_complaint.php' => ['New complaint', 'Tell us what needs attention'],
-    'complaints.php' => ['My complaints', 'Track every request in one place'],
+    'add_complaint.php' => ['New case', 'Tell us what needs attention'],
+    'complaints.php' => ['My cases', 'Track every request in one place'],
     'admin_dashboard.php' => ['Operations overview', 'Monitor the campus resolution pipeline'],
-    'admin_complaints.php' => ['Manage complaints', 'Review, route, and resolve incoming cases'],
+    'admin_complaints.php' => ['Manage cases', 'Review, route, and resolve incoming cases'],
     'admin_users.php' => ['Users & roles', 'Manage access across the portal'],
     'admin_assignments.php' => ['Workflow & accounts', 'Keep ownership and escalation clear'],
     'reports.php' => ['Reports & analytics', 'Turn resolution activity into insight'],

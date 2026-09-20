@@ -13,7 +13,7 @@ if (isset($_SESSION['user_id'])) {
 }
 $current_page = basename($_SERVER['PHP_SELF']);
 $role = $_SESSION['user_role'] ?? 'user';
-$role_label = ['admin' => 'Administrator', 'department' => 'Department team', 'officer' => 'Complaint officer', 'user' => 'Student'][$role] ?? ucfirst($role);
+$role_label = ['admin' => 'Administrator', 'department' => 'Department team', 'officer' => 'Case officer', 'user' => 'Student'][$role] ?? ucfirst($role);
 $initial = strtoupper(substr(trim($_SESSION['user_name'] ?? 'U'), 0, 1));
 function sidebar_link(string $page, string $icon, string $label, string $current_page, ?int $badge = null): void {
     $active = $page === $current_page ? ' active' : '';
@@ -33,7 +33,7 @@ function sidebar_link(string $page, string $icon, string $label, string $current
     <ul class="nav flex-column sidebar-nav">
         <?php if ($role === 'admin'): ?>
             <?php sidebar_link('admin_dashboard.php', 'bi-grid-1x2', 'Overview', $current_page); ?>
-            <?php sidebar_link('admin_complaints.php', 'bi-kanban', 'Manage complaints', $current_page); ?>
+            <?php sidebar_link('admin_complaints.php', 'bi-kanban', 'Manage cases', $current_page); ?>
             <?php sidebar_link('admin_users.php', 'bi-people', 'Users & roles', $current_page); ?>
             <?php sidebar_link('admin_assignments.php', 'bi-diagram-3', 'Workflow & accounts', $current_page); ?>
             <?php sidebar_link('reports.php', 'bi-bar-chart-line', 'Reports & analytics', $current_page); ?>
@@ -46,8 +46,8 @@ function sidebar_link(string $page, string $icon, string $label, string $current
             <?php sidebar_link('notifications.php', 'bi-bell', 'Notifications', $current_page, $unread_count); ?>
         <?php else: ?>
             <?php sidebar_link('dashboard.php', 'bi-grid-1x2', 'My overview', $current_page); ?>
-            <?php sidebar_link('add_complaint.php', 'bi-plus-circle', 'New complaint', $current_page); ?>
-            <?php sidebar_link('complaints.php', 'bi-inbox', 'My complaints', $current_page); ?>
+            <?php sidebar_link('add_complaint.php', 'bi-plus-circle', 'New case', $current_page); ?>
+            <?php sidebar_link('complaints.php', 'bi-inbox', 'My cases', $current_page); ?>
             <?php sidebar_link('notifications.php', 'bi-bell', 'Notifications', $current_page, $unread_count); ?>
         <?php endif; ?>
     </ul>
