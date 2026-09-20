@@ -109,3 +109,14 @@ Specify your license here (e.g., MIT). If no LICENSE file exists, consider addin
 
 ## Support
 For issues, please open an issue in this repository. For urgent support, include logs, reproduction steps, and environment details (Docker / PHP / MariaDB versions).
+
+
+## Notification queue worker
+
+Status, comment, assignment, and escalation alerts are enqueued in the `notification_queue` table so web requests stay responsive. Run the worker with:
+
+```bash
+php bin/process_notification_queue.php
+```
+
+For production, schedule this command from cron or a process supervisor at a short interval. The worker claims pending items, delivers email and push notifications when configured, records the result, and retries transient failures according to the queue policy. Keep the worker on the same PHP configuration and database credentials as the web application.

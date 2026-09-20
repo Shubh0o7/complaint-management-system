@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Online Complaint and Grievance Management System interactive demo">
-  <title>Grievance Portal | Interactive Demo</title>
+  <meta name="description" content="CampusResolve student grievance and complaint management portal demo">
+  <title>CampusResolve | Student Grievance Portal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
@@ -12,16 +12,33 @@
   <link rel="stylesheet" href="docs/styles.css">
 </head>
 <body>
-  <div id="app-root"></div>
+  <main id="app-root" class="demo-loader" aria-live="polite" aria-busy="true">
+    <div class="loader-card">
+      <span class="loader-mark" aria-hidden="true"><i class="bi bi-shield-check"></i></span>
+      <strong>Loading CampusResolve</strong>
+      <span>Preparing the interactive portal…</span>
+    </div>
+  </main>
   <script>
-    fetch('docs/index.html').then(response => response.text()).then(html => {
+    const root = document.getElementById('app-root');
+    fetch('docs/index.html', { headers: { Accept: 'text/html' } }).then(response => {
+      if (!response.ok) throw new Error(`Demo shell request failed (${response.status})`);
+      return response.text();
+    }).then(html => {
       const body = html.match(/<body[^>]*>([\s\S]*)<\/body>/i);
-      document.getElementById('app-root').innerHTML = body ? body[1] : html;
+      root.className = '';
+      root.removeAttribute('aria-busy');
+      root.innerHTML = body ? body[1] : html;
       const script = document.createElement('script');
       script.src = 'docs/app.js';
+      script.onerror = () => {
+        root.innerHTML = '<section class="demo-load-error"><i class="bi bi-exclamation-triangle" aria-hidden="true"></i><h1>Unable to start the demo</h1><p>The interface loaded, but its interaction layer could not be downloaded. Check your connection and refresh the page.</p><button type="button" onclick="location.reload()">Refresh demo</button></section>';
+      };
       document.body.appendChild(script);
     }).catch(() => {
-      document.getElementById('app-root').innerHTML = '<main style="font-family:sans-serif;padding:3rem"><h1>Grievance Portal</h1><p>The demo is loading. Please refresh the page.</p></main>';
+      root.className = 'demo-loader';
+      root.removeAttribute('aria-busy');
+      root.innerHTML = '<section class="demo-load-error"><i class="bi bi-wifi-off" aria-hidden="true"></i><h1>Demo temporarily unavailable</h1><p>We could not load the CampusResolve interface. Check your connection and try again.</p><button type="button" onclick="location.reload()">Try again</button></section>';
     });
   </script>
 </body>
