@@ -115,29 +115,32 @@ function format_file_size($bytes) {
                 </nav>
 
                 <!-- Complaint Header -->
-                <div class="card border-0 shadow-sm mb-4">
+                <div class="complaint-hero card mb-4">
                     <div class="card-body p-4">
-                        <div class="d-flex justify-content-between align-items-start flex-wrap">
+                        <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
                             <div>
-                                <h4 class="fw-bold mb-2"><?= htmlspecialchars($complaint['subject']) ?></h4>
+                                <div class="complaint-reference-label">Complaint reference</div>
+                                <div class="complaint-reference"><?= htmlspecialchars($complaint['reference_no'] ?? ('GRV-' . date('Y') . '-' . str_pad((string)$complaint_id, 5, '0', STR_PAD_LEFT))) ?></div>
+                                <h2 class="fw-bold mb-2 mt-2"><?= htmlspecialchars($complaint['subject']) ?></h2>
                                 <div class="d-flex gap-2 flex-wrap align-items-center">
                                     <?= get_status_badge($complaint['status']) ?>
                                     <?= get_priority_badge($complaint['priority']) ?>
-                                    <span class="badge bg-light text-dark"><i class="bi bi-folder me-1"></i><?= htmlspecialchars($complaint['category']) ?></span>
-                                    <small class="text-muted"><i class="bi bi-calendar me-1"></i><?= date('M d, Y \a\t h:i A', strtotime($complaint['created_at'])) ?></small>
-                                    <span class="badge bg-light text-dark">SLA due: <?= htmlspecialchars($complaint['sla_due_at'] ?? 'Not calculated') ?></span>
                                     <?php if (is_complaint_overdue($complaint['sla_due_at'] ?? null, $complaint['status'])): ?><span class="badge bg-danger">Overdue</span><?php endif; ?>
+                                    <small class="text-muted"><i class="bi bi-calendar3 me-1"></i><?= date('M d, Y \a\t h:i A', strtotime($complaint['created_at'])) ?></small>
                                 </div>
                             </div>
-                            <div class="text-end">
-                                <small class="text-muted d-block">Reference: <strong><?= htmlspecialchars($complaint['reference_no'] ?? ('#' . $complaint_id)) ?></strong></small>
-                                <a class="btn btn-sm btn-outline-primary mt-2" href="receipt.php?id=<?= $complaint_id ?>"><i class="bi bi-file-earmark-pdf me-1"></i>PDF receipt</a>
-                                <?php if ($complaint['status'] === 'Resolved' && !$is_admin): ?><a class="btn btn-sm btn-outline-success mt-2" href="feedback.php?id=<?= $complaint_id ?>"><i class="bi bi-star me-1"></i><?= $complaint['feedback_rating'] ? 'Update feedback' : 'Rate resolution' ?></a><?php endif; ?>
-                                <?php if ($is_admin): ?>
-                                <small class="text-muted">By: <?= htmlspecialchars($display_user_name) ?></small>
-                                <?php endif; ?>
+                            <div class="d-flex gap-2 flex-wrap justify-content-end">
+                                <a class="btn btn-sm btn-outline-primary" href="receipt.php?id=<?= $complaint_id ?>"><i class="bi bi-file-earmark-pdf me-1"></i>PDF receipt</a>
+                                <?php if ($complaint['status'] === 'Resolved' && !$is_admin): ?><a class="btn btn-sm btn-outline-success" href="feedback.php?id=<?= $complaint_id ?>"><i class="bi bi-star me-1"></i><?= $complaint['feedback_rating'] ? 'Update feedback' : 'Rate resolution' ?></a><?php endif; ?>
                             </div>
                         </div>
+                        <div class="complaint-meta-grid mt-4">
+                            <div><small>Priority</small><strong><?= htmlspecialchars($complaint['priority']) ?></strong></div>
+                            <div><small>Department</small><strong><?= htmlspecialchars($complaint['department_name'] ?? 'Awaiting routing') ?></strong></div>
+                            <div><small>Officer</small><strong><?= htmlspecialchars($complaint['officer_name'] ?? 'Not assigned') ?></strong></div>
+                            <div><small>SLA due</small><strong><?= htmlspecialchars($complaint['sla_due_at'] ?? 'Not calculated') ?></strong></div>
+                        </div>
+                        <?php if ($is_admin): ?><div class="small text-muted mt-3"><i class="bi bi-person me-1"></i>Submitted by <?= htmlspecialchars($display_user_name) ?></div><?php endif; ?>
                     </div>
                 </div>
 

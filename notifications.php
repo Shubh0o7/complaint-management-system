@@ -76,11 +76,12 @@ function get_notification_icon($type) {
                 </div>
 
                 <?php if (empty($notifications)): ?>
-                <div class="card border-0 shadow-sm">
+                <div class="card border-0 shadow-sm empty-state-card">
                     <div class="card-body text-center py-5">
-                        <i class="bi bi-bell-slash display-4 text-muted"></i>
-                        <p class="text-muted mt-3 mb-0">No notifications yet.</p>
-                        <p class="text-muted small">You'll be notified when there are updates to your complaints.</p>
+                        <div class="empty-state-icon"><i class="bi bi-check2-circle"></i></div>
+                        <h5 class="mt-3 mb-1">You're all caught up</h5>
+                        <p class="text-muted small mb-3">No new notifications. Updates about your complaints will appear here.</p>
+                        <?php if (($_SESSION['user_role'] ?? 'user') === 'user'): ?><a href="complaints.php" class="btn btn-outline-primary btn-sm"><i class="bi bi-inbox me-1"></i>View my complaints</a><?php endif; ?>
                     </div>
                 </div>
                 <?php else: ?>

@@ -555,3 +555,31 @@ main.p-4 { padding: 29px 38px 50px !important; max-width: 1500px; margin: auto; 
     main.p-4 { padding: 19px 15px 36px !important; }
     .table-responsive { margin-right: -3px; }
 }
+
+
+/* Attachment-driven detail and account UX */
+.complaint-hero { background: linear-gradient(135deg, #f8fbff 0%, #fff 72%); border-top: 4px solid var(--cr-blue) !important; }
+.complaint-reference-label { color: #8793a6; font-size: 10px; font-weight: 800; letter-spacing: 1.1px; text-transform: uppercase; }
+.complaint-reference { color: var(--cr-blue); font: 800 18px/1.2 'Plus Jakarta Sans', 'Segoe UI', sans-serif; letter-spacing: .4px; }
+.complaint-hero h2 { color: var(--cr-ink); font-size: clamp(21px, 3vw, 30px); }
+.complaint-meta-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.complaint-meta-grid > div { background: #f5f7fb; border: 1px solid var(--cr-line); border-radius: 8px; padding: 11px 12px; }
+.complaint-meta-grid small { display: block; color: #8996a9; font-size: 9px; font-weight: 800; letter-spacing: .8px; text-transform: uppercase; }
+.complaint-meta-grid strong { display: block; color: var(--cr-ink); font-size: 12px; margin-top: 5px; overflow-wrap: anywhere; }
+.account-trigger { border: 0; background: transparent; display: flex; align-items: center; gap: 9px; padding: 2px; color: var(--cr-ink); }
+.account-trigger:hover { color: var(--cr-blue); }
+.account-chevron { color: #8b98aa; font-size: 10px; margin-left: 2px; }
+.account-menu { width: 230px; padding: 8px; border: 1px solid var(--cr-line); border-radius: 11px; box-shadow: 0 15px 35px rgba(21,43,77,.16); }
+.account-menu-heading { padding: 6px 9px 4px; }
+.account-menu-heading strong, .account-menu-heading small { display: block; }
+.account-menu-heading strong { color: var(--cr-ink); font-size: 12px; }
+.account-menu-heading small { color: var(--cr-muted); font-size: 10px; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; }
+.account-menu .dropdown-item { border-radius: 6px; color: var(--cr-ink); font-size: 11px; padding: 8px 9px; }
+.account-menu .dropdown-item:hover { background: var(--cr-wash); color: var(--cr-blue); }
+.account-menu .dropdown-item i { width: 21px; color: var(--cr-blue); }
+@media (max-width: 900px) { .complaint-meta-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 760px) { .topbar-user-copy, .account-chevron { display: none; } .complaint-meta-grid { grid-template-columns: 1fr 1fr; } }
+
+.empty-state-card { background: linear-gradient(180deg, #fff 0%, #fbfdff 100%); }
+.empty-state-icon { width: 58px; height: 58px; display: grid; place-items: center; margin: 0 auto; border-radius: 18px; background: var(--cr-green-soft, #e6f6f1); color: var(--cr-green); font-size: 28px; }
+.empty-state-card h5 { color: var(--cr-ink); font-weight: 700; }
