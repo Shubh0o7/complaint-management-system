@@ -583,3 +583,13 @@ main.p-4 { padding: 29px 38px 50px !important; max-width: 1500px; margin: auto; 
 .empty-state-card { background: linear-gradient(180deg, #fff 0%, #fbfdff 100%); }
 .empty-state-icon { width: 58px; height: 58px; display: grid; place-items: center; margin: 0 auto; border-radius: 18px; background: var(--cr-green-soft, #e6f6f1); color: var(--cr-green); font-size: 28px; }
 .empty-state-card h5 { color: var(--cr-ink); font-weight: 700; }
+
+
+/* Normalize legacy role pages so department/officer/profile screens feel like the same product */
+main > header.bg-white.border-bottom { min-height: 88px; display: flex; align-items: center; justify-content: space-between; padding: 18px 38px !important; }
+main > header.bg-white.border-bottom h4 { color: var(--cr-ink); font: 700 22px/1.15 'Plus Jakarta Sans', 'Segoe UI', sans-serif; }
+main > header.bg-white.border-bottom small { color: var(--cr-muted) !important; font-size: 11px; }
+main > .container-fluid.p-4, main > .container.p-4 { max-width: 1500px; padding: 29px 38px 50px !important; }
+main .card h2, main .card h4 { color: var(--cr-ink); }
+main .card .text-muted { color: var(--cr-muted) !important; }
+@media (max-width: 760px) { main > header.bg-white.border-bottom { min-height: 72px; padding: 16px 18px !important; } main > header.bg-white.border-bottom h4 { font-size: 17px; } main > .container-fluid.p-4, main > .container.p-4 { padding: 19px 15px 36px !important; } }
