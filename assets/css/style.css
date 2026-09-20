@@ -631,3 +631,82 @@ main .card .text-muted { color: var(--cr-muted) !important; }
 .role-admin table thead { background: #dfeaf4 !important; color: #163b62; }
 
 .case-label { color: var(--cr-blue); font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+
+
+/* Final designer pass — editorial hierarchy, calm surfaces, and role-specific composition */
+:root {
+    --design-bg: #f7f9fc;
+    --design-surface: #ffffff;
+    --design-border: #e6ebf2;
+    --design-ink: #10233f;
+    --design-subtle: #728197;
+    --design-accent: #2d6cdf;
+    --design-accent-dark: #1f4fa8;
+    --design-mint: #1a9a83;
+    --design-lilac: #7558b8;
+    --design-radius: 16px;
+    --design-shadow: 0 14px 40px rgba(16,35,63,.075);
+}
+html { scroll-behavior: smooth; }
+body { background: var(--design-bg); color: var(--design-ink); font-family: 'Inter', 'DM Sans', 'Segoe UI', sans-serif; letter-spacing: -.01em; }
+h1, h2, h3, h4, h5, h6, .brand-lockup strong, .app-topbar h1 { font-family: 'Plus Jakarta Sans', 'Inter', 'Segoe UI', sans-serif; letter-spacing: -.035em; }
+a { transition: color .18s ease, background-color .18s ease, border-color .18s ease; }
+:focus-visible { outline: 3px solid rgba(45,108,223,.32); outline-offset: 3px; }
+.d-flex > .flex-grow-1 { background: transparent; }
+.sidebar { background: linear-gradient(180deg, #142f56 0%, #102746 100%) !important; border-right: 1px solid rgba(255,255,255,.08) !important; }
+.sidebar-brand { padding-bottom: 32px; }
+.brand-mark { background: linear-gradient(135deg, #3e86ef, #2c62c5); border-radius: 14px; }
+.sidebar-nav .nav-link { min-height: 44px; }
+.sidebar-nav .nav-link.active { box-shadow: inset 3px 0 #71c6bf, 0 7px 17px rgba(0,0,0,.12); }
+.app-topbar { position: sticky; top: 0; z-index: 900; background: rgba(255,255,255,.94); backdrop-filter: blur(14px); border-bottom-color: rgba(230,235,242,.9); }
+.app-topbar h1 { font-size: 23px; }
+main.p-4 { padding-top: 34px !important; }
+.card { background: var(--design-surface); border-color: var(--design-border) !important; border-radius: var(--design-radius) !important; box-shadow: var(--design-shadow) !important; }
+.card-header { background: linear-gradient(180deg, #fff, #fbfcfe) !important; }
+.card-body { padding: 21px; }
+.display-6 { font-family: 'Plus Jakarta Sans', sans-serif; letter-spacing: -.06em; }
+.btn { min-height: 38px; padding: 9px 15px; border-radius: 10px; letter-spacing: -.01em; }
+.btn-primary { background: linear-gradient(135deg, var(--design-accent), #4383e5); border-color: var(--design-accent); }
+.btn-primary:hover, .btn-primary:focus { background: linear-gradient(135deg, var(--design-accent-dark), #2d6cdf); border-color: var(--design-accent-dark); transform: translateY(-1px); }
+.btn-outline-primary { background: #fff; }
+.form-control, .form-select { min-height: 42px; background: #fbfcfe; }
+.form-control::placeholder { color: #a8b2c1; }
+.table-responsive { border-radius: 12px; }
+.table { margin-bottom: 0; }
+.table thead th { padding-top: 13px; padding-bottom: 13px; }
+.table tbody tr { transition: background-color .18s ease; }
+.table tbody tr:hover { background: #f7faff; }
+.badge { font-weight: 700; letter-spacing: .01em; }
+.alert { box-shadow: 0 7px 20px rgba(16,35,63,.055); }
+.breadcrumb { font-size: 11px; }
+
+/* Personal / split-screen composition */
+.role-user main > .card.bg-primary { min-height: 188px; display: flex; align-items: center; }
+.role-user main > .row:first-of-type { --bs-gutter-x: 16px; }
+.role-user main > .row:first-of-type .card-body { min-height: 132px; display: flex; flex-direction: column; justify-content: center; }
+.role-user main > .row:last-of-type { align-items: stretch; }
+
+/* Department / operations board composition */
+.role-department main > .container-fluid > .row:first-of-type { --bs-gutter-x: 14px; }
+.role-department main > .container-fluid > .row:first-of-type .card-body { min-height: 118px; }
+.role-department main > .container-fluid > .card { box-shadow: 0 12px 28px rgba(26,92,84,.08) !important; }
+.role-department .table td:first-child a { color: #146f68; }
+
+/* Officer / focused investigation composition */
+.role-officer main > .container-fluid > .row:first-of-type .card-body { min-height: 116px; }
+.role-officer main > .container-fluid > .card .table { font-size: 12px; }
+.role-officer main > .container-fluid > .card .table td { vertical-align: middle; }
+.role-officer .modal-content { border: 0; border-top: 4px solid var(--design-lilac); border-radius: 15px; }
+
+/* Admin / asymmetrical control-center composition */
+.role-admin main > .card.bg-dark { min-height: 170px; display: flex; align-items: center; }
+.role-admin main > .row:first-of-type .card-body { min-height: 126px; display: flex; flex-direction: column; justify-content: center; }
+.role-admin main > .row:nth-of-type(2) .card-body { min-height: 98px; }
+.role-admin main > .card:last-child .table { font-size: 12px; }
+
+@media (max-width: 760px) {
+    .app-topbar h1 { font-size: 18px; }
+    main.p-4 { padding-top: 22px !important; }
+    .card-body { padding: 17px; }
+    .role-user main > .card.bg-primary, .role-admin main > .card.bg-dark { min-height: 150px; }
+}
