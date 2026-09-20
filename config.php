@@ -1,8 +1,9 @@
 <?php
 /**
  * Database configuration.
- * Docker Compose supplies these values automatically; local PHP users can
- * override them with environment variables or use the same defaults.
+ * The Docker image ships with its own MariaDB instance and uses these local
+ * defaults. Every value can still be overridden with environment variables
+ * when connecting the app to a managed/external database.
  */
 define('DB_HOST', getenv('DB_HOST') ?: '127.0.0.1');
 define('DB_PORT', (int)(getenv('DB_PORT') ?: 3306));

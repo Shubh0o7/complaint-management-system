@@ -80,11 +80,11 @@ If you prefer not to use Docker:
 
 ## Configuration
 - Copy `.env.example` to `.env` and populate database credentials and any secret keys.
-- Ensure DB_HOST, DB_PORT, DB_DATABASE, DB_USERNAME, DB_PASSWORD are set for MariaDB.
+- Set `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS`, and `DB_NAME` only when overriding the bundled MariaDB connection.
 - For production, set appropriate app key and enforce HTTPS.
 
 ## Database
-- Uses MariaDB. Migration files and seeders (if present) will build the schema and provide demo data.
+- Uses MariaDB. `database.sql` creates the schema, application user, reference data, and demo accounts during first initialization.
 - Back up your DB before running destructive commands on production.
 
 ## CI / CD
@@ -110,6 +110,12 @@ Specify your license here (e.g., MIT). If no LICENSE file exists, consider addin
 ## Support
 For issues, please open an issue in this repository. For urgent support, include logs, reproduction steps, and environment details (Docker / PHP / MariaDB versions).
 
+
+## Database
+
+The Docker deployment is self-contained: the application image includes MariaDB, initializes a private `complaint_system` database from `database.sql` on first boot, and stores its data in `/var/lib/mysql`. No separate database service or manual SQL import is required for the single-container deployment. The Docker Compose setup uses the same schema with a dedicated `complaint_db` volume.
+
+To use a managed database instead, set `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS`, and `DB_NAME`; the application will use those values instead of the bundled defaults.
 
 ## Notification queue worker
 

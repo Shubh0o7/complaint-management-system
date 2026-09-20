@@ -9,14 +9,16 @@ services:
     dockerContext: .
     healthCheckPath: /login.php
     envVars:
+      # These defaults connect to the MariaDB bundled in the image.
+      # Replace all DB_* values when using an external managed database.
       - key: DB_HOST
-        sync: false
+        value: "127.0.0.1"
       - key: DB_PORT
         value: "3306"
       - key: DB_USER
-        sync: false
+        value: "complaint_user"
       - key: DB_PASS
-        sync: false
+        value: "complaint_pass"
       - key: DB_NAME
         value: complaint_system
       - key: APP_ENV

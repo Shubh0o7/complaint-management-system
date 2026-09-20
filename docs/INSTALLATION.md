@@ -10,7 +10,7 @@ cd complaint-management-system
 docker compose up --build
 ```
 
-Open `http://localhost:8080`. The Compose stack initializes Apache/PHP, MariaDB, the database schema, the application database user, and the uploads volume automatically. No manual SQL import is required.
+Open `http://localhost:8080`. The Compose stack initializes Apache/PHP, MariaDB, the database schema, the application database user, and the uploads volume automatically. No manual SQL import or separately hosted database is required.
 
 The demonstration administrator account is:
 
@@ -20,6 +20,10 @@ The demonstration administrator account is:
 | Password | `admin123` |
 
 Change this password immediately through **Profile & Password** for any non-demo use.
+
+## Single-container deployment
+
+The application Docker image also contains MariaDB for environments where you want one deployable service with its own database. It initializes the schema from `database.sql` on first boot and uses the `DB_*` environment variables when supplied. Mount `/var/lib/mysql` to persistent storage in production so data survives container replacement.
 
 ## Local PHP/MariaDB installation
 
