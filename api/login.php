@@ -31,10 +31,10 @@ $contentType = isset($_SERVER['CONTENT_TYPE']) ? trim($_SERVER['CONTENT_TYPE']) 
 
 if (strpos($contentType, 'application/json') !== false) {
     $input = json_decode(file_get_contents('php://input'), true);
-    $email = trim($input['email'] ?? '');
+    $email = strtolower(trim($input['email'] ?? ''));
     $password = $input['password'] ?? '';
 } else {
-    $email = trim($_POST['email'] ?? '');
+    $email = strtolower(trim($_POST['email'] ?? ''));
     $password = $_POST['password'] ?? '';
 }
 
@@ -83,6 +83,12 @@ if ($result->num_rows === 1) {
 
         // Resolve the destination from the authenticated role using the shared allow-list.
         $redirect = role_home($_SESSION['user_role']);
+        $roleLabels = [
+            'user' => 'Student',
+            'admin' => 'Administrator',
+            'department' => 'Department Manager',
+            'officer' => 'Complaint Officer',
+        ];
 
         echo json_encode([
             'success' => true,
@@ -92,7 +98,8 @@ if ($result->num_rows === 1) {
                 'id' => $user['id'],
                 'name' => $user['full_name'],
                 'email' => $user['email'],
-                'role' => $user['role'] ?? 'user'
+                'role' => $user['role'] ?? 'user',
+                'role_label' => $roleLabels[$user['role'] ?? 'user'] ?? 'User'
             ]
         ]);
     } else {

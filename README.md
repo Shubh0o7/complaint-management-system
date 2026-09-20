@@ -117,6 +117,18 @@ The Docker deployment is self-contained: the application image includes MariaDB,
 
 To use a managed database instead, set `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASS`, and `DB_NAME`; the application will use those values instead of the bundled defaults.
 
+## Role-based login
+
+Students must create their own account from `register.php`; public registration always creates a `user` account and cannot create staff roles. The bundled institutional accounts use separate login IDs and passwords:
+
+| Role | Login ID | Password | Workspace |
+|---|---|---|---|
+| Administrator | `admin@campus.edu` | `Admin@1234` | `admin_dashboard.php` |
+| Department Manager | `manager@campus.edu` | `Manager@1234` | `department_dashboard.php` |
+| Complaint Officer | `officer@campus.edu` | `Officer@1234` | `officer_dashboard.php` |
+
+Change the seeded staff passwords before using the system outside a demonstration environment.
+
 ## Notification queue worker
 
 Status, comment, assignment, and escalation alerts are enqueued in the `notification_queue` table so web requests stay responsive. Run the worker with:

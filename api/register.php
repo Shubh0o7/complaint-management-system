@@ -31,20 +31,26 @@ $contentType = isset($_SERVER['CONTENT_TYPE']) ? trim($_SERVER['CONTENT_TYPE']) 
 if (strpos($contentType, 'application/json') !== false) {
     $input = json_decode(file_get_contents('php://input'), true);
     $full_name = trim($input['full_name'] ?? '');
-    $email = trim($input['email'] ?? '');
+    $email = strtolower(trim($input['email'] ?? ''));
     $password = $input['password'] ?? '';
     $confirm_password = $input['confirm_password'] ?? '';
 } else {
     $full_name = trim($_POST['full_name'] ?? '');
-    $email = trim($_POST['email'] ?? '');
+    $email = strtolower(trim($_POST['email'] ?? ''));
     $password = $_POST['password'] ?? '';
     $confirm_password = $_POST['confirm_password'] ?? '';
 }
 
-// Validate input
+// Validate input. Public registration always creates a student account; staff
+// roles are provisioned only through the seeded/administrative account flow.
 if (empty($full_name) || empty($email) || empty($password) || empty($confirm_password)) {
     http_response_code(400);
     echo json_encode(['success' => false, 'message' => 'Please fill in all fields.']);
+    exit();
+}
+if (strlen($full_name) > 100) {
+    http_response_code(400);
+    echo json_encode(['success' => false, 'message' => 'Full name must be 100 characters or fewer.']);
     exit();
 }
 
@@ -60,9 +66,9 @@ if ($password !== $confirm_password) {
     exit();
 }
 
-if (strlen($password) < 6) {
+if (strlen($password) < 8) {
     http_response_code(400);
-    echo json_encode(['success' => false, 'message' => 'Password must be at least 6 characters long.']);
+    echo json_encode(['success' => false, 'message' => 'Password must be at least 8 characters long.']);
     exit();
 }
 

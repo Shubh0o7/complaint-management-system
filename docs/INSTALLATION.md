@@ -12,14 +12,15 @@ docker compose up --build
 
 Open `http://localhost:8080`. The Compose stack initializes Apache/PHP, MariaDB, the database schema, the application database user, and the uploads volume automatically. No manual SQL import or separately hosted database is required.
 
-The demonstration administrator account is:
+The seeded institutional accounts are:
 
 | Field | Value |
 |---|---|
-| Email | `admin@cms.com` |
-| Password | `admin123` |
+| Administrator login | `admin@campus.edu` / `Admin@1234` |
+| Department Manager login | `manager@campus.edu` / `Manager@1234` |
+| Complaint Officer login | `officer@campus.edu` / `Officer@1234` |
 
-Change this password immediately through **Profile & Password** for any non-demo use.
+Students do not use a shared seeded account. They must select **Sign up**, create a student account with their own email and password, and then sign in. Staff roles cannot be created through public registration. Change the seeded staff passwords immediately through **Profile & Password** for any non-demo use.
 
 ## Single-container deployment
 

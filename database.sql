@@ -120,12 +120,6 @@ CREATE TABLE IF NOT EXISTS `notifications` (
   FOREIGN KEY (`complaint_id`) REFERENCES `complaints`(`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- College staff demonstration accounts. Students create accounts through register.php; no student account is pre-seeded.
-INSERT IGNORE INTO `users` (`full_name`, `email`, `password`, `role`, `department_id`) VALUES
-('Administrator', 'admin@campus.edu', '$2y$10$uFFH0pkxnZOG70akOL5oxupzBXpYGWind8i2CIzvwLG6fjdvC.kha', 'admin', NULL),
-('Infrastructure Manager', 'manager@campus.edu', '$2y$10$dVzRolKsqeMOn0ngi1zuf.iR3fVFuxMHiJun.IfLKUven5aUrMkNy', 'department', (SELECT id FROM departments WHERE name = 'Infrastructure' LIMIT 1)),
-('Priya Nair', 'officer@campus.edu', '$2y$10$J9MW8nBeDi5GMJJmk7msAOppvttS.yQFtQJ15YPkP.ny9VKh2tFYC', 'officer', (SELECT id FROM departments WHERE name = 'Infrastructure' LIMIT 1));
-
 -- Upgrade notes for existing installations:
 -- ALTER TABLE users MODIFY role ENUM('user','admin','department','officer') NOT NULL DEFAULT 'user';
 -- ALTER TABLE users ADD department_id INT NULL, ADD is_active TINYINT(1) NOT NULL DEFAULT 1;

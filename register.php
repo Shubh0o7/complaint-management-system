@@ -26,7 +26,8 @@ if (isset($_SESSION['user_id'])) {
                 </div>
                 <div class="card shadow-sm border-0">
                     <div class="card-body p-4">
-                        <h5 class="text-center mb-3">Create your account</h5>
+                            <h5 class="text-center mb-2">Create your student account</h5>
+                            <p class="text-center text-muted small mb-4">Student access is created here. Staff accounts are issued separately by the institution.</p>
                         <div id="registerMessage" class="d-none"></div>
                         <form id="registerForm" novalidate>
                             <div class="mb-3">
@@ -52,7 +53,7 @@ if (isset($_SESSION['user_id'])) {
                                 <div class="input-group">
                                     <span class="input-group-text"><i class="bi bi-lock"></i></span>
                                     <input type="password" class="form-control" id="password" name="password" 
-                                           placeholder="Enter password (min 6 chars)" required>
+                                           placeholder="Enter password (min 8 chars)" minlength="8" required>
                                     <button type="button" class="password-toggle" data-password-toggle="password" aria-label="Show password" aria-pressed="false" title="Show password"><i class="bi bi-eye"></i></button>
                                 </div>
                                 <div class="invalid-feedback">Please enter a password.</div>
@@ -136,8 +137,8 @@ if (isset($_SESSION['user_id'])) {
                 return false;
             }
 
-            if (password.length < 6) {
-                showMessage('danger', 'Password must be at least 6 characters long.');
+            if (password.length < 8) {
+                showMessage('danger', 'Password must be at least 8 characters long.');
                 return false;
             }
 

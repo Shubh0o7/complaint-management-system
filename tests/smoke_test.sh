@@ -37,6 +37,11 @@ grep -q "hash('sha256'" forgot_password.php || fail "Password reset token hashin
 grep -q 'expires_at > NOW()' reset_password.php || fail "Password reset expiry validation missing"
 grep -q 'used_at = NOW()' reset_password.php || fail "Password reset token revocation missing"
 grep -q 'require_csrf' forgot_password.php reset_password.php || fail "Password reset CSRF guard missing"
+grep -q "VALUES (?, ?, ?, 'user')" api/register.php || fail "Public registration is not restricted to student role"
+grep -q "admin@campus.edu" database.sql || fail "Administrator seed account missing"
+grep -q "manager@campus.edu" database.sql || fail "Department manager seed account missing"
+grep -q "officer@campus.edu" database.sql || fail "Complaint officer seed account missing"
+grep -q "role_home(\$_SESSION\['user_role'\])" api/login.php || fail "Role-specific login routing missing"
 pass "Mutating API CSRF, upload MIME, multi-channel alerts, and password-reset guards"
 
 for file in index.html docs/index.html docs/styles.css docs/app.js docs/.nojekyll database.sql Dockerfile docker-compose.yml package.json package-lock.json tests/e2e-auth-theme.mjs .github/workflows/ci-cd.yml includes/security.php includes/pdf_helper.php includes/push_helper.php includes/notification_queue.php profile.php settings.php change_password.php forgot_password.php reset_password.php feedback.php receipt.php admin_export.php admin_audit.php escalate_complaint.php api/push_subscribe.php bin/process_notification_queue.php service-worker.js assets/js/push-notifications.js composer.json; do
