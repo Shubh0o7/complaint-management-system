@@ -24,8 +24,7 @@ if (isset($_SESSION['user_id'])) {
         <section class="campus-auth-card">
             <div class="campus-auth-form">
                     <div class="campus-auth-tabs"><a class="active" href="login.php">Login</a><a href="register.php">Sign up</a></div>
-                    <p class="campus-eyebrow">SECURE SQL ACCOUNT ACCESS</p><h1>Welcome</h1><p class="campus-auth-subtitle">Sign in with the unique email and password assigned to your dashboard.</p>
-                        <div class="campus-role-note"><i class="bi bi-info-circle"></i><span><strong>Students:</strong> create an account first. <strong>Administrators, department managers, and officers:</strong> use the separate institutional credentials issued to you.</span></div>
+                    <p class="campus-eyebrow">SECURE ACCOUNT ACCESS</p><h1>Welcome</h1>
                         <!-- Dynamic message container -->
                         <div id="loginMessage" class="d-none"></div>
                         <form id="loginForm" novalidate>
