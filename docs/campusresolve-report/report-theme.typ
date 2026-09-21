@@ -66,6 +66,7 @@
     paper: "a4",
     margin: (top: 2.5cm, bottom: 2.5cm, x: 2.2cm),
     numbering: "1",
+    background: rect(width: 100%, height: 100%, stroke: 1pt + black),
     header: if running-header {
       context {
         if counter(page).get().first() > 0 {
@@ -107,6 +108,7 @@
     font: ("Noto Sans", "Noto Sans CJK SC"),
     fill: report-accent,
   )
+  show heading.where(level: 1): set align(center)
 
   show heading.where(level: 1): set text(size: h1.size * body-size, weight: h1.weight)
   show heading.where(level: 1): set block(

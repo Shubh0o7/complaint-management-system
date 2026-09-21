@@ -4,7 +4,7 @@
   title: "CampusResolve: Online Case and Grievance Management System",
   author: "Omkar Bagave",
   rhythm: "report",
-  running-header: true,
+  running-header: false,
 )
 
 #set text(font: "Libertinus Serif", size: 11pt)
@@ -18,7 +18,8 @@
         #v(1.2cm)
         #text(size: 16pt, weight: "bold")[CAMPUSRESOLVE]
         #v(0.9em)
-        #text(size: 18pt, weight: "bold")[ONLINE CASE AND GRIEVANCE MANAGEMENT SYSTEM]
+        #text(size: 16pt, weight: "bold")[ONLINE CASE AND GRIEVANCE\
+        MANAGEMENT SYSTEM]
         #v(1.4em)
         #text(size: 13pt, weight: "bold")[A Community Engagement Project Report]
         #v(0.7em)
