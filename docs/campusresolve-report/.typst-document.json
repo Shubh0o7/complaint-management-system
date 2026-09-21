@@ -1,0 +1,10 @@
+{
+  "entry": "main.typ",
+  "metadata": {
+    "author": "Omkar Bagave",
+    "subtitle": "A Community Engagement Project Report",
+    "title": "CampusResolve: Online Case and Grievance Management System"
+  },
+  "mode": "report",
+  "theme": "report-theme.typ"
+}
