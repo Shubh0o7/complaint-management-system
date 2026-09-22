@@ -56,7 +56,7 @@ if (isset($_SESSION['user_id'])) {
                         <div class="campus-auth-links"><a href="forgot_password.php">Forgot password?</a><span>Use the email assigned to your role.</span></div>
                         <p class="campus-auth-note"><i class="bi bi-database-check"></i> Accounts and Case records are stored directly in the MySQL/MariaDB database.</p>
                     </div>
-            <aside class="campus-auth-visual"><div class="campus-orbit orbit-a"></div><div class="campus-orbit orbit-b"></div><div class="campus-orbit orbit-c"></div><div class="campus-laptop"><div class="campus-screen"><i class="bi bi-laptop"></i><span>Secure campus access</span></div></div><div class="campus-auth-caption"><strong>Submit. Track. Resolve.</strong><span>One clear place for every campus case.</span></div></aside>
+            <aside class="campus-auth-visual"><div class="campus-orbit orbit-a"></div><div class="campus-orbit orbit-b"></div><div class="campus-orbit orbit-c"></div><div class="campus-laptop"><div class="campus-screen"><i class="bi bi-laptop"></i><span>Secure campus access</span></div></div><div class="campus-plant" aria-hidden="true"><i class="bi bi-flower1"></i></div><div class="campus-auth-caption"><strong>Submit. Track. Resolve.</strong><span>One clear place for every campus case.</span></div></aside>
         </section>
     </main>
     <style>
@@ -88,6 +88,8 @@ if (isset($_SESSION['user_id'])) {
       .campus-orbit { display: none; }
       .campus-laptop { transform: rotate(-8deg) scale(.9) !important; background: rgba(255,255,255,.94) !important; }
       .campus-screen { border-color: #5b4b8e !important; background: #f4fbfa !important; color: #5b4b8e !important; }
+      .campus-plant { position: absolute; z-index: 2; right: 18%; top: 34%; color: #2f9183; font-size: 52px; transform: rotate(10deg); filter: drop-shadow(0 10px 8px rgba(35,111,102,.18)); }
+      .campus-plant::after { content: ''; position: absolute; left: -8px; bottom: -7px; width: 38px; height: 20px; border-radius: 4px 4px 13px 13px; background: #f6fbfa; box-shadow: 0 5px 8px rgba(35,111,102,.14); }
       .campus-auth-caption { bottom: 34px !important; }
       .campus-auth-caption strong { font-size: 19px !important; }
       @media(max-width:760px) { .campus-auth-shell { width: calc(100% - 26px) !important; } .campus-auth-nav nav { display: none !important; } .campus-auth-nav-cta { margin-left: auto; } .campus-auth-card { margin-top: 12px !important; border-radius: 16px !important; } .campus-auth-visual { min-height: 260px !important; } .campus-auth-form .btn-primary { align-self: stretch; width: 100%; } }
