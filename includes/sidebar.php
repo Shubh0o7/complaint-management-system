@@ -28,6 +28,9 @@ function sidebar_link(string $page, string $icon, string $label, string $current
             <span class="brand-mark"><i class="bi bi-shield-check"></i></span>
             <span><strong>CampusResolve</strong><small>Student grievance portal</small></span>
         </a>
+        <button class="sidebar-collapse-toggle" type="button" data-sidebar-collapse aria-label="Collapse sidebar" aria-expanded="true" aria-controls="primary-navigation" title="Collapse sidebar">
+            <i class="bi bi-layout-sidebar-inset"></i>
+        </button>
     </div>
     <div class="sidebar-label">Workspace</div>
     <ul class="nav flex-column sidebar-nav">

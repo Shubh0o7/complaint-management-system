@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const root = document.documentElement;
     const sidebarMin = 220;
     const sidebarMax = 380;
+    const sidebarCollapsedWidth = 84;
     const storedSidebarWidth = Number.parseInt(window.localStorage.getItem('campusresolve-sidebar-width'), 10);
     let sidebarWidth = Number.isFinite(storedSidebarWidth) ? storedSidebarWidth : 260;
     const applySidebarWidth = function (width, persist) {
@@ -47,10 +48,28 @@ document.addEventListener('DOMContentLoaded', function () {
         if (persist) window.localStorage.setItem('campusresolve-sidebar-width', String(sidebarWidth));
     };
     applySidebarWidth(sidebarWidth, false);
+    const collapseButton = document.querySelector('[data-sidebar-collapse]');
+    const setSidebarCollapsed = function (collapsed, persist) {
+        if (!sidebar) return;
+        sidebar.classList.toggle('collapsed', collapsed);
+        root.style.setProperty('--cr-sidebar-width', collapsed ? sidebarCollapsedWidth + 'px' : sidebarWidth + 'px');
+        if (collapseButton) {
+            collapseButton.setAttribute('aria-expanded', String(!collapsed));
+            collapseButton.setAttribute('aria-label', collapsed ? 'Expand sidebar' : 'Collapse sidebar');
+            collapseButton.setAttribute('title', collapsed ? 'Expand sidebar' : 'Collapse sidebar');
+            collapseButton.innerHTML = collapsed ? '<i class="bi bi-layout-sidebar-inset-reverse"></i>' : '<i class="bi bi-layout-sidebar-inset"></i>';
+        }
+        if (persist) window.localStorage.setItem('campusresolve-sidebar-collapsed', collapsed ? '1' : '0');
+    };
+    const initiallyCollapsed = window.localStorage.getItem('campusresolve-sidebar-collapsed') === '1';
+    setSidebarCollapsed(initiallyCollapsed, false);
+    if (collapseButton) collapseButton.addEventListener('click', function () {
+        setSidebarCollapsed(!sidebar.classList.contains('collapsed'), true);
+    });
     if (resizeHandle) {
         let pointerId = null;
         resizeHandle.addEventListener('pointerdown', function (event) {
-            if (window.innerWidth <= 760) return;
+            if (window.innerWidth <= 760 || sidebar.classList.contains('collapsed')) return;
             pointerId = event.pointerId;
             resizeHandle.setPointerCapture(pointerId);
             document.body.classList.add('sidebar-resizing');

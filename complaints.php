@@ -64,7 +64,7 @@ $complaints = $stmt->get_result();
     <title>My Complaints - Complaint Management System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="assets/css/style.css?v=sidebar-20260922-1">
+    <link rel="stylesheet" href="assets/css/style.css?v=sidebar-collapse-20260922-1">
 </head>
 <body>
     <div class="d-flex">
