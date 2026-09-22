@@ -23,7 +23,8 @@ CREATE TABLE IF NOT EXISTS `users` (
   `department_id` INT DEFAULT NULL,
   `is_active` TINYINT(1) NOT NULL DEFAULT 1,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  CONSTRAINT `fk_users_department` FOREIGN KEY (`department_id`) REFERENCES `departments`(`id`) ON DELETE SET NULL
+  CONSTRAINT `fk_users_department` FOREIGN KEY (`department_id`) REFERENCES `departments`(`id`) ON DELETE SET NULL,
+  INDEX `idx_users_role_active` (`role`, `is_active`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `categories` (
@@ -67,7 +68,8 @@ CREATE TABLE IF NOT EXISTS `complaints` (
   CONSTRAINT `fk_complaints_user` FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_complaints_department` FOREIGN KEY (`department_id`) REFERENCES `departments`(`id`) ON DELETE SET NULL,
   CONSTRAINT `fk_complaints_officer` FOREIGN KEY (`officer_id`) REFERENCES `users`(`id`) ON DELETE SET NULL,
-  INDEX `idx_complaints_status` (`status`), INDEX `idx_complaints_department` (`department_id`), INDEX `idx_complaints_officer` (`officer_id`)
+  INDEX `idx_complaints_status` (`status`), INDEX `idx_complaints_department` (`department_id`), INDEX `idx_complaints_officer` (`officer_id`),
+  INDEX `idx_complaints_created_at` (`created_at`), INDEX `idx_complaints_user_created` (`user_id`, `created_at`), INDEX `idx_complaints_department_created` (`department_id`, `created_at`), INDEX `idx_complaints_officer_created` (`officer_id`, `created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS `complaint_timeline` (
@@ -117,7 +119,8 @@ CREATE TABLE IF NOT EXISTS `notifications` (
   `is_read` TINYINT(1) DEFAULT 0,
   `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`complaint_id`) REFERENCES `complaints`(`id`) ON DELETE SET NULL
+  FOREIGN KEY (`complaint_id`) REFERENCES `complaints`(`id`) ON DELETE SET NULL,
+  INDEX `idx_notifications_user_read_created` (`user_id`, `is_read`, `created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- Upgrade notes for existing installations:
