@@ -11,15 +11,12 @@ Every dashboard is protected by authentication. Students must first create an ac
 | Student Dashboard | Register first through `register.php` | Create your own password | `dashboard.php` |
 | Administrator | `admin@campus.edu` | `Admin@1234` | `admin_dashboard.php` |
 | Information Technology Manager | `manager@campus.edu` | `Manager@1234` | `department_dashboard.php` |
-| Information Technology Officer | `officer@campus.edu` | `Officer@1234` | `officer_dashboard.php` |
+| Shared Case Officer | `officer@campus.edu` | `Officer@1234` | `officer_dashboard.php` |
 | Infrastructure Manager | `infrastructure.manager@campus.edu` | `InfrastructureManager@1234` | `department_dashboard.php` |
-| Infrastructure Officer | `infrastructure.officer@campus.edu` | `InfrastructureOfficer@1234` | `officer_dashboard.php` |
 | Academic Affairs Manager | `academic.manager@campus.edu` | `AcademicManager@1234` | `department_dashboard.php` |
-| Academic Affairs Officer | `academic.officer@campus.edu` | `AcademicOfficer@1234` | `officer_dashboard.php` |
 | Student Affairs Manager | `student.manager@campus.edu` | `StudentManager@1234` | `department_dashboard.php` |
-| Student Affairs Officer | `student.officer@campus.edu` | `StudentOfficer@1234` | `officer_dashboard.php` |
 
-These staff credentials are college demonstration credentials only and must be replaced before production use. Students are intentionally not seeded: they must register their own account and then log in. A role cannot be selected after login to bypass the account's assigned permissions. Direct access to another PHP dashboard is checked again by server-side role guards and is rejected or redirected when unauthorized.
+These staff credentials are college demonstration credentials only and must be replaced before production use. For now, `officer@campus.edu` is a shared officer account accepted by every department, so only one officer login is needed. The extra department-specific officer seed accounts are disabled. Students are intentionally not seeded: they must register their own account and then log in. A role cannot be selected after login to bypass the account's assigned permissions. Direct access to another PHP dashboard is checked again by server-side role guards and is rejected or redirected when unauthorized.
 
 ## 2. Complaint lifecycle workflow
 

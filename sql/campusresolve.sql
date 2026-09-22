@@ -355,3 +355,9 @@ INSERT INTO `users` (`full_name`, `email`, `password`, `role`, `department_id`, 
 ON DUPLICATE KEY UPDATE
   `full_name` = VALUES(`full_name`), `password` = VALUES(`password`), `role` = VALUES(`role`),
   `department_id` = VALUES(`department_id`), `is_active` = VALUES(`is_active`);
+
+-- Temporary demo mode: one shared officer can receive cases from every department.
+UPDATE `users`
+SET `is_active` = CASE WHEN `email` = 'officer@campus.edu' THEN 1 ELSE 0 END
+WHERE `role` = 'officer';
+UPDATE `users` SET `department_id` = NULL WHERE `email` = 'officer@campus.edu' AND `role` = 'officer';
