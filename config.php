@@ -18,6 +18,17 @@ if ($conn->connect_error) {
 }
 $conn->set_charset('utf8mb4');
 
+// Correct the original demo hash on existing installations without
+// overwriting a password that has already been changed by an administrator.
+$legacyInfrastructureHash = '$2y$10$kBM/CstmMuDqht4dmzD8n.Cu.6izq93oSz37uBmpgFFoWNLm02yk6';
+$currentInfrastructureHash = '$2y$10$qXNAQkDQpIjJkEpRnMFnS.90FMivN4kZnUpMjFfylN3XAMdCRlF0y';
+$migration = $conn->prepare("UPDATE users SET password = ? WHERE email = 'infrastructure.manager@campus.edu' AND role = 'department' AND password = ?");
+if ($migration) {
+    $migration->bind_param('ss', $currentInfrastructureHash, $legacyInfrastructureHash);
+    $migration->execute();
+    $migration->close();
+}
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }

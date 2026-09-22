@@ -346,7 +346,7 @@ ON DUPLICATE KEY UPDATE
 
 -- Department-first workflow accounts. Admin routes to a department; its manager assigns an officer.
 INSERT INTO `users` (`full_name`, `email`, `password`, `role`, `department_id`, `is_active`) VALUES
-('Infrastructure Manager', 'infrastructure.manager@campus.edu', '$2y$10$kBM/CstmMuDqht4dmzD8n.Cu.6izq93oSz37uBmpgFFoWNLm02yk6', 'department', (SELECT id FROM departments WHERE name = 'Infrastructure'), 1),
+('Infrastructure Manager', 'infrastructure.manager@campus.edu', '$2y$10$qXNAQkDQpIjJkEpRnMFnS.90FMivN4kZnUpMjFfylN3XAMdCRlF0y', 'department', (SELECT id FROM departments WHERE name = 'Infrastructure'), 1),
 ('Infrastructure Officer', 'infrastructure.officer@campus.edu', '$2y$10$ry1JCUeB6uJq/1Uwdr1SJ.r6LOGUOG.N7D3HQ64xeuenQRJnxah.O', 'officer', (SELECT id FROM departments WHERE name = 'Infrastructure'), 1),
 ('Academic Affairs Manager', 'academic.manager@campus.edu', '$2y$10$.kzPck1otENjlEQo3ZXQeuUwnY4hpG5Qnowgyi7ckCeAfFCIz1nou', 'department', (SELECT id FROM departments WHERE name = 'Academic Affairs'), 1),
 ('Academic Affairs Officer', 'academic.officer@campus.edu', '$2y$10$FGfLSdQnlEEONKkzSrf.S.TRI39uqkV/3TlXl1sqfla.O6aX4zJRC', 'officer', (SELECT id FROM departments WHERE name = 'Academic Affairs'), 1),
