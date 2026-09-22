@@ -63,6 +63,7 @@ function sidebar_link(string $page, string $icon, string $label, string $current
             <a href="logout.php" class="logout-link"><i class="bi bi-box-arrow-right"></i> Sign out</a>
         </div>
     </div>
+    <div class="sidebar-resize-handle" data-sidebar-resize role="separator" aria-label="Resize navigation sidebar" aria-orientation="vertical" aria-valuemin="220" aria-valuemax="380" aria-valuenow="260" tabindex="0" title="Drag to resize sidebar"></div>
 </nav>
 <div class="sidebar-backdrop" data-sidebar-close></div>
 <?php unset($role_label, $initial, $current_page); ?>

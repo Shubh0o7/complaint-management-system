@@ -33,6 +33,55 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Resizable desktop sidebar: drag the edge or use the arrow keys on the handle.
+    const resizeHandle = document.querySelector('[data-sidebar-resize]');
+    const root = document.documentElement;
+    const sidebarMin = 220;
+    const sidebarMax = 380;
+    const storedSidebarWidth = Number.parseInt(window.localStorage.getItem('campusresolve-sidebar-width'), 10);
+    let sidebarWidth = Number.isFinite(storedSidebarWidth) ? storedSidebarWidth : 260;
+    const applySidebarWidth = function (width, persist) {
+        sidebarWidth = Math.max(sidebarMin, Math.min(sidebarMax, Math.round(width)));
+        root.style.setProperty('--cr-sidebar-width', sidebarWidth + 'px');
+        if (resizeHandle) resizeHandle.setAttribute('aria-valuenow', String(sidebarWidth));
+        if (persist) window.localStorage.setItem('campusresolve-sidebar-width', String(sidebarWidth));
+    };
+    applySidebarWidth(sidebarWidth, false);
+    if (resizeHandle) {
+        let pointerId = null;
+        resizeHandle.addEventListener('pointerdown', function (event) {
+            if (window.innerWidth <= 760) return;
+            pointerId = event.pointerId;
+            resizeHandle.setPointerCapture(pointerId);
+            document.body.classList.add('sidebar-resizing');
+            event.preventDefault();
+        });
+        resizeHandle.addEventListener('pointermove', function (event) {
+            if (pointerId === null) return;
+            applySidebarWidth(event.clientX, false);
+        });
+        const stopResize = function () {
+            if (pointerId === null) return;
+            pointerId = null;
+            document.body.classList.remove('sidebar-resizing');
+            applySidebarWidth(sidebarWidth, true);
+        };
+        resizeHandle.addEventListener('pointerup', stopResize);
+        resizeHandle.addEventListener('pointercancel', stopResize);
+        resizeHandle.addEventListener('keydown', function (event) {
+            if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+                event.preventDefault();
+                applySidebarWidth(sidebarWidth + (event.key === 'ArrowRight' ? 10 : -10), true);
+            } else if (event.key === 'Home') {
+                event.preventDefault();
+                applySidebarWidth(sidebarMin, true);
+            } else if (event.key === 'End') {
+                event.preventDefault();
+                applySidebarWidth(sidebarMax, true);
+            }
+        });
+    }
+
     // Mobile sidebar: close on navigation, backdrop click, Escape, or viewport resize.
     const sidebar = document.getElementById('primary-navigation');
     const menuButton = document.querySelector('[data-sidebar-toggle]');
