@@ -16,7 +16,7 @@ This directory contains the design evidence and operational documentation for th
 | [Diagrams](diagrams/) | ER, DFD 0–2, use case, architecture, and sequence diagrams |
 | [Screenshots](screenshots/modules/) | Login, signup, and four role-specific interface captures |
 
-The public browser demo is available at [shubh0o7.github.io/complaint-management-system](https://shubh0o7.github.io/complaint-management-system/). Its authentication screen follows a clean split Login/Sign up layout inspired by the supplied reference, but GitHub Pages is a static preview and does not connect directly to SQL. The complete PHP application uses direct MySQL/MariaDB persistence: `register.php` creates Student Dashboard accounts in the `users` table, and the authenticated dashboards read and write Cases through PHP sessions and prepared SQL queries. Review [Workflows and Dashboards](WORKFLOWS-AND-DASHBOARDS.md) for the ER model and the complete role-by-role explanation.
+The complete live CampusResolve application is available at [complaint-management-system-ff6u.onrender.com](https://complaint-management-system-ff6u.onrender.com/). It runs the PHP application with its MariaDB database, so `register.php` creates Student Dashboard accounts in the `users` table and the authenticated dashboards read and write Cases through PHP sessions and prepared SQL queries. Use the Render deployment for real signup, login, routing, officer assignment, and status updates. Review [Workflows and Dashboards](WORKFLOWS-AND-DASHBOARDS.md) for the ER model and the complete role-by-role explanation.
 
 | Demo role | Email | Password |
 |---|---|---|

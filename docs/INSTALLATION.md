@@ -32,4 +32,4 @@ Install PHP 8.3 with MySQLi, Apache, MariaDB/MySQL, and the standard file-info e
 
 ## First-run checklist
 
-After startup, verify that the login page loads, the administrator can reach **Workflow & Accounts**, a complainant account can submit a complaint, and the generated reference number appears in the complaint list. Then run `tests/smoke_test.sh` and review the GitHub Actions result. The GitHub Pages preview is available separately at `https://shubh0o7.github.io/complaint-management-system/`.
+After startup, verify that the login page loads, the administrator can reach **Workflow & Accounts**, a complainant account can submit a complaint, and the generated reference number appears in the complaint list. Then run `tests/smoke_test.sh` and review the GitHub Actions result. The hosted production-style deployment is available at `https://complaint-management-system-ff6u.onrender.com/`.
