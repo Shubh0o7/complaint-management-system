@@ -28,32 +28,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $department = $departmentStmt->get_result()->fetch_assoc();
         $departmentStmt->close();
 
-        // Prefer the seeded institutional officer for every admin-routed case.
-        // The fallback keeps the workflow usable if the demo account is replaced.
-        $officerStmt = $conn->prepare("SELECT id, full_name, email FROM users WHERE role = 'officer' AND is_active = 1 ORDER BY CASE WHEN email = 'officer@campus.edu' THEN 0 ELSE 1 END, id ASC LIMIT 1");
-        $officerStmt->execute();
-        $officer = $officerStmt->get_result()->fetch_assoc();
-        $officerStmt->close();
-
         if (!$complaint || !$department) {
             $error = 'Choose a valid case and active department.';
-        } elseif (!$officer) {
-            $error = 'No active case officer is configured for this department yet.';
         } else {
-            $update = $conn->prepare('UPDATE complaints SET department_id = ?, officer_id = ? WHERE id = ?');
-            $officerId = (int)$officer['id'];
-            $update->bind_param('iii', $departmentId, $officerId, $complaintId);
+            // Admin routes to a department only. Its manager will assign the
+            // case to an officer from the department dashboard.
+            $update = $conn->prepare('UPDATE complaints SET department_id = ?, officer_id = NULL WHERE id = ?');
+            $update->bind_param('ii', $departmentId, $complaintId);
             $updated = $update->execute();
             $update->close();
 
             if ($updated) {
                 $reference = $complaint['reference_no'] ?: ('#' . $complaintId);
                 add_timeline_entry($conn, $complaintId, $actorId, 'Department Assigned', null, $department['name'], 'Administrator routed this case to ' . $department['name'] . '.');
-                add_timeline_entry($conn, $complaintId, $actorId, 'Officer Assigned', null, $officer['full_name'], 'The case was automatically assigned to the default department officer.');
                 create_notification($conn, (int)$complaint['user_id'], $complaintId, 'Case routed', 'Your case ' . $reference . ' was routed to ' . $department['name'] . ' for review.', 'assignment');
-                create_notification($conn, $officerId, $complaintId, 'New case assigned', 'Case ' . $reference . ' has been assigned to you by an administrator.', 'assignment');
-                audit_log($conn, 'assign_case', 'complaint', $complaintId, 'Administrator routed case to ' . $department['name'] . ' and default officer ' . $officer['full_name']);
-                $message = 'Case routed to ' . $department['name'] . ' and assigned to ' . $officer['full_name'] . '.';
+                $managerStmt = $conn->prepare("SELECT id FROM users WHERE role = 'department' AND department_id = ? AND is_active = 1");
+                $managerStmt->bind_param('i', $departmentId);
+                $managerStmt->execute();
+                foreach ($managerStmt->get_result() as $manager) {
+                    create_notification($conn, (int)$manager['id'], $complaintId, 'New case for your department', 'Case ' . $reference . ' is ready for officer assignment.', 'assignment');
+                }
+                $managerStmt->close();
+                audit_log($conn, 'assign_department', 'complaint', $complaintId, 'Administrator routed case to ' . $department['name'] . '; department manager must assign an officer.');
+                $message = 'Case routed to ' . $department['name'] . '. The department manager can now assign it to an officer.';
             } else {
                 $error = 'The case could not be routed. Please try again.';
             }
@@ -125,7 +122,7 @@ foreach ($complaints as $case) if (empty($case['department_id'])) $pendingCount+
                 <div class="col-12 col-xxl-8">
                     <section class="card h-100">
                         <div class="card-header d-flex flex-wrap align-items-center justify-content-between gap-2">
-                            <div><h2 class="h5 mb-1">Case routing queue</h2><p class="small text-muted mb-0">Every routed case is automatically sent to the default department officer.</p></div>
+                            <div><h2 class="h5 mb-1">Case routing queue</h2><p class="small text-muted mb-0">Route each case to a department. Its manager assigns the officer.</p></div>
                             <span class="badge rounded-pill text-bg-<?= $pendingCount ? 'warning' : 'success' ?>"><?= $pendingCount ?> awaiting routing</span>
                         </div>
                         <div class="card-body p-0">
@@ -137,8 +134,8 @@ foreach ($complaints as $case) if (empty($case['department_id'])) $pendingCount+
                                         <tr>
                                             <td><a class="fw-semibold text-decoration-none" href="view_complaint.php?id=<?= (int)$case['id'] ?>"><?= htmlspecialchars($case['subject']) ?></a><div class="small text-muted"><?= htmlspecialchars($case['reference_no'] ?: ('#' . $case['id'])) ?> · <?= htmlspecialchars($case['user_name']) ?></div></td>
                                             <td><span class="badge text-bg-<?= $case['priority'] === 'High' ? 'danger' : ($case['priority'] === 'Medium' ? 'warning' : 'secondary') ?>"><?= htmlspecialchars($case['priority']) ?></span><div class="small text-muted mt-1"><?= htmlspecialchars($case['status']) ?></div></td>
-                                            <td><div><?= htmlspecialchars($case['department_name'] ?: 'Unassigned') ?></div><div class="small text-muted"><i class="bi bi-person-check me-1"></i><?= htmlspecialchars($case['officer_name'] ?: 'Awaiting default officer') ?></div></td>
-                                            <td><form class="d-flex gap-2" method="post"><?= csrf_field() ?><input type="hidden" name="complaint_id" value="<?= (int)$case['id'] ?>"><select class="form-select form-select-sm" name="department_id" aria-label="Department for case" required><option value="">Select</option><?php foreach ($departments as $department): ?><option value="<?= (int)$department['id'] ?>" <?= (int)$case['department_id'] === (int)$department['id'] ? 'selected' : '' ?>><?= htmlspecialchars($department['name']) ?></option><?php endforeach; ?></select><button class="btn btn-sm btn-primary" name="assign_department" title="Route to department and default officer"><i class="bi bi-send me-1"></i>Route</button></form></td>
+                                            <td><div><?= htmlspecialchars($case['department_name'] ?: 'Unassigned') ?></div><div class="small text-muted"><i class="bi bi-person-check me-1"></i><?= htmlspecialchars($case['officer_name'] ?: 'Awaiting department assignment') ?></div></td>
+                                            <td><form class="d-flex gap-2" method="post"><?= csrf_field() ?><input type="hidden" name="complaint_id" value="<?= (int)$case['id'] ?>"><select class="form-select form-select-sm" name="department_id" aria-label="Department for case" required><option value="">Select</option><?php foreach ($departments as $department): ?><option value="<?= (int)$department['id'] ?>" <?= (int)$case['department_id'] === (int)$department['id'] ? 'selected' : '' ?>><?= htmlspecialchars($department['name']) ?></option><?php endforeach; ?></select><button class="btn btn-sm btn-primary" name="assign_department" title="Route to department"><i class="bi bi-send me-1"></i>Route</button></form></td>
                                         </tr>
                                     <?php endforeach; ?>
                                     <?php if (!$complaints): ?><tr><td colspan="4" class="text-center text-muted py-5">No cases are waiting for routing.</td></tr><?php endif; ?>
@@ -152,8 +149,8 @@ foreach ($complaints as $case) if (empty($case['department_id'])) $pendingCount+
 
                 <div class="col-12 col-xxl-4">
                     <section class="card mb-4">
-                        <div class="card-header"><h2 class="h5 mb-1">Default routing</h2><p class="small text-muted mb-0">The seeded officer receives all routed cases.</p></div>
-                        <div class="card-body"><div class="d-flex align-items-center gap-3"><span class="brand-mark"><i class="bi bi-person-badge"></i></span><div><strong>Complaint Officer</strong><div class="small text-muted">officer@campus.edu</div><span class="badge text-bg-success mt-2">Active default</span></div></div></div>
+                        <div class="card-header"><h2 class="h5 mb-1">Routing flow</h2><p class="small text-muted mb-0">A simple handoff keeps ownership clear.</p></div>
+                        <div class="card-body"><div class="d-flex flex-column gap-3"><div class="d-flex align-items-center gap-3"><span class="brand-mark"><i class="bi bi-shield-check"></i></span><div><strong>1. Administrator</strong><div class="small text-muted">Routes the case to a department</div></div></div><div class="d-flex align-items-center gap-3"><span class="brand-mark"><i class="bi bi-diagram-3"></i></span><div><strong>2. Department manager</strong><div class="small text-muted">Assigns it to an officer</div></div></div><div class="d-flex align-items-center gap-3"><span class="brand-mark"><i class="bi bi-person-badge"></i></span><div><strong>3. Officer</strong><div class="small text-muted">Opens assigned cases and updates status</div></div></div></div></div>
                     </section>
                     <section class="card">
                         <div class="card-header"><h2 class="h5 mb-1">Create role account</h2><p class="small text-muted mb-0">Provision another department or officer account when needed.</p></div>
