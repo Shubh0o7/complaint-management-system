@@ -64,6 +64,31 @@ if ($seedCheck && $seedCheck->num_rows === 0) {
     }
 }
 
+// Fallback for installations where the first prepared seed ran before all
+// department records were available. This version uses direct static queries
+// and remains idempotent through the system-settings marker and subject check.
+$seedCheckV2 = $conn->query("SELECT setting_value FROM system_settings WHERE setting_key = 'demo_cases_seeded_v2' LIMIT 1");
+if ($seedCheckV2 && $seedCheckV2->num_rows === 0) {
+    $demoSeedHash = '$2y$10$MKYI3XkThqoJujeEMhMJ6OcdT1f2HQzV2nfa3jiiEFVCajhb.p7J.';
+    $conn->query("INSERT IGNORE INTO users (full_name, email, password, role, is_active) VALUES ('Demo Student', 'demo.student@campus.edu', '$demoSeedHash', 'user', 1)");
+    $demoCases = [
+        ['Wi-Fi access is unstable in the library', 'IT Support', 'High', 'The library connection drops several times during study hours.', 'Pending', 'Information Technology'],
+        ['Water dispenser requires maintenance', 'Infrastructure', 'Medium', 'The dispenser near the north block is not cooling water.', 'In Progress', 'Infrastructure'],
+        ['Request for examination timetable clarification', 'Academic', 'Medium', 'Please clarify the room allocation for the upcoming assessment.', 'Resolved', 'Academic Affairs'],
+        ['Hostel study room lighting issue', 'Hostel', 'Low', 'Two lights in the common study room are not working.', 'Pending', 'Student Affairs'],
+    ];
+    foreach ($demoCases as [$subject, $category, $priority, $description, $status, $department]) {
+        $subjectSql = $conn->real_escape_string($subject);
+        $categorySql = $conn->real_escape_string($category);
+        $prioritySql = $conn->real_escape_string($priority);
+        $descriptionSql = $conn->real_escape_string($description);
+        $statusSql = $conn->real_escape_string($status);
+        $departmentSql = $conn->real_escape_string($department);
+        $conn->query("INSERT INTO complaints (user_id, department_id, officer_id, subject, category, priority, description, status, admin_remarks) SELECT u.id, d.id, o.id, '$subjectSql', '$categorySql', '$prioritySql', '$descriptionSql', '$statusSql', 'Demo case seeded for presentation' FROM users u JOIN departments d JOIN users o ON o.email = 'officer@campus.edu' AND o.role = 'officer' WHERE u.email = 'demo.student@campus.edu' AND d.name = '$departmentSql' AND NOT EXISTS (SELECT 1 FROM complaints c WHERE c.user_id = u.id AND c.subject = '$subjectSql')");
+    }
+    $conn->query("INSERT INTO system_settings (setting_key, setting_value) VALUES ('demo_cases_seeded_v2', '1') ON DUPLICATE KEY UPDATE setting_value = '1'");
+}
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
