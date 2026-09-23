@@ -10,7 +10,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 5000);
     });
 
-    document.querySelectorAll('form[novalidate]').forEach(function (form) {
+    document.querySelectorAll('form').forEach(function (form) {
+        const hasValidationFields = form.matches('[novalidate], .needs-validation') || form.querySelector('[required], input[type="email"], input[type="password"]');
+        if (!hasValidationFields || form.dataset.validationBound === '1') return;
+        form.dataset.validationBound = '1';
         form.addEventListener('submit', function (event) {
             if (!form.checkValidity()) {
                 event.preventDefault();
@@ -34,6 +37,9 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Resizable desktop sidebar: drag the edge or use the arrow keys on the handle.
+    // Resolve the element before any state is applied. The previous order caused a
+    // temporal-dead-zone error and stopped all sidebar controls from initializing.
+    const sidebar = document.getElementById('primary-navigation');
     const resizeHandle = document.querySelector('[data-sidebar-resize]');
     const root = document.documentElement;
     const sidebarMin = 220;
@@ -102,7 +108,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Mobile sidebar: close on navigation, backdrop click, Escape, or viewport resize.
-    const sidebar = document.getElementById('primary-navigation');
     const menuButton = document.querySelector('[data-sidebar-toggle]');
     const backdrop = document.querySelector('[data-sidebar-close]');
     const setSidebar = function (open) {

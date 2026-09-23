@@ -162,6 +162,6 @@ foreach ($complaints as $case) if (empty($case['department_id'])) $pendingCount+
     </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="assets/js/script.js"></script>
+<script src="assets/js/script.js?v=sidebar-validation-20260923-1"></script>
 </body>
 </html>
