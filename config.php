@@ -71,7 +71,7 @@ $seedCheckV2 = $conn->query("SELECT COUNT(*) AS cnt FROM complaints WHERE subjec
 $seededCaseCount = (int) ($seedCheckV2?->fetch_assoc()['cnt'] ?? 0);
 if ($seededCaseCount < 4) {
     $demoSeedHash = '$2y$10$MKYI3XkThqoJujeEMhMJ6OcdT1f2HQzV2nfa3jiiEFVCajhb.p7J.';
-    $conn->query("INSERT IGNORE INTO users (full_name, email, password, role, is_active) VALUES ('Demo Student', 'demo.student@campus.edu', '$demoSeedHash', 'user', 1)");
+    $conn->query("INSERT INTO users (full_name, email, password, role, is_active) VALUES ('Demo Student', 'demo.student@campus.edu', '$demoSeedHash', 'user', 1) ON DUPLICATE KEY UPDATE id = LAST_INSERT_ID(id), is_active = 1");
     $demoCases = [
         ['Wi-Fi access is unstable in the library', 'IT Support', 'High', 'The library connection drops several times during study hours.', 'Pending', 'Information Technology'],
         ['Water dispenser requires maintenance', 'Infrastructure', 'Medium', 'The dispenser near the north block is not cooling water.', 'In Progress', 'Infrastructure'],
@@ -85,7 +85,7 @@ if ($seededCaseCount < 4) {
         $descriptionSql = $conn->real_escape_string($description);
         $statusSql = $conn->real_escape_string($status);
         $departmentSql = $conn->real_escape_string($department);
-        $conn->query("INSERT INTO complaints (user_id, department_id, officer_id, subject, category, priority, description, status, admin_remarks) SELECT u.id, d.id, o.id, '$subjectSql', '$categorySql', '$prioritySql', '$descriptionSql', '$statusSql', 'Demo case seeded for presentation' FROM users u JOIN departments d JOIN users o ON o.email = 'officer@campus.edu' AND o.role = 'officer' WHERE u.email = 'demo.student@campus.edu' AND d.name = '$departmentSql' AND NOT EXISTS (SELECT 1 FROM complaints c WHERE c.user_id = u.id AND c.subject = '$subjectSql')");
+        $conn->query("INSERT INTO complaints (user_id, department_id, officer_id, subject, category, priority, description, status, admin_remarks) SELECT u.id, (SELECT d.id FROM departments d WHERE d.name = '$departmentSql' LIMIT 1), (SELECT o.id FROM users o WHERE o.email = 'officer@campus.edu' AND o.role = 'officer' LIMIT 1), '$subjectSql', '$categorySql', '$prioritySql', '$descriptionSql', '$statusSql', 'Demo case seeded for presentation' FROM users u WHERE u.email = 'demo.student@campus.edu' AND NOT EXISTS (SELECT 1 FROM complaints c WHERE c.user_id = u.id AND c.subject = '$subjectSql')");
     }
     $conn->query("INSERT INTO system_settings (setting_key, setting_value) VALUES ('demo_cases_seeded_v2', '1') ON DUPLICATE KEY UPDATE setting_value = '1'");
 }
