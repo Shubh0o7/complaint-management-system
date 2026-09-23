@@ -52,10 +52,11 @@ if ($seedCheck && $seedCheck->num_rows === 0) {
             ['Academic', 'Request for examination timetable clarification', 'Medium', 'Please clarify the room allocation for the upcoming assessment.', 'Academic Affairs', 'Resolved'],
             ['Hostel', 'Hostel study room lighting issue', 'Low', 'Two lights in the common study room are not working.', 'Student Affairs', 'Pending'],
         ];
-        $caseInsert = $conn->prepare("INSERT INTO complaints (user_id, department_id, officer_id, subject, category, priority, description, status, admin_remarks) SELECT ?, d.id, NULLIF(?, 0), ?, ?, ?, ?, ?, 'Demo case seeded for presentation' FROM departments d WHERE d.name = ? AND NOT EXISTS (SELECT 1 FROM complaints c WHERE c.subject = ? AND c.user_id = ?)");
+        $caseInsert = $conn->prepare("INSERT INTO complaints (user_id, department_id, officer_id, reference_no, subject, category, priority, description, status, admin_remarks) SELECT ?, d.id, NULLIF(?, 0), ?, ?, ?, ?, ?, ?, 'Demo case seeded for presentation' FROM departments d WHERE d.name = ? AND NOT EXISTS (SELECT 1 FROM complaints c WHERE c.subject = ? AND c.user_id = ?)");
         if ($caseInsert && $demoUserId > 0) {
-            foreach ($cases as [$category, $subject, $priority, $description, $department, $status]) {
-                $caseInsert->bind_param('iisssssssi', $demoUserId, $officerId, $subject, $category, $priority, $description, $status, $department, $subject, $demoUserId);
+            foreach ($cases as $index => [$category, $subject, $priority, $description, $department, $status]) {
+                $reference = 'DEMO-' . str_pad((string) ($index + 1), 3, '0', STR_PAD_LEFT);
+                $caseInsert->bind_param('iissssssssi', $demoUserId, $officerId, $reference, $subject, $category, $priority, $description, $status, $department, $subject, $demoUserId);
                 $caseInsert->execute();
             }
             $caseInsert->close();
@@ -85,7 +86,8 @@ if ($seededCaseCount < 4) {
         $descriptionSql = $conn->real_escape_string($description);
         $statusSql = $conn->real_escape_string($status);
         $departmentSql = $conn->real_escape_string($department);
-        $conn->query("INSERT INTO complaints (user_id, department_id, officer_id, subject, category, priority, description, status, admin_remarks) SELECT u.id, (SELECT d.id FROM departments d WHERE d.name = '$departmentSql' LIMIT 1), (SELECT o.id FROM users o WHERE o.email = 'officer@campus.edu' AND o.role = 'officer' LIMIT 1), '$subjectSql', '$categorySql', '$prioritySql', '$descriptionSql', '$statusSql', 'Demo case seeded for presentation' FROM users u WHERE u.email = 'demo.student@campus.edu' AND NOT EXISTS (SELECT 1 FROM complaints c WHERE c.user_id = u.id AND c.subject = '$subjectSql')");
+        $referenceSql = 'DEMO-' . str_pad((string) (array_search($subject, array_column($demoCases, 0), true) + 1), 3, '0', STR_PAD_LEFT);
+        $conn->query("INSERT INTO complaints (user_id, department_id, officer_id, reference_no, subject, category, priority, description, status, admin_remarks) SELECT u.id, (SELECT d.id FROM departments d WHERE d.name = '$departmentSql' LIMIT 1), (SELECT o.id FROM users o WHERE o.email = 'officer@campus.edu' LIMIT 1), '$referenceSql', '$subjectSql', '$categorySql', '$prioritySql', '$descriptionSql', '$statusSql', 'Demo case seeded for presentation' FROM users u WHERE u.email = 'demo.student@campus.edu' AND NOT EXISTS (SELECT 1 FROM complaints c WHERE c.user_id = u.id AND c.subject = '$subjectSql')");
     }
     $conn->query("INSERT INTO system_settings (setting_key, setting_value) VALUES ('demo_cases_seeded_v2', '1') ON DUPLICATE KEY UPDATE setting_value = '1'");
 }

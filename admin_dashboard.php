@@ -10,14 +10,14 @@ if ($demoCount < 4) {
     $demoHash = '$2y$10$MKYI3XkThqoJujeEMhMJ6OcdT1f2HQzV2nfa3jiiEFVCajhb.p7J.';
     $conn->query("INSERT INTO users (full_name, email, password, role, is_active) VALUES ('Demo Student', 'demo.student@campus.edu', '$demoHash', 'user', 1) ON DUPLICATE KEY UPDATE is_active = 1");
     $demoCases = [
-        ['Wi-Fi access is unstable in the library', 'IT Support', 'High', 'The library connection drops several times during study hours.', 'Pending', 'Information Technology'],
-        ['Water dispenser requires maintenance', 'Infrastructure', 'Medium', 'The dispenser near the north block is not cooling water.', 'In Progress', 'Infrastructure'],
-        ['Request for examination timetable clarification', 'Academic', 'Medium', 'Please clarify the room allocation for the upcoming assessment.', 'Resolved', 'Academic Affairs'],
-        ['Hostel study room lighting issue', 'Hostel', 'Low', 'Two lights in the common study room are not working.', 'Pending', 'Student Affairs'],
+        ['DEMO-001', 'Wi-Fi access is unstable in the library', 'IT Support', 'High', 'The library connection drops several times during study hours.', 'Pending', 'Information Technology'],
+        ['DEMO-002', 'Water dispenser requires maintenance', 'Infrastructure', 'Medium', 'The dispenser near the north block is not cooling water.', 'In Progress', 'Infrastructure'],
+        ['DEMO-003', 'Request for examination timetable clarification', 'Academic', 'Medium', 'Please clarify the room allocation for the upcoming assessment.', 'Resolved', 'Academic Affairs'],
+        ['DEMO-004', 'Hostel study room lighting issue', 'Hostel', 'Low', 'Two lights in the common study room are not working.', 'Pending', 'Student Affairs'],
     ];
-    foreach ($demoCases as [$subject, $category, $priority, $description, $status, $department]) {
+    foreach ($demoCases as [$reference, $subject, $category, $priority, $description, $status, $department]) {
         $q = fn(string $v): string => $conn->real_escape_string($v);
-        $conn->query("INSERT INTO complaints (user_id, department_id, officer_id, subject, category, priority, description, status, admin_remarks) SELECT u.id, (SELECT id FROM departments WHERE name = '" . $q($department) . "' LIMIT 1), (SELECT id FROM users WHERE email = 'officer@campus.edu' LIMIT 1), '" . $q($subject) . "', '" . $q($category) . "', '" . $q($priority) . "', '" . $q($description) . "', '" . $q($status) . "', 'Demo case seeded for presentation' FROM users u WHERE u.email = 'demo.student@campus.edu' AND NOT EXISTS (SELECT 1 FROM complaints c WHERE c.admin_remarks = 'Demo case seeded for presentation' AND c.subject = '" . $q($subject) . "')");
+        $conn->query("INSERT INTO complaints (user_id, department_id, officer_id, reference_no, subject, category, priority, description, status, admin_remarks) SELECT u.id, (SELECT id FROM departments WHERE name = '" . $q($department) . "' LIMIT 1), (SELECT id FROM users WHERE email = 'officer@campus.edu' LIMIT 1), '" . $q($reference) . "', '" . $q($subject) . "', '" . $q($category) . "', '" . $q($priority) . "', '" . $q($description) . "', '" . $q($status) . "', 'Demo case seeded for presentation' FROM users u WHERE u.email = 'demo.student@campus.edu' AND NOT EXISTS (SELECT 1 FROM complaints c WHERE c.admin_remarks = 'Demo case seeded for presentation' AND c.subject = '" . $q($subject) . "')");
     }
 }
 

@@ -367,26 +367,26 @@ INSERT INTO `users` (`full_name`, `email`, `password`, `role`, `is_active`) VALU
 ('Demo Student', 'demo.student@campus.edu', '$2y$10$MKYI3XkThqoJujeEMhMJ6OcdT1f2HQzV2nfa3jiiEFVCajhb.p7J.', 'user', 1)
 ON DUPLICATE KEY UPDATE `full_name` = VALUES(`full_name`), `role` = VALUES(`role`), `is_active` = VALUES(`is_active`);
 
-INSERT INTO `complaints` (`user_id`, `department_id`, `officer_id`, `subject`, `category`, `priority`, `description`, `status`, `admin_remarks`)
-SELECT u.id, d.id, o.id, 'Wi-Fi access is unstable in the library', 'IT Support', 'High', 'The library connection drops several times during study hours.', 'Pending', 'Demo case seeded for presentation'
+INSERT INTO `complaints` (`user_id`, `department_id`, `officer_id`, `reference_no`, `subject`, `category`, `priority`, `description`, `status`, `admin_remarks`)
+SELECT u.id, d.id, o.id, 'DEMO-001', 'Wi-Fi access is unstable in the library', 'IT Support', 'High', 'The library connection drops several times during study hours.', 'Pending', 'Demo case seeded for presentation'
 FROM users u JOIN departments d JOIN users o ON o.email = 'officer@campus.edu' AND o.role = 'officer'
 WHERE u.email = 'demo.student@campus.edu' AND d.name = 'Information Technology'
   AND NOT EXISTS (SELECT 1 FROM complaints c WHERE c.user_id = u.id AND c.subject = 'Wi-Fi access is unstable in the library');
 
-INSERT INTO `complaints` (`user_id`, `department_id`, `officer_id`, `subject`, `category`, `priority`, `description`, `status`, `admin_remarks`)
-SELECT u.id, d.id, o.id, 'Water dispenser requires maintenance', 'Infrastructure', 'Medium', 'The dispenser near the north block is not cooling water.', 'In Progress', 'Demo case seeded for presentation'
+INSERT INTO `complaints` (`user_id`, `department_id`, `officer_id`, `reference_no`, `subject`, `category`, `priority`, `description`, `status`, `admin_remarks`)
+SELECT u.id, d.id, o.id, 'DEMO-002', 'Water dispenser requires maintenance', 'Infrastructure', 'Medium', 'The dispenser near the north block is not cooling water.', 'In Progress', 'Demo case seeded for presentation'
 FROM users u JOIN departments d JOIN users o ON o.email = 'officer@campus.edu' AND o.role = 'officer'
 WHERE u.email = 'demo.student@campus.edu' AND d.name = 'Infrastructure'
   AND NOT EXISTS (SELECT 1 FROM complaints c WHERE c.user_id = u.id AND c.subject = 'Water dispenser requires maintenance');
 
-INSERT INTO `complaints` (`user_id`, `department_id`, `officer_id`, `subject`, `category`, `priority`, `description`, `status`, `admin_remarks`)
-SELECT u.id, d.id, o.id, 'Request for examination timetable clarification', 'Academic', 'Medium', 'Please clarify the room allocation for the upcoming assessment.', 'Resolved', 'Demo case seeded for presentation'
+INSERT INTO `complaints` (`user_id`, `department_id`, `officer_id`, `reference_no`, `subject`, `category`, `priority`, `description`, `status`, `admin_remarks`)
+SELECT u.id, d.id, o.id, 'DEMO-003', 'Request for examination timetable clarification', 'Academic', 'Medium', 'Please clarify the room allocation for the upcoming assessment.', 'Resolved', 'Demo case seeded for presentation'
 FROM users u JOIN departments d JOIN users o ON o.email = 'officer@campus.edu' AND o.role = 'officer'
 WHERE u.email = 'demo.student@campus.edu' AND d.name = 'Academic Affairs'
   AND NOT EXISTS (SELECT 1 FROM complaints c WHERE c.user_id = u.id AND c.subject = 'Request for examination timetable clarification');
 
-INSERT INTO `complaints` (`user_id`, `department_id`, `officer_id`, `subject`, `category`, `priority`, `description`, `status`, `admin_remarks`)
-SELECT u.id, d.id, o.id, 'Hostel study room lighting issue', 'Hostel', 'Low', 'Two lights in the common study room are not working.', 'Pending', 'Demo case seeded for presentation'
+INSERT INTO `complaints` (`user_id`, `department_id`, `officer_id`, `reference_no`, `subject`, `category`, `priority`, `description`, `status`, `admin_remarks`)
+SELECT u.id, d.id, o.id, 'DEMO-004', 'Hostel study room lighting issue', 'Hostel', 'Low', 'Two lights in the common study room are not working.', 'Pending', 'Demo case seeded for presentation'
 FROM users u JOIN departments d JOIN users o ON o.email = 'officer@campus.edu' AND o.role = 'officer'
 WHERE u.email = 'demo.student@campus.edu' AND d.name = 'Student Affairs'
   AND NOT EXISTS (SELECT 1 FROM complaints c WHERE c.user_id = u.id AND c.subject = 'Hostel study room lighting issue');
