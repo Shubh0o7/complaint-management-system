@@ -67,8 +67,9 @@ if ($seedCheck && $seedCheck->num_rows === 0) {
 // Fallback for installations where the first prepared seed ran before all
 // department records were available. This version uses direct static queries
 // and remains idempotent through the system-settings marker and subject check.
-$seedCheckV2 = $conn->query("SELECT setting_value FROM system_settings WHERE setting_key = 'demo_cases_seeded_v2' LIMIT 1");
-if ($seedCheckV2 && $seedCheckV2->num_rows === 0) {
+$seedCheckV2 = $conn->query("SELECT COUNT(*) AS cnt FROM complaints WHERE subject IN ('Wi-Fi access is unstable in the library', 'Water dispenser requires maintenance', 'Request for examination timetable clarification', 'Hostel study room lighting issue')");
+$seededCaseCount = (int) ($seedCheckV2?->fetch_assoc()['cnt'] ?? 0);
+if ($seededCaseCount < 4) {
     $demoSeedHash = '$2y$10$MKYI3XkThqoJujeEMhMJ6OcdT1f2HQzV2nfa3jiiEFVCajhb.p7J.';
     $conn->query("INSERT IGNORE INTO users (full_name, email, password, role, is_active) VALUES ('Demo Student', 'demo.student@campus.edu', '$demoSeedHash', 'user', 1)");
     $demoCases = [
