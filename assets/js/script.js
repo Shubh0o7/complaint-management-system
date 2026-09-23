@@ -67,7 +67,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         if (persist) window.localStorage.setItem('campusresolve-sidebar-collapsed', collapsed ? '1' : '0');
     };
-    const initiallyCollapsed = window.localStorage.getItem('campusresolve-sidebar-collapsed') === '1';
+    // Keep the original full-width layout on each page load. A previously saved
+    // collapsed state could unexpectedly change the layout on pages that have
+    // only just started loading the shared script.
+    const initiallyCollapsed = false;
     setSidebarCollapsed(initiallyCollapsed, false);
     if (collapseButton) collapseButton.addEventListener('click', function () {
         setSidebarCollapsed(!sidebar.classList.contains('collapsed'), true);
